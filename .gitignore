@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+.next/
+*.tsbuildinfo
+.turbo/
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+
+# IDE / OS
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# Python / backend
+apps/backend/.venv/
+apps/backend/__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+
+# Uploaded files (storage local adapter, desarrollo)
+storage/uploads/

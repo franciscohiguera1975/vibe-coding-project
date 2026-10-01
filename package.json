@@ -1,0 +1,19 @@
+{
+  "name": "vibe-coding-platform",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Plataforma de enseñanza práctica de Vibe Coding con FastAPI, IA e IA Agéntica",
+  "workspaces": [
+    "apps/frontend",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace apps/frontend",
+    "build:frontend": "npm run build --workspace apps/frontend",
+    "lint:frontend": "npm run lint --workspace apps/frontend",
+    "test:frontend": "npm run test --workspace apps/frontend"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
