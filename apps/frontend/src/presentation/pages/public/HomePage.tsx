@@ -68,14 +68,14 @@ const STEPS = [
 const INSTRUCTORS = [
   {
     photo: instructor1,
-    name: 'Francisco Javier Higuera González',
+    name: 'Mtr. Francisco Javier Higuera González',
     role: 'Docente-Investigador',
     org: 'Universidad UTE',
     logo: logoUte,
   },
   {
     photo: instructor2,
-    name: 'Carlos Byron Bermeo León',
+    name: 'Mgs. Carlos Byron Bermeo León',
     role: 'Facultad de Ciencias Sociales, Educación y Humanidades · Depto. de Comunicación y Artes',
     org: 'Universidad UTPL',
     logo: logoUtpl,
@@ -89,7 +89,7 @@ const INSTRUCTORS = [
   },
   {
     photo: instructor4,
-    name: 'José Francisco Silva Garcés',
+    name: 'Mgs. José Francisco Silva Garcés',
     role: 'Docente-Investigador',
     org: 'Universidad UTE',
     logo: logoUte,
