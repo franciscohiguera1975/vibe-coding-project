@@ -52,7 +52,7 @@ cualquier despliegue real** — son solo para desarrollo/evaluación local.
 
 ```bash
 make test               # backend (pytest) + frontend (vitest)
-curl http://localhost:3000/api/health   # {"status": "ok"}
+curl http://localhost:3000/health   # {"status": "ok"}
 ```
 
 Si algo falla, ver [`troubleshooting.md`](troubleshooting.md) para los problemas

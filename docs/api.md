@@ -11,9 +11,9 @@ declara el permiso que requiere vía `require_permission(...)` (ver
 
 ## Salud
 
-| Método | Ruta | Auth |
-|---|---|---|
-| GET | `/api/health` | pública |
+`GET /health` (sin el prefijo `/api` — pensado para checks de infraestructura
+que no deberían depender de que la API esté versionada bajo `/api`): pública,
+responde `{"status": "ok"}`.
 
 ## Autenticación (`routers/auth.py`)
 
