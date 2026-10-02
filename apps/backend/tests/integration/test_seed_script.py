@@ -27,7 +27,7 @@ def test_seed_is_idempotent_and_creates_expected_data():
         session = uow._session
         assert session.scalar(select(func.count()).select_from(UserModel)) == 1
         assert session.scalar(select(func.count()).select_from(RoleModel)) == 4
-        assert session.scalar(select(func.count()).select_from(PermissionModel)) == 12
+        assert session.scalar(select(func.count()).select_from(PermissionModel)) == 13
         assert session.scalar(select(func.count()).select_from(PracticeModel)) == 4
 
         admin = uow.users.get_by_email("admin@vibecoding-platform.dev")

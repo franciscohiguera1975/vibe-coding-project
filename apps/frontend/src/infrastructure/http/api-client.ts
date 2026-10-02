@@ -20,14 +20,30 @@ function buildQuery(params?: Record<string, unknown>): string {
   return `?${search.toString()}`;
 }
 
+/** Campos JSONB de contenido libre definido por quien autora la practica (no son
+ * nombres de esquema de la API): sus claves internas (p.ej. `speed_kmh`) deben
+ * preservarse tal cual, nunca convertirse a camelCase/snake_case. */
+const OPAQUE_KEYS = new Set([
+  'content',
+  'evaluation',
+  'aiConfiguration',
+  'ai_configuration',
+  'embeddingConfiguration',
+  'embedding_configuration',
+  'metadata',
+  'details',
+  'value',
+  'payload',
+]);
+
 function toCamelCase(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(toCamelCase);
   if (value !== null && typeof value === 'object') {
     return Object.fromEntries(
-      Object.entries(value as Record<string, unknown>).map(([key, v]) => [
-        key.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase()),
-        toCamelCase(v),
-      ]),
+      Object.entries(value as Record<string, unknown>).map(([key, v]) => {
+        const camelKey = key.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase());
+        return [camelKey, OPAQUE_KEYS.has(camelKey) ? v : toCamelCase(v)];
+      }),
     );
   }
   return value;
@@ -37,10 +53,10 @@ function toSnakeCase(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(toSnakeCase);
   if (value !== null && typeof value === 'object') {
     return Object.fromEntries(
-      Object.entries(value as Record<string, unknown>).map(([key, v]) => [
-        key.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`),
-        toSnakeCase(v),
-      ]),
+      Object.entries(value as Record<string, unknown>).map(([key, v]) => {
+        const snakeKey = key.replace(/[A-Z]/g, (c) => `_${c.toLowerCase()}`);
+        return [snakeKey, OPAQUE_KEYS.has(key) ? v : toSnakeCase(v)];
+      }),
     );
   }
   return value;
@@ -59,6 +75,10 @@ export class ApiClient implements HttpClient {
 
   post<T>(path: string, body?: unknown): Promise<T> {
     return this.request<T>('POST', path, body);
+  }
+
+  put<T>(path: string, body?: unknown): Promise<T> {
+    return this.request<T>('PUT', path, body);
   }
 
   patch<T>(path: string, body?: unknown): Promise<T> {

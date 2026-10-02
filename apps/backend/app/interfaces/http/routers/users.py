@@ -1,22 +1,37 @@
 import uuid
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 
 from app.application.dto.user_dto import CreateUserInput
 from app.application.use_cases.users.assign_role import AssignRoleUseCase
 from app.application.use_cases.users.create_user import CreateUserUseCase
+from app.application.use_cases.users.list_users import ListUsersUseCase
 from app.domain import permissions as perm
 from app.domain.entities.identity import User
+from app.domain.value_objects.pagination import PageRequest
 from app.interfaces.http.controllers.auth_controller import user_to_public
+from app.interfaces.http.controllers.user_controller import user_page_to_response
+from app.interfaces.http.dependencies.admin_use_cases import get_list_users_use_case
 from app.interfaces.http.dependencies.auth import require_permission
 from app.interfaces.http.dependencies.use_cases import (
     get_assign_role_use_case,
     get_create_user_use_case,
 )
 from app.interfaces.http.schemas.auth import UserPublic
-from app.interfaces.http.schemas.user import AssignRoleRequest, CreateUserRequest
+from app.interfaces.http.schemas.user import AssignRoleRequest, CreateUserRequest, UserListResponse
 
 router = APIRouter(prefix="/users", tags=["users"])
+
+
+@router.get("", response_model=UserListResponse)
+def list_users(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=20, ge=1, le=100),
+    actor: User = Depends(require_permission(perm.USER_READ)),
+    use_case: ListUsersUseCase = Depends(get_list_users_use_case),
+) -> UserListResponse:
+    result = use_case.execute(actor=actor, page_request=PageRequest(page=page, page_size=page_size))
+    return user_page_to_response(result)
 
 
 @router.post("", response_model=UserPublic, status_code=201)

@@ -3,9 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.infrastructure.config import get_settings
 from app.interfaces.http.exception_handlers import register_exception_handlers
+from app.interfaces.http.routers.audit import router as audit_router
 from app.interfaces.http.routers.auth import router as auth_router
+from app.interfaces.http.routers.catalog import router as catalog_router
+from app.interfaces.http.routers.configurations import router as configurations_router
 from app.interfaces.http.routers.health import router as health_router
 from app.interfaces.http.routers.practices import router as practices_router
+from app.interfaces.http.routers.roles import permissions_router
 from app.interfaces.http.routers.roles import router as roles_router
 from app.interfaces.http.routers.users import router as users_router
 
@@ -31,4 +35,8 @@ app.include_router(health_router)
 app.include_router(auth_router, prefix="/api")
 app.include_router(users_router, prefix="/api")
 app.include_router(roles_router, prefix="/api")
+app.include_router(permissions_router, prefix="/api")
 app.include_router(practices_router, prefix="/api")
+app.include_router(catalog_router, prefix="/api")
+app.include_router(configurations_router, prefix="/api")
+app.include_router(audit_router, prefix="/api")

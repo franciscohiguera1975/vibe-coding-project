@@ -2,6 +2,7 @@ import uuid
 from collections.abc import Callable
 
 from app.application.ports.unit_of_work import UnitOfWork
+from app.application.services import audit
 from app.domain import permissions as perm
 from app.domain.entities.identity import User
 from app.domain.exceptions import NotFoundError, PermissionDeniedError
@@ -30,5 +31,13 @@ class AssignRoleUseCase:
                 user.roles.append(role)
 
             updated = uow.users.update(user)
+            audit.record(
+                uow,
+                actor=actor,
+                action="user.assign_role",
+                entity_type="User",
+                entity_id=str(user.id),
+                metadata={"role_name": role_name},
+            )
             uow.commit()
             return updated

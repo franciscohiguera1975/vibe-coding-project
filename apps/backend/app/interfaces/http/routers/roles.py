@@ -10,7 +10,7 @@ from app.interfaces.http.controllers.role_controller import role_to_public
 from app.interfaces.http.dependencies.auth import require_permission
 from app.interfaces.http.dependencies.unit_of_work import get_uow_factory
 from app.interfaces.http.dependencies.use_cases import get_assign_permission_use_case
-from app.interfaces.http.schemas.role import AssignPermissionRequest, RolePublic
+from app.interfaces.http.schemas.role import AssignPermissionRequest, PermissionPublic, RolePublic
 
 router = APIRouter(prefix="/roles", tags=["roles"])
 
@@ -36,3 +36,16 @@ def assign_permission(
         actor=actor, role_name=role_name, permission_code=payload.permission_code
     )
     return role_to_public(role)
+
+
+permissions_router = APIRouter(prefix="/permissions", tags=["roles"])
+
+
+@permissions_router.get("", response_model=list[PermissionPublic])
+def list_permissions(
+    actor: User = Depends(require_permission(perm.USER_READ)),
+    uow_factory: Callable[[], UnitOfWork] = Depends(get_uow_factory),
+) -> list[PermissionPublic]:
+    with uow_factory() as uow:
+        permissions = uow.permissions.list_all()
+    return [PermissionPublic(code=p.code, description=p.description) for p in permissions]

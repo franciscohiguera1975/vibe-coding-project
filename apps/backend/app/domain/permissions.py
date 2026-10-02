@@ -18,6 +18,8 @@ CONFIGURATION_UPDATE = "configuration:update"
 
 ROLE_ASSIGN_PERMISSION = "role:assign_permission"
 
+AUDIT_READ = "audit:read"
+
 ALL_PERMISSIONS: dict[str, str] = {
     PRACTICE_CREATE: "Crear practicas",
     PRACTICE_READ: "Leer practicas",
@@ -31,6 +33,7 @@ ALL_PERMISSIONS: dict[str, str] = {
     CONFIGURATION_READ: "Leer configuraciones",
     CONFIGURATION_UPDATE: "Actualizar configuraciones",
     ROLE_ASSIGN_PERMISSION: "Asignar permisos a un rol",
+    AUDIT_READ: "Leer el registro de auditoría",
 }
 
 # Roles iniciales sugeridos (Prompt Maestro §15) -> permisos que incluyen.

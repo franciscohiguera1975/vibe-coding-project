@@ -16,7 +16,7 @@ from app.domain.repositories.progress_repository import (
     StudentPracticeAttemptRepository,
     StudentProgressRepository,
 )
-from app.domain.repositories.system_repository import ConfigurationRepository
+from app.domain.repositories.system_repository import AuditLogRepository, ConfigurationRepository
 
 
 class UnitOfWork(Protocol):
@@ -35,6 +35,7 @@ class UnitOfWork(Protocol):
     practice_evaluations: PracticeEvaluationRepository
     student_progress: StudentProgressRepository
     configurations: ConfigurationRepository
+    audit_logs: AuditLogRepository
 
     def __enter__(self) -> "UnitOfWork": ...
 

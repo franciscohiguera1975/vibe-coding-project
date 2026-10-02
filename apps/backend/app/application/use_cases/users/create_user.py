@@ -3,6 +3,7 @@ from collections.abc import Callable
 from app.application.dto.user_dto import CreateUserInput
 from app.application.ports.security import PasswordHasher
 from app.application.ports.unit_of_work import UnitOfWork
+from app.application.services import audit
 from app.domain import permissions as perm
 from app.domain.entities.identity import User
 from app.domain.exceptions import ConflictError, NotFoundError, PermissionDeniedError
@@ -44,5 +45,13 @@ class CreateUserUseCase:
                 roles=roles,
             )
             created = uow.users.add(new_user)
+            audit.record(
+                uow,
+                actor=actor,
+                action="user.create",
+                entity_type="User",
+                entity_id=str(created.id),
+                metadata={"email": email, "role_names": data.role_names},
+            )
             uow.commit()
             return created

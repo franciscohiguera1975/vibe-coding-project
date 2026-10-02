@@ -2,6 +2,7 @@ import uuid
 from collections.abc import Callable
 
 from app.application.ports.unit_of_work import UnitOfWork
+from app.application.services import audit
 from app.domain import permissions as perm
 from app.domain.entities.identity import User
 from app.domain.entities.practice import Practice, PracticeStatus
@@ -30,5 +31,13 @@ class PublishPracticeUseCase:
 
             practice.status = PracticeStatus.PUBLISHED
             updated = uow.practices.update(practice)
+            audit.record(
+                uow,
+                actor=actor,
+                action="practice.publish",
+                entity_type="Practice",
+                entity_id=str(practice.id),
+                metadata={"slug": practice.slug},
+            )
             uow.commit()
             return updated

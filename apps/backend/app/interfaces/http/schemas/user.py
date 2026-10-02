@@ -14,4 +14,12 @@ class AssignRoleRequest(BaseModel):
     role_name: str
 
 
-__all__ = ["CreateUserRequest", "AssignRoleRequest", "UserPublic"]
+class UserListResponse(BaseModel):
+    items: list[UserPublic]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+
+
+__all__ = ["CreateUserRequest", "AssignRoleRequest", "UserListResponse", "UserPublic"]

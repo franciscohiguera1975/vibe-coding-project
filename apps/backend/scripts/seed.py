@@ -65,13 +65,19 @@ def seed_permissions(uow) -> dict[str, Permission]:
 
 
 def seed_roles(uow, permissions_by_code: dict[str, Permission]) -> dict[str, Role]:
+    """Crea los roles faltantes y sincroniza los permisos de ROLE_DEFINITIONS en los ya
+    existentes (re-ejecutar el seed despues de agregar un permiso nuevo debe propagarlo)."""
     result = {}
     for role_name, codes in perm.ROLE_DEFINITIONS.items():
+        role_permissions = [permissions_by_code[c] for c in codes]
         existing = uow.roles.get_by_name(role_name)
         if existing:
+            existing_codes = {p.code for p in existing.permissions}
+            if existing_codes != set(codes):
+                existing.permissions = role_permissions
+                existing = uow.roles.update(existing)
             result[role_name] = existing
             continue
-        role_permissions = [permissions_by_code[c] for c in codes]
         result[role_name] = uow.roles.add(
             Role(name=role_name, description=f"Rol {role_name}", permissions=role_permissions)
         )

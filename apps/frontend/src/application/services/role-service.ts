@@ -11,4 +11,8 @@ export class RoleService {
   assignPermission(roleName: string, permissionCode: string): Promise<Role> {
     return this.http.post<Role>(`/roles/${roleName}/permissions`, { permissionCode });
   }
+
+  listPermissions(): Promise<{ code: string; description: string }[]> {
+    return this.http.get<{ code: string; description: string }[]>('/permissions');
+  }
 }
