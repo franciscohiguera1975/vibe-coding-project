@@ -10,6 +10,12 @@ from app.infrastructure.database.repositories.practice_repository import (
     SqlAlchemyPracticeRepository,
     SqlAlchemyPracticeTagRepository,
 )
+from app.infrastructure.database.repositories.progress_repository import (
+    SqlAlchemyPracticeEvaluationRepository,
+    SqlAlchemyPracticeSubmissionRepository,
+    SqlAlchemyStudentPracticeAttemptRepository,
+    SqlAlchemyStudentProgressRepository,
+)
 from app.infrastructure.database.session import SessionLocal
 
 
@@ -29,6 +35,10 @@ class SqlAlchemyUnitOfWork:
         self.practices = SqlAlchemyPracticeRepository(self._session)
         self.practice_categories = SqlAlchemyPracticeCategoryRepository(self._session)
         self.practice_tags = SqlAlchemyPracticeTagRepository(self._session)
+        self.practice_attempts = SqlAlchemyStudentPracticeAttemptRepository(self._session)
+        self.practice_submissions = SqlAlchemyPracticeSubmissionRepository(self._session)
+        self.practice_evaluations = SqlAlchemyPracticeEvaluationRepository(self._session)
+        self.student_progress = SqlAlchemyStudentProgressRepository(self._session)
         return self
 
     def __exit__(self, exc_type: object, exc_value: object, traceback: object) -> None:

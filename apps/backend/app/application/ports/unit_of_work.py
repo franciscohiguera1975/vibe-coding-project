@@ -10,6 +10,12 @@ from app.domain.repositories.practice_repository import (
     PracticeRepository,
     PracticeTagRepository,
 )
+from app.domain.repositories.progress_repository import (
+    PracticeEvaluationRepository,
+    PracticeSubmissionRepository,
+    StudentPracticeAttemptRepository,
+    StudentProgressRepository,
+)
 
 
 class UnitOfWork(Protocol):
@@ -23,6 +29,10 @@ class UnitOfWork(Protocol):
     practices: PracticeRepository
     practice_categories: PracticeCategoryRepository
     practice_tags: PracticeTagRepository
+    practice_attempts: StudentPracticeAttemptRepository
+    practice_submissions: PracticeSubmissionRepository
+    practice_evaluations: PracticeEvaluationRepository
+    student_progress: StudentProgressRepository
 
     def __enter__(self) -> "UnitOfWork": ...
 

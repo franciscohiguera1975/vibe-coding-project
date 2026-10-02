@@ -3,7 +3,13 @@ import uuid
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session, selectinload
 
-from app.domain.entities.practice import Practice, PracticeCategory, PracticeTag
+from app.domain.entities.practice import (
+    Practice,
+    PracticeCategory,
+    PracticeDifficulty,
+    PracticeStatus,
+    PracticeTag,
+)
 from app.domain.repositories.practice_repository import PracticeFilters
 from app.domain.value_objects.pagination import Page, PageRequest
 from app.infrastructure.database.models.catalog import PracticeCategoryModel, PracticeTagModel
@@ -34,7 +40,7 @@ def _practice_to_domain(model: PracticeModel) -> Practice:
         objectives=list(model.objectives),
         instructions=model.instructions,
         category_id=model.category_id,
-        difficulty=model.difficulty.value,
+        difficulty=PracticeDifficulty(model.difficulty.value),
         estimated_time_minutes=model.estimated_time_minutes,
         technologies=list(model.technologies),
         tag_ids=[t.id for t in model.tags],
@@ -42,7 +48,7 @@ def _practice_to_domain(model: PracticeModel) -> Practice:
         evaluation=dict(model.evaluation),
         ai_configuration=dict(model.ai_configuration),
         embedding_configuration=dict(model.embedding_configuration),
-        status=model.status.value,
+        status=PracticeStatus(model.status.value),
         metadata=dict(model.practice_metadata),
         created_by_id=model.created_by_id,
         created_at=model.created_at,
