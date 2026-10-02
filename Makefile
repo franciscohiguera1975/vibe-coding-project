@@ -1,4 +1,4 @@
-.PHONY: help dev-backend dev-frontend install-backend install-frontend migrate seed test test-backend test-frontend lint lint-backend lint-frontend format docker-up docker-down deploy deploy-down
+.PHONY: help dev-backend dev-frontend stop-backend stop-frontend stop install-backend install-frontend migrate seed test test-backend test-frontend lint lint-backend lint-frontend format docker-up docker-down deploy deploy-down
 
 BACKEND_DIR = apps/backend
 VENV = $(BACKEND_DIR)/.venv
@@ -6,7 +6,7 @@ PY = $(VENV)/bin/python
 PIP = $(VENV)/bin/pip
 
 help:
-	@echo "Targets: install-backend install-frontend dev-backend dev-frontend migrate seed test lint format docker-up docker-down deploy deploy-down"
+	@echo "Targets: install-backend install-frontend dev-backend dev-frontend stop-backend stop-frontend stop migrate seed test lint format docker-up docker-down deploy deploy-down"
 
 $(VENV)/bin/activate:
 	python3 -m venv $(VENV)
@@ -23,6 +23,16 @@ dev-backend:
 
 dev-frontend:
 	npm run dev:frontend
+
+# dev-backend/dev-frontend corren en primer plano (Ctrl+C para detenerlos); estos
+# targets son para pararlos desde otra terminal cuando quedaron en segundo plano.
+stop-backend:
+	-fuser -k $${BACKEND_PORT:-3000}/tcp
+
+stop-frontend:
+	-fuser -k $${FRONTEND_PORT:-5173}/tcp
+
+stop: stop-backend stop-frontend
 
 migrate:
 	cd $(BACKEND_DIR) && .venv/bin/alembic upgrade head
