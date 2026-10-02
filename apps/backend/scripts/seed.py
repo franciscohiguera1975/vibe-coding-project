@@ -32,7 +32,7 @@ from app.domain.value_objects.slug import Slug  # noqa: E402
 from app.infrastructure.database.unit_of_work import SqlAlchemyUnitOfWork  # noqa: E402
 from app.infrastructure.security.password_hasher import BcryptPasswordHasher  # noqa: E402
 
-SEED_ADMIN_EMAIL = os.environ.get("SEED_ADMIN_EMAIL", "admin@vibecoding.local")
+SEED_ADMIN_EMAIL = os.environ.get("SEED_ADMIN_EMAIL", "admin@vibecoding-platform.dev")
 SEED_ADMIN_PASSWORD = os.environ.get("SEED_ADMIN_PASSWORD", "ChangeMe123!")
 
 CATEGORIES = [

@@ -30,7 +30,7 @@ def test_seed_is_idempotent_and_creates_expected_data():
         assert session.scalar(select(func.count()).select_from(PermissionModel)) == 12
         assert session.scalar(select(func.count()).select_from(PracticeModel)) == 4
 
-        admin = uow.users.get_by_email("admin@vibecoding.local")
+        admin = uow.users.get_by_email("admin@vibecoding-platform.dev")
         assert admin is not None
         assert admin.has_role("ADMIN")
 

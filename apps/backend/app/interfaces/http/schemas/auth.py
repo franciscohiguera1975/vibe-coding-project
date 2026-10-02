@@ -16,6 +16,7 @@ class UserPublic(BaseModel):
     full_name: str
     is_active: bool
     roles: list[str]
+    permissions: list[str]
 
 
 class TokenResponse(BaseModel):

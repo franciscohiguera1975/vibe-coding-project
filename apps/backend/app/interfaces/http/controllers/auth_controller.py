@@ -4,12 +4,14 @@ from app.interfaces.http.schemas.auth import TokenResponse, UserPublic
 
 
 def user_to_public(user: User) -> UserPublic:
+    permission_codes = sorted({p.code for role in user.roles for p in role.permissions})
     return UserPublic(
         id=str(user.id),
         email=user.email,
         full_name=user.full_name,
         is_active=user.is_active,
         roles=[r.name for r in user.roles],
+        permissions=permission_codes,
     )
 
 
