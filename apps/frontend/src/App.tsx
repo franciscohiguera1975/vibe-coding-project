@@ -5,6 +5,7 @@ import { CatalogPage } from '@/presentation/pages/public/CatalogPage';
 import { HomePage } from '@/presentation/pages/public/HomePage';
 import { NotFoundPage } from '@/presentation/pages/public/NotFoundPage';
 import { PracticeDetailPage } from '@/presentation/pages/public/PracticeDetailPage';
+import { PracticeEmbedPage } from '@/presentation/pages/public/PracticeEmbedPage';
 import { LoginPage } from '@/presentation/pages/auth/LoginPage';
 import { DashboardPage } from '@/presentation/pages/admin/DashboardPage';
 import { PracticesAdminPage } from '@/presentation/pages/admin/PracticesAdminPage';
@@ -19,6 +20,8 @@ import { Route, Routes } from 'react-router-dom';
 export default function App() {
   return (
     <Routes>
+      <Route path="practices/:slug/embed" element={<PracticeEmbedPage />} />
+
       <Route element={<PublicLayout />}>
         <Route index element={<HomePage />} />
         <Route path="catalogo" element={<CatalogPage />} />

@@ -9,6 +9,25 @@ vi.mock('@/infrastructure/container', () => ({
   authService: { me: vi.fn().mockRejectedValue(new Error('no token')) },
   practiceService: {
     list: vi.fn().mockResolvedValue({ items: [], total: 0, page: 1, pageSize: 12, totalPages: 0 }),
+    getBySlug: vi.fn().mockResolvedValue({
+      id: '1',
+      slug: 'software-01-simulacion-mru',
+      title: 'Simulación de movimiento rectilíneo uniforme',
+      description: 'Descripción de prueba',
+      type: 'software',
+      difficulty: 'beginner',
+      estimatedTimeMinutes: 45,
+      technologies: [],
+      status: 'published',
+      categoryId: null,
+      objectives: [],
+      instructions: 'Instrucciones de prueba',
+      content: {},
+      evaluation: {},
+      aiConfiguration: {},
+      embeddingConfiguration: {},
+      metadata: {},
+    }),
   },
   userService: {},
   roleService: {},
@@ -49,5 +68,13 @@ describe('App routing', () => {
   it('renders a 404 page for unknown routes', async () => {
     renderApp('/ruta-inexistente');
     expect(await screen.findByText(/Página no encontrada/i)).toBeInTheDocument();
+  });
+
+  it('renders the embed view for a practice without the public layout chrome', async () => {
+    renderApp('/practices/software-01-simulacion-mru/embed');
+    expect(
+      await screen.findByText(/Simulación de movimiento rectilíneo uniforme/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /catálogo/i })).not.toBeInTheDocument();
   });
 });
