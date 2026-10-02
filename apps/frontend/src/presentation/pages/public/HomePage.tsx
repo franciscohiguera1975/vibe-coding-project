@@ -1,5 +1,4 @@
 import { usePractices } from '@/application/hooks/use-practices';
-import aboutImage from '@/assets/home/about-learning-to-code.jpg';
 import categoryImages from '@/assets/home/category-images-practice.jpg';
 import categorySoftware from '@/assets/home/category-software.jpg';
 import heroImages from '@/assets/home/hero-images-practice.jpg';
@@ -11,6 +10,8 @@ import instructor1 from '@/assets/team/instructor1.jpeg';
 import instructor2 from '@/assets/team/instructor2.png';
 import instructor3 from '@/assets/team/instructor3.jpeg';
 import instructor4 from '@/assets/team/instructor4.png';
+import { AboutIntro } from '@/presentation/components/AboutIntro';
+import { FeatureHighlights } from '@/presentation/components/FeatureHighlights';
 import { HeroCarousel, type HeroSlide } from '@/presentation/components/HeroCarousel';
 import { PracticeCard } from '@/presentation/components/PracticeCard';
 import { Link } from 'react-router-dom';
@@ -42,51 +43,6 @@ const SLIDES: HeroSlide[] = [
       'Compare sus resultados contra una referencia humana y entienda los límites de lo que un modelo puede inferir de una imagen.',
     primaryCta: { label: 'Prácticas de imágenes', to: '/catalogo?type=image' },
     secondaryCta: { label: 'Cómo funciona', to: '/acerca' },
-  },
-];
-
-const HIGHLIGHTS = [
-  {
-    title: 'Vibe Coding guiado',
-    description:
-      'Practique desarrollo de software asistido por IA con instrucciones claras y criterios de evaluación explícitos.',
-    icon: (
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 8l-4 4 4 4m6-8l4 4-4 4M13 4l-2 16" />
-    ),
-  },
-  {
-    title: 'Manejo de imágenes',
-    description:
-      'Construya y evalúe prototipos de análisis de imágenes, comparando sus resultados contra una referencia humana.',
-    icon: (
-      <>
-        <rect x="3" y="4" width="18" height="16" rx="2" />
-        <circle cx="9" cy="10" r="2" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21 16l-5.5-5.5L7 19" />
-      </>
-    ),
-  },
-  {
-    title: 'Tutor con IA',
-    description:
-      'Reciba pistas y retroalimentación de un agente con herramientas controladas, trazabilidad y límites claros.',
-    icon: (
-      <>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2m0 14v2M5 12H3m18 0h-2" />
-        <rect x="6" y="6" width="12" height="12" rx="3" />
-      </>
-    ),
-  },
-  {
-    title: 'Embebido en Moodle',
-    description:
-      'Cada práctica puede incrustarse directamente en un curso de Moodle, D2L o Canvas sin perder funcionalidad.',
-    icon: (
-      <>
-        <rect x="3" y="4" width="18" height="12" rx="2" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 20h8M12 16v4" />
-      </>
-    ),
   },
 ];
 
@@ -168,76 +124,9 @@ export function HomePage() {
     <div>
       <HeroCarousel slides={SLIDES} />
 
-      <section className="bg-white py-14">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {HIGHLIGHTS.map((item) => (
-              <div
-                key={item.title}
-                className="rounded-xl bg-brand-50/60 p-6 text-center transition-shadow hover:shadow-md"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  className="mx-auto h-10 w-10 text-brand-600"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth={1.5}
-                >
-                  {item.icon}
-                </svg>
-                <h3 className="mt-4 text-base font-semibold text-navy-900">{item.title}</h3>
-                <p className="mt-2 text-sm text-ink-500">{item.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <FeatureHighlights />
 
-      <section className="bg-ink-50 py-16">
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
-          <img
-            src={aboutImage}
-            alt="Estudiante siguiendo una lección de programación en línea"
-            className="h-full w-full rounded-xl object-cover shadow-sm"
-          />
-          <div>
-            <span className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-brand-600">
-              <span className="h-0.5 w-8 bg-brand-500" /> Acerca de
-            </span>
-            <h2 className="mt-3 text-3xl font-bold text-navy-900">Bienvenido a Vibe Coding</h2>
-            <p className="mt-4 text-ink-600">
-              Una plataforma educativa independiente, creada para enseñar desarrollo de software y
-              manejo de imágenes con apoyo de Inteligencia Artificial — con prácticas reutilizables,
-              evaluación basada en criterios explícitos y un tutor de IA que ayuda sin resolver el
-              ejercicio por usted.
-            </p>
-            <div className="mt-6 grid grid-cols-1 gap-x-8 gap-y-2 sm:grid-cols-2">
-              {[
-                'Prácticas interactivas reutilizables',
-                'Evaluación con criterios explícitos',
-                'Tutor de IA con límites y trazabilidad',
-                'Embebido para Moodle, D2L y Canvas',
-              ].map((item) => (
-                <p key={item} className="flex items-center gap-2 text-sm text-ink-700">
-                  <svg
-                    viewBox="0 0 24 24"
-                    className="h-4 w-4 flex-shrink-0 text-brand-500"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
-                  </svg>
-                  {item}
-                </p>
-              ))}
-            </div>
-            <Link to="/acerca" className="btn-primary mt-8 inline-flex">
-              Leer más
-            </Link>
-          </div>
-        </div>
-      </section>
+      <AboutIntro />
 
       <section className="bg-white py-16">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
