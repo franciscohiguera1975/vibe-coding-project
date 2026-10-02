@@ -10,9 +10,11 @@ from app.interfaces.http.routers.auth import router as auth_router
 from app.interfaces.http.routers.catalog import router as catalog_router
 from app.interfaces.http.routers.configurations import router as configurations_router
 from app.interfaces.http.routers.health import router as health_router
+from app.interfaces.http.routers.images import router as images_router
 from app.interfaces.http.routers.practices import router as practices_router
 from app.interfaces.http.routers.roles import permissions_router
 from app.interfaces.http.routers.roles import router as roles_router
+from app.interfaces.http.routers.storage import router as storage_router
 from app.interfaces.http.routers.users import router as users_router
 
 settings = get_settings()
@@ -44,3 +46,5 @@ app.include_router(configurations_router, prefix="/api")
 app.include_router(audit_router, prefix="/api")
 app.include_router(ai_router, prefix="/api")
 app.include_router(agent_router, prefix="/api")
+app.include_router(images_router, prefix="/api")
+app.include_router(storage_router, prefix="/api")

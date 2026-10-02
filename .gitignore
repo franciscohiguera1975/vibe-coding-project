@@ -38,4 +38,4 @@ apps/backend/__pycache__/
 *.egg-info/
 
 # Uploaded files (storage local adapter, desarrollo)
-storage/uploads/
+**/storage/uploads/

@@ -1,5 +1,13 @@
+import { useAnalyzeImage } from '@/application/hooks/use-images';
 import type { PracticeRunnerProps } from '@/presentation/practices/types';
 import { useState } from 'react';
+
+interface ImageSlotState {
+  previewUrl?: string;
+  count?: number;
+  warnings?: string[];
+  isAnalyzing?: boolean;
+}
 
 export function ImagePracticeRunner({ practice, onSubmit, isSubmitting }: PracticeRunnerProps) {
   const evaluation = practice.evaluation as {
@@ -12,12 +20,40 @@ export function ImagePracticeRunner({ practice, onSubmit, isSubmitting }: Practi
   };
 
   const imageIds = Object.keys(evaluation.reference ?? {});
-  const [counts, setCounts] = useState<Record<string, string>>({});
+  const [slots, setSlots] = useState<Record<string, ImageSlotState>>({});
   const [report, setReport] = useState('');
+  const analyzeImage = useAnalyzeImage();
+
+  async function handleFileSelected(imageId: string, file: File | undefined) {
+    if (!file) return;
+    const previewUrl = URL.createObjectURL(file);
+    setSlots((s) => ({ ...s, [imageId]: { previewUrl, isAnalyzing: true } }));
+    try {
+      const result = await analyzeImage.mutateAsync({ slug: practice.slug, file });
+      setSlots((s) => ({
+        ...s,
+        [imageId]: {
+          previewUrl,
+          count: result.count,
+          warnings: result.warnings,
+          isAnalyzing: false,
+        },
+      }));
+    } catch {
+      setSlots((s) => ({
+        ...s,
+        [imageId]: { previewUrl, isAnalyzing: false, warnings: ['error al analizar'] },
+      }));
+    }
+  }
+
+  function handleCountOverride(imageId: string, value: string) {
+    setSlots((s) => ({ ...s, [imageId]: { ...s[imageId], count: Number(value) } }));
+  }
 
   async function handleSubmitCounts() {
     const payload = {
-      counts: Object.fromEntries(imageIds.map((id) => [id, Number(counts[id] ?? 0)])),
+      counts: Object.fromEntries(imageIds.map((id) => [id, slots[id]?.count ?? 0])),
     };
     await onSubmit(payload);
   }
@@ -49,22 +85,45 @@ export function ImagePracticeRunner({ practice, onSubmit, isSubmitting }: Practi
         <div className="card p-5">
           <h3 className="font-semibold text-ink-900">Conteo por imagen</h3>
           <p className="mt-1 text-xs text-ink-500">
-            Las imágenes de referencia se gestionan desde el panel de administración; ingrese su
-            conteo para cada identificador.
+            Suba cada imagen de referencia; el prototipo propone un conteo que usted puede revisar y
+            corregir antes de enviar (la decisión final es suya).
           </p>
-          <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
-            {imageIds.map((id) => (
-              <div key={id}>
-                <label className="label">{id}</label>
-                <input
-                  type="number"
-                  min={0}
-                  className="input"
-                  value={counts[id] ?? ''}
-                  onChange={(e) => setCounts((c) => ({ ...c, [id]: e.target.value }))}
-                />
-              </div>
-            ))}
+          <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {imageIds.map((id) => {
+              const slot = slots[id] ?? {};
+              return (
+                <div key={id} className="rounded-lg border border-ink-100 p-3">
+                  <label className="label">{id}</label>
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    className="input text-xs"
+                    onChange={(e) => handleFileSelected(id, e.target.files?.[0])}
+                  />
+                  {slot.previewUrl && (
+                    <img
+                      src={slot.previewUrl}
+                      alt={`Vista previa de ${id}`}
+                      className="mt-2 h-24 w-full rounded object-cover"
+                    />
+                  )}
+                  {slot.isAnalyzing && <p className="mt-1 text-xs text-ink-400">Analizando...</p>}
+                  {slot.warnings && slot.warnings.length > 0 && (
+                    <p className="mt-1 text-xs text-amber-700">⚠ {slot.warnings.join('; ')}</p>
+                  )}
+                  <div className="mt-2">
+                    <label className="label">Conteo propuesto (editable)</label>
+                    <input
+                      type="number"
+                      min={0}
+                      className="input"
+                      value={slot.count ?? ''}
+                      onChange={(e) => handleCountOverride(id, e.target.value)}
+                    />
+                  </div>
+                </div>
+              );
+            })}
           </div>
           <button className="btn-primary mt-4" onClick={handleSubmitCounts} disabled={isSubmitting}>
             {isSubmitting ? 'Enviando...' : 'Enviar conteo'}

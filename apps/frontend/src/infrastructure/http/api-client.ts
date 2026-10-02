@@ -89,6 +89,29 @@ export class ApiClient implements HttpClient {
     return this.request<T>('DELETE', path);
   }
 
+  async uploadFile<T>(path: string, formData: FormData, isRetry = false): Promise<T> {
+    const headers: Record<string, string> = {};
+    const accessToken = this.tokens.getAccessToken();
+    if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+
+    // Sin Content-Type: el navegador fija el boundary multipart automaticamente.
+    const response = await fetch(`${BASE_URL}${path}`, { method: 'POST', headers, body: formData });
+
+    if (response.status === 401 && !isRetry) {
+      const refreshed = await this.refreshAccessToken();
+      if (refreshed) return this.uploadFile<T>(path, formData, true);
+      this.tokens.clear();
+    }
+
+    const text = await response.text();
+    const data = text ? JSON.parse(text) : undefined;
+
+    if (!response.ok) {
+      throw new ApiError(response.status, extractErrorMessage(data) ?? response.statusText);
+    }
+    return toCamelCase(data) as T;
+  }
+
   private async request<T>(
     method: string,
     path: string,

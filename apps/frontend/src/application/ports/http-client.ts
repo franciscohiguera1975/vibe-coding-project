@@ -4,6 +4,7 @@ export interface HttpClient {
   put<T>(path: string, body?: unknown): Promise<T>;
   patch<T>(path: string, body?: unknown): Promise<T>;
   delete<T>(path: string): Promise<T>;
+  uploadFile<T>(path: string, formData: FormData): Promise<T>;
 }
 
 export class ApiError extends Error {
