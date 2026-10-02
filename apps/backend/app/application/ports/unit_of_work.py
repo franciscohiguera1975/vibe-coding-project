@@ -1,5 +1,10 @@
 from typing import Protocol
 
+from app.domain.repositories.ai_repository import (
+    AIMessageRepository,
+    AISessionRepository,
+    AIToolCallRepository,
+)
 from app.domain.repositories.identity_repository import (
     PermissionRepository,
     RoleRepository,
@@ -36,6 +41,9 @@ class UnitOfWork(Protocol):
     student_progress: StudentProgressRepository
     configurations: ConfigurationRepository
     audit_logs: AuditLogRepository
+    ai_sessions: AISessionRepository
+    ai_messages: AIMessageRepository
+    ai_tool_calls: AIToolCallRepository
 
     def __enter__(self) -> "UnitOfWork": ...
 

@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.infrastructure.config import get_settings
 from app.interfaces.http.exception_handlers import register_exception_handlers
+from app.interfaces.http.routers.agent import router as agent_router
 from app.interfaces.http.routers.ai import router as ai_router
 from app.interfaces.http.routers.audit import router as audit_router
 from app.interfaces.http.routers.auth import router as auth_router
@@ -42,3 +43,4 @@ app.include_router(catalog_router, prefix="/api")
 app.include_router(configurations_router, prefix="/api")
 app.include_router(audit_router, prefix="/api")
 app.include_router(ai_router, prefix="/api")
+app.include_router(agent_router, prefix="/api")

@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from app.domain.exceptions import (
+    AgentLimitExceededError,
     ConflictError,
     DomainError,
     InvalidCredentialsError,
@@ -42,6 +43,12 @@ def register_exception_handlers(app: FastAPI) -> None:
         request: Request, exc: InvalidCredentialsError
     ) -> JSONResponse:
         return _error_response(401, str(exc))
+
+    @app.exception_handler(AgentLimitExceededError)
+    async def handle_agent_limit_exceeded(
+        request: Request, exc: AgentLimitExceededError
+    ) -> JSONResponse:
+        return _error_response(429, str(exc) or "El agente alcanzo su limite de iteraciones/tokens")
 
     @app.exception_handler(DomainError)
     async def handle_domain_error(request: Request, exc: DomainError) -> JSONResponse:

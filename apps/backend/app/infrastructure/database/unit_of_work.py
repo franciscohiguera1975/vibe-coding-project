@@ -1,5 +1,10 @@
 from sqlalchemy.orm import Session, sessionmaker
 
+from app.infrastructure.database.repositories.ai_repository import (
+    SqlAlchemyAIMessageRepository,
+    SqlAlchemyAISessionRepository,
+    SqlAlchemyAIToolCallRepository,
+)
 from app.infrastructure.database.repositories.identity_repository import (
     SqlAlchemyPermissionRepository,
     SqlAlchemyRoleRepository,
@@ -45,6 +50,9 @@ class SqlAlchemyUnitOfWork:
         self.student_progress = SqlAlchemyStudentProgressRepository(self._session)
         self.configurations = SqlAlchemyConfigurationRepository(self._session)
         self.audit_logs = SqlAlchemyAuditLogRepository(self._session)
+        self.ai_sessions = SqlAlchemyAISessionRepository(self._session)
+        self.ai_messages = SqlAlchemyAIMessageRepository(self._session)
+        self.ai_tool_calls = SqlAlchemyAIToolCallRepository(self._session)
         return self
 
     def __exit__(self, exc_type: object, exc_value: object, traceback: object) -> None:

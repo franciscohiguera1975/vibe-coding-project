@@ -7,6 +7,7 @@ import {
   useSubmitPractice,
 } from '@/application/hooks/use-practices';
 import type { PracticeAttempt, PracticeEvaluation } from '@/domain/entities/practice';
+import { AskTutorPanel } from '@/presentation/components/AskTutorPanel';
 import { getPracticeRunner } from '@/presentation/practices/registry';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -151,6 +152,8 @@ export function PracticeDetailPage() {
                 <p className="mt-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{hint}</p>
               )}
             </div>
+
+            {slug && <AskTutorPanel practiceSlug={slug} />}
           </div>
         )}
 
