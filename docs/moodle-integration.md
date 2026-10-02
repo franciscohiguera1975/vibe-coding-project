@@ -38,7 +38,7 @@ Recomendaciones:
 - Use una altura generosa (800–1000px): el contenido crece según el tipo de
   práctica (los ejecutores de imagen con varias tarjetas de carga son más largos).
 - El dominio de Moodle debe poder enmarcar el de la plataforma. En el despliegue
-  con Docker/nginx (ver `docs/deployment.md`), configure la cabecera
+  con Docker/nginx (ver `docs/docker.md`/`docs/native-deployment.md`), configure la cabecera
   `Content-Security-Policy: frame-ancestors` con el dominio del Moodle institucional
   en lugar de bloquear el enmarcado con `X-Frame-Options: DENY`.
 - Las cookies de sesión de la plataforma son independientes de las de Moodle: cada
@@ -55,9 +55,9 @@ almacenado localmente.
 
 Para integraciones que no dependen de un iframe (por ejemplo, un bloque o plugin
 de Moodle que consuma datos directamente), la API REST pública documentada en
-`docs/api-reference.md` permite consultar el catálogo (`GET /api/practices`), el
+`docs/api.md` permite consultar el catálogo (`GET /api/practices`), el
 detalle de una práctica (`GET /api/practices/{slug}`) e iniciar/enviar intentos
-(`POST /api/practices/{slug}/start`, `POST /api/practices/attempts/{id}/submit`)
+(`POST /api/practices/{slug}/start`, `POST /api/practices/attempts/submit`)
 autenticando con JWT.
 
 ## Evolución futura (no implementada)
