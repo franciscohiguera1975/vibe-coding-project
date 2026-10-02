@@ -1,10 +1,16 @@
 import { usePractices } from '@/application/hooks/use-practices';
-import aboutImage from '@/assets/home/about-workspace.jpg';
+import aboutImage from '@/assets/home/about-learning-to-code.jpg';
 import categoryImages from '@/assets/home/category-images-practice.jpg';
 import categorySoftware from '@/assets/home/category-software.jpg';
 import heroImages from '@/assets/home/hero-images-practice.jpg';
 import heroSoftware1 from '@/assets/home/hero-software-1.jpg';
 import heroSoftware2 from '@/assets/home/hero-software-2.jpg';
+import logoUte from '@/assets/logos/ute.png';
+import logoUtpl from '@/assets/logos/utpl.png';
+import instructor1 from '@/assets/team/instructor1.jpeg';
+import instructor2 from '@/assets/team/instructor2.png';
+import instructor3 from '@/assets/team/instructor3.jpeg';
+import instructor4 from '@/assets/team/instructor4.png';
 import { HeroCarousel, type HeroSlide } from '@/presentation/components/HeroCarousel';
 import { PracticeCard } from '@/presentation/components/PracticeCard';
 import { Link } from 'react-router-dom';
@@ -103,6 +109,37 @@ const STEPS = [
   },
 ];
 
+const INSTRUCTORS = [
+  {
+    photo: instructor1,
+    name: 'Francisco Javier Higuera González',
+    role: 'Docente-Investigador',
+    org: 'Universidad UTE',
+    logo: logoUte,
+  },
+  {
+    photo: instructor2,
+    name: 'Carlos Byron Bermeo León',
+    role: 'Facultad de Ciencias Sociales, Educación y Humanidades · Depto. de Comunicación y Artes',
+    org: 'Universidad UTPL',
+    logo: logoUtpl,
+  },
+  {
+    photo: instructor3,
+    name: 'Mgs. Yamilet García',
+    role: 'Docente-Investigador',
+    org: 'Universidad UTE',
+    logo: logoUte,
+  },
+  {
+    photo: instructor4,
+    name: 'José Francisco Silva Garcés',
+    role: 'Docente-Investigador',
+    org: 'Universidad UTE',
+    logo: logoUte,
+  },
+];
+
 const VOICES = [
   {
     initials: 'DS',
@@ -160,7 +197,7 @@ export function HomePage() {
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:px-8">
           <img
             src={aboutImage}
-            alt="Edición de código en un editor con resaltado de sintaxis"
+            alt="Estudiante siguiendo una lección de programación en línea"
             className="h-full w-full rounded-xl object-cover shadow-sm"
           />
           <div>
@@ -281,6 +318,37 @@ export function HomePage() {
                 </div>
                 <h3 className="mt-4 text-base font-semibold text-navy-900">{step.title}</h3>
                 <p className="mt-2 text-sm text-ink-500">{step.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-ink-50 py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <span className="inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-brand-600">
+              <span className="h-0.5 w-8 bg-brand-500" /> Instructores
+              <span className="h-0.5 w-8 bg-brand-500" />
+            </span>
+            <h2 className="mt-3 text-3xl font-bold text-navy-900">Quiénes la construyen</h2>
+          </div>
+          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {INSTRUCTORS.map((person) => (
+              <div key={person.name} className="card overflow-hidden text-center">
+                <img
+                  src={person.photo}
+                  alt={person.name}
+                  className="h-56 w-full object-cover object-top"
+                />
+                <div className="p-4">
+                  <p className="font-semibold text-navy-900">{person.name}</p>
+                  <p className="mt-1 text-xs text-ink-500">{person.role}</p>
+                  <div className="mt-2 flex items-center justify-center gap-1.5">
+                    <img src={person.logo} alt="" className="h-4 w-auto" />
+                    <p className="text-xs font-medium text-brand-600">{person.org}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
