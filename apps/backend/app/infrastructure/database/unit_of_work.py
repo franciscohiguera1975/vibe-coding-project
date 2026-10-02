@@ -16,6 +16,9 @@ from app.infrastructure.database.repositories.progress_repository import (
     SqlAlchemyStudentPracticeAttemptRepository,
     SqlAlchemyStudentProgressRepository,
 )
+from app.infrastructure.database.repositories.system_repository import (
+    SqlAlchemyConfigurationRepository,
+)
 from app.infrastructure.database.session import SessionLocal
 
 
@@ -39,6 +42,7 @@ class SqlAlchemyUnitOfWork:
         self.practice_submissions = SqlAlchemyPracticeSubmissionRepository(self._session)
         self.practice_evaluations = SqlAlchemyPracticeEvaluationRepository(self._session)
         self.student_progress = SqlAlchemyStudentProgressRepository(self._session)
+        self.configurations = SqlAlchemyConfigurationRepository(self._session)
         return self
 
     def __exit__(self, exc_type: object, exc_value: object, traceback: object) -> None:
