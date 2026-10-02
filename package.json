@@ -4,8 +4,7 @@
   "version": "0.1.0",
   "description": "Plataforma de enseñanza práctica de Vibe Coding con FastAPI, IA e IA Agéntica",
   "workspaces": [
-    "apps/frontend",
-    "packages/*"
+    "apps/frontend"
   ],
   "scripts": {
     "dev:frontend": "npm run dev --workspace apps/frontend",

@@ -5,8 +5,6 @@
 ```
 apps/backend/     # FastAPI, Clean/Hexagonal, Alembic, pytest
 apps/frontend/    # React + TS + Vite + Tailwind + React Router
-packages/*/        # reservado para código TS compartido (hoy sin contenido —
-                    # el frontend no ha necesitado extraer nada aún)
 database/seeds/   # datos de seed (roles, permisos, categorías, prácticas)
 docker/           # Dockerfiles + nginx.conf.template
 docs/             # esta documentación

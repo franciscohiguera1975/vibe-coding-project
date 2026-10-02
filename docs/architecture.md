@@ -76,10 +76,14 @@ rompería el contrato que cada ejecutor espera. Ver `OPAQUE_KEYS` en
 
 ## Decisiones no especificadas por el Prompt Maestro (documentadas)
 
-- **Monorepo**: npm workspaces (no pnpm/Turborepo) para `apps/frontend` +
-  `packages/*`; el backend Python se gestiona aparte con un venv, orquestado por
-  el `Makefile` raíz. Se eligió npm workspaces por ser la opción con menor fricción
-  de tooling adicional para un proyecto de este tamaño.
+- **Monorepo**: npm workspaces (no pnpm/Turborepo) para `apps/frontend`; el
+  backend Python se gestiona aparte con un venv, orquestado por el `Makefile`
+  raíz. Se eligió npm workspaces por ser la opción con menor fricción de
+  tooling adicional para un proyecto de este tamaño. El scaffold original
+  reservaba un workspace `packages/*` para código TS compartido, pero se
+  eliminó al no haber surgido ninguna necesidad real de extraer código
+  compartido del frontend — se puede reintroducir sin fricción si aparece esa
+  necesidad.
 - **Proveedor de IA real**: `AnthropicAdapter` (Claude) detrás de `AIProvider`;
   `MockAIAdapter` es el valor por defecto en desarrollo/pruebas.
 - **Agente de IA**: orquestador determinista escrito a mano (no un framework tipo
