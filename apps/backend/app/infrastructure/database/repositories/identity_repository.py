@@ -136,6 +136,19 @@ class SqlAlchemyRoleRepository:
         self._session.refresh(model, attribute_names=["permissions"])
         return _role_to_domain(model)
 
+    def update(self, role: Role) -> Role:
+        model = self._session.get(RoleModel, role.id)
+        if model is None:
+            raise ValueError(f"RoleModel {role.id} no encontrado")
+        model.name = role.name
+        model.description = role.description
+        ids = [p.id for p in role.permissions]
+        model.permissions = list(
+            self._session.scalars(select(PermissionModel).where(PermissionModel.id.in_(ids)))
+        )
+        self._session.flush()
+        return _role_to_domain(model)
+
 
 class SqlAlchemyPermissionRepository:
     def __init__(self, session: Session) -> None:

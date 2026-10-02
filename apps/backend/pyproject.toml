@@ -11,7 +11,7 @@ dependencies = [
   "fastapi>=0.115,<0.116",
   "uvicorn[standard]>=0.30,<0.31",
   "gunicorn>=22,<23",
-  "pydantic>=2.8,<3",
+  "pydantic[email]>=2.8,<3",
   "pydantic-settings>=2.4,<3",
   "sqlalchemy>=2.0,<2.1",
   "alembic>=1.13,<2",
@@ -43,6 +43,9 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+# B008: Depends(...)/require_permission(...) en defaults es el idiom de DI de FastAPI,
+# no el antipatron de argumentos mutables que la regla busca detectar.
+ignore = ["B008"]
 
 [tool.black]
 line-length = 100

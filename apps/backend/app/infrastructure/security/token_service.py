@@ -1,3 +1,4 @@
+import uuid
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -25,6 +26,7 @@ class JoseTokenService:
         payload: dict[str, Any] = {
             "sub": subject,
             "type": token_type,
+            "jti": str(uuid.uuid4()),
             "iat": now,
             "exp": now + timedelta(seconds=expires_in_seconds),
         }
