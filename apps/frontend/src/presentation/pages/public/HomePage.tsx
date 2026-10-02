@@ -1,5 +1,5 @@
 import { usePractices } from '@/application/hooks/use-practices';
-import categoryImages from '@/assets/home/category-images-practice.jpg';
+import categoryImages from '@/assets/home/category-images-practice-4.jpg';
 import categorySoftware from '@/assets/home/category-software.jpg';
 import heroImages from '@/assets/home/hero-images-practice.jpg';
 import heroSoftware1 from '@/assets/home/hero-software-1.jpg';

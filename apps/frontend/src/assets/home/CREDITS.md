@@ -12,6 +12,7 @@ de Wikimedia Commons o generadas localmente con Pillow para este proyecto.
 | `category-images-practice-3.jpg` | [Knöpfe — 2018 — 0502 (Dietmar Rabich)](https://commons.wikimedia.org/wiki/File:Kn%C3%B6pfe_--_2018_--_0502.jpg) | CC BY-SA 4.0 — Dietmar Rabich |
 | `category-software.jpg` | Generada localmente (Pillow): ilustración abstracta de un editor de código | — (propia) |
 | `category-software-2.jpg` | [BalticServers data center](https://commons.wikimedia.org/wiki/File:BalticServers_data_center.jpg) | CC BY-SA 3.0 |
+| `category-images-practice-4.jpg` | [Skittles Candies Pile](https://commons.wikimedia.org/wiki/File:Skittles-Candies-Pile.jpg) | Dominio público |
 
 Las fotos en `src/assets/team/` (instructor1-4) y los logos en `src/assets/logos/`
 (ute.png, utpl.png) fueron suministrados directamente por los docentes del curso —
