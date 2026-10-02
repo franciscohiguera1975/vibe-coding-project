@@ -1,0 +1,28 @@
+# Build desde la raiz del monorepo:
+#   docker build -f docker/Dockerfile.frontend \
+#     --build-arg VITE_API_URL=http://localhost:3000 -t vibe-coding-frontend .
+#
+# VITE_API_URL se hornea en el bundle estatico en tiempo de build (Vite no lee
+# variables de entorno en tiempo de ejecucion), por eso es un build-arg y no una
+# variable del contenedor en runtime.
+FROM node:20-alpine AS build
+
+WORKDIR /app
+
+COPY package.json package-lock.json* ./
+COPY apps/frontend/package.json apps/frontend/package.json
+RUN npm install --workspace apps/frontend --include-workspace-root
+
+COPY apps/frontend/ apps/frontend/
+
+ARG VITE_API_URL=http://localhost:3000
+ENV VITE_API_URL=${VITE_API_URL}
+RUN npm run build:frontend
+
+FROM nginx:1.27-alpine
+
+ENV MOODLE_ORIGIN=""
+COPY docker/nginx.conf.template /etc/nginx/templates/default.conf.template
+COPY --from=build /app/apps/frontend/dist /usr/share/nginx/html
+
+EXPOSE 80

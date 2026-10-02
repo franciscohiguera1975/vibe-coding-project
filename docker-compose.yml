@@ -16,5 +16,52 @@ services:
       timeout: 5s
       retries: 10
 
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-vibe_coding}:${POSTGRES_PASSWORD:-vibe_coding}@postgres:5432/${POSTGRES_DB:-vibe_coding_dev}
+      BACKEND_URL: ${BACKEND_URL:-http://localhost:3000}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-dev}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-15m}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN:-7d}
+      AI_PROVIDER: ${AI_PROVIDER:-mock}
+      AI_API_KEY: ${AI_API_KEY:-}
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-local}
+      CORS_ALLOWED_ORIGINS: ${FRONTEND_URL:-http://localhost:5173}
+      SEED_ON_START: ${SEED_ON_START:-true}
+      # SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD: deliberadamente no se fijan aqui.
+      # Si se definen en .env, Docker Compose las pasa tal cual (interpolacion de
+      # variables de entorno, no de esta plantilla); si no, scripts/seed.py usa su
+      # propio valor por defecto. Fijarlas aqui con un default vacio ("") pisaria
+      # ese valor por defecto con una cadena vacia en vez de dejarlo actuar.
+    volumes:
+      - backend_storage:/app/apps/backend/storage/uploads
+    ports:
+      - "${BACKEND_PORT:-3000}:8000"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:3000}
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      MOODLE_ORIGIN: ${MOODLE_ORIGIN:-}
+    ports:
+      - "${FRONTEND_PORT:-5173}:80"
+
 volumes:
   postgres_data:
+  backend_storage:

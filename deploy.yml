@@ -1,0 +1,25 @@
+# Descriptor de los dos modos de despliegue soportados (ver scripts/deploy.sh y
+# docs/deployment.md). DEPLOY_MODE se lee del .env de la raiz del monorepo.
+modes:
+  docker:
+    description: >
+      Levanta postgres, backend y frontend como contenedores via docker-compose.yml.
+      Recomendado para evaluacion rapida y para el despliegue institucional por
+      defecto.
+    up: docker compose up -d --build
+    down: docker compose down
+    logs: docker compose logs -f
+
+  native:
+    description: >
+      Backend corriendo con un venv de Python + gunicorn (o systemd), frontend
+      compilado como build estatico servido por nginx, PostgreSQL instalado en el
+      host (o apuntando a uno gestionado externamente). Ver docs/deployment.md
+      para los pasos completos y ejemplos de unidades systemd.
+    steps:
+      - make install-backend
+      - make install-frontend
+      - make migrate
+      - make seed
+      - npm run build:frontend
+      - "cd apps/backend && .venv/bin/gunicorn app.main:app -k uvicorn.workers.UvicornWorker -b 0.0.0.0:${BACKEND_PORT:-3000}"

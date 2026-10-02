@@ -1,0 +1,36 @@
+# Build desde la raiz del monorepo:
+#   docker build -f docker/Dockerfile.backend -t vibe-coding-backend .
+# (lo hace docker-compose.yml automaticamente con `docker compose up -d --build`)
+#
+# La jerarquia apps/backend + database se preserva dentro de la imagen (en vez de
+# aplanarla) porque scripts/seed.py localiza `database/seeds` subiendo dos niveles
+# desde su propio archivo (apps/backend/scripts -> apps/backend -> raiz del repo),
+# igual que en desarrollo local.
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      build-essential \
+      libpq-dev \
+      libjpeg62-turbo-dev \
+      zlib1g-dev \
+      libwebp-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app/apps/backend
+
+COPY apps/backend/pyproject.toml ./
+RUN pip install -e .
+
+COPY apps/backend/ .
+COPY database/ /app/database/
+COPY docker/backend-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+EXPOSE 8000
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["gunicorn", "app.main:app", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "--workers", "2"]
