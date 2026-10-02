@@ -1,12 +1,10 @@
 """Las 4 practicas iniciales (Prompt Maestro §17): 2 de desarrollo de software y 2 de
-manejo de imagenes, derivadas de las guias CEDIA 02 y 18 y de sus skills (ya instaladas
-en ~/.claude/skills/), no de ejemplos genericos (regla §37).
+manejo de imagenes (regla §37: contenido derivado de material pedagogico propio, no de
+ejemplos genericos).
 
-- software-01 y image-01 construyen el prototipo que cada guia describe en su "Nivel 2".
-- software-02 e image-02 extienden la MISMA guia (no hay una tercera/cuarta guia
-  disponible): software-02 usa los propios "Criterios de comprobacion" de la Guia 18
-  como casos de depuracion; image-02 usa el paso 5 de la Guia 02 (informe de errores
-  sobre las 8 imagenes reservadas) como ejercicio de interpretacion.
+Nota interna (no citar en campos visibles al estudiante): software-01/image-01
+construyen un prototipo completo; software-02/image-02 extienden ese mismo prototipo
+como ejercicio de depuracion/diagnostico sobre sus propios criterios de aceptacion.
 """
 
 from typing import Any
@@ -20,7 +18,7 @@ INITIAL_PRACTICES: list[dict[str, Any]] = [
         "difficulty": "beginner",
         "estimated_time_minutes": 45,
         "technologies": ["javascript", "html", "css"],
-        "tags": ["vibe-coding", "guia-18", "simulacion"],
+        "tags": ["vibe-coding", "fisica-mru", "simulacion"],
         "objectives": [
             "Construir con asistencia de IA una actividad interactiva de predicción y verificación",
             "Expresar un modelo físico explícito (distancia = velocidad × tiempo) en código, no en texto generado por el modelo de lenguaje",
@@ -32,17 +30,18 @@ INITIAL_PRACTICES: list[dict[str, Any]] = [
             "velocidad y tiempo, y compara su predicción con el resultado calculado."
         ),
         "instructions": (
-            "Siga los cinco pasos de la Guía 18. (1) Escriba el objetivo y los supuestos: "
-            "viaje a velocidad constante, distancia = velocidad × tiempo, velocidad entre 0 "
-            "y 100 km/h, tiempo entre 0 y 3 horas; aceleración, tráfico y paradas quedan "
-            "fuera del modelo. (2) Implemente la secuencia fija predecir → ajustar → "
-            "ejecutar → observar → explicar: no se puede ajustar sin haber predicho antes. "
-            "(3) Construya los controles (deslizadores o campos con unidades visibles, "
-            "accesibles por teclado, con botón de reinicio) y calcule la distancia en "
-            "código, nunca estimada por el modelo de lenguaje. (4) Muestre el resultado "
-            "numérico con su equivalente textual y una retroalimentación que compare la "
-            "predicción del estudiante con el resultado calculado. (5) Verifique los tres "
-            "ejemplos numéricos y responda la pregunta de transferencia con valores nuevos."
+            "Construya la actividad en cinco pasos. (1) Escriba el objetivo y los "
+            "supuestos: viaje a velocidad constante, distancia = velocidad × tiempo, "
+            "velocidad entre 0 y 100 km/h, tiempo entre 0 y 3 horas; aceleración, "
+            "tráfico y paradas quedan fuera del modelo. (2) Implemente la secuencia fija "
+            "predecir → ajustar → ejecutar → observar → explicar: no se puede ajustar "
+            "sin haber predicho antes. (3) Construya los controles (deslizadores o "
+            "campos con unidades visibles, accesibles por teclado, con botón de "
+            "reinicio) y calcule la distancia en código, nunca estimada por el modelo de "
+            "lenguaje. (4) Muestre el resultado numérico con su equivalente textual y "
+            "una retroalimentación que compare la predicción del estudiante con el "
+            "resultado calculado. (5) Verifique los tres ejemplos numéricos y responda "
+            "la pregunta de transferencia con valores nuevos."
         ),
         "content": {
             "model": {
@@ -73,12 +72,9 @@ INITIAL_PRACTICES: list[dict[str, Any]] = [
                 {"field": "distance_km_case3", "expected": 0, "tolerance": 0.01},
             ],
         },
-        "ai_configuration": {"hints_enabled": True, "hint_context": "Guía 18 — modelo MRU"},
+        "ai_configuration": {"hints_enabled": True, "hint_context": "modelo de MRU"},
         "embedding_configuration": {"embeddable": True, "layout": "standalone"},
-        "metadata": {
-            "source_guide": "CEDIA 2026 · Guía 18 · Actividad interactiva o simulación educativa",
-            "skill": "cedia-guia-18-actividad-interactiva-simulacion",
-        },
+        "metadata": {},
         "status": "published",
     },
     {
@@ -89,16 +85,16 @@ INITIAL_PRACTICES: list[dict[str, Any]] = [
         "difficulty": "intermediate",
         "estimated_time_minutes": 40,
         "technologies": ["javascript", "html"],
-        "tags": ["vibe-coding", "guia-18", "depuracion", "evaluacion-de-codigo"],
+        "tags": ["vibe-coding", "fisica-mru", "depuracion", "evaluacion-de-codigo"],
         "objectives": [
             "Analizar código generado por IA contra una especificación escrita",
             "Detectar y corregir errores de validación de límites y de accesibilidad",
-            "Usar los criterios de aceptación de la Guía 18 como pruebas de regresión",
+            "Usar los criterios de aceptación de la práctica base como pruebas de regresión",
         ],
         "description": (
             "A partir de una versión con errores intencionales de la simulación de MRU "
-            "(practica software-01), identifique y corrija los fallos usando los "
-            "criterios de aceptación de la Guía 18 como referencia de corrección."
+            "(practica software-01), identifique y corrija los fallos usando sus "
+            "criterios de aceptación como referencia de corrección."
         ),
         "instructions": (
             "Se le entrega una versión de la simulación de MRU con tres fallos "
@@ -135,7 +131,6 @@ INITIAL_PRACTICES: list[dict[str, Any]] = [
         "ai_configuration": {"hints_enabled": True},
         "embedding_configuration": {"embeddable": True, "layout": "standalone"},
         "metadata": {
-            "source_guide": "CEDIA 2026 · Guía 18 (sección Criterios de comprobación)",
             "extends": "software-01-simulacion-mru",
         },
         "status": "published",
@@ -148,7 +143,7 @@ INITIAL_PRACTICES: list[dict[str, Any]] = [
         "difficulty": "beginner",
         "estimated_time_minutes": 50,
         "technologies": ["python", "html"],
-        "tags": ["imagenes", "guia-02", "conteo", "vision"],
+        "tags": ["imagenes", "conteo-objetos", "conteo", "vision"],
         "objectives": [
             "Construir un prototipo de conteo de objetos con una regla explícita",
             "Comparar el conteo propuesto contra una referencia humana",
@@ -160,8 +155,8 @@ INITIAL_PRACTICES: list[dict[str, Any]] = [
             "visible ante imágenes ilegibles."
         ),
         "instructions": (
-            "Siga los cinco pasos de la Guía 02. (1) Escriba la regla de conteo con sus "
-            "cuatro partes: qué cuenta (un círculo cuyo centro es visible), qué no "
+            "Construya el prototipo en cinco pasos. (1) Escriba la regla de conteo con "
+            "sus cuatro partes: qué cuenta (un círculo cuyo centro es visible), qué no "
             "cuenta (sin centro visible, reflejos, sombras), cuándo la imagen es "
             "ilegible (desenfoque que impide ver los centros) y qué se conserva siempre "
             "(identificador, versión del método, resultado por imagen). (2) Prepare una "
@@ -210,8 +205,6 @@ INITIAL_PRACTICES: list[dict[str, Any]] = [
         "ai_configuration": {"strategy": "analyze_image", "uses_ai_provider": True},
         "embedding_configuration": {"embeddable": True, "layout": "standalone"},
         "metadata": {
-            "source_guide": "CEDIA 2026 · Guía 02 · Análisis de imágenes de investigación con IA",
-            "skill": "cedia-guia-02-analisis-imagenes-investigacion",
             "note": (
                 "La referencia de conteo es un marcador de posición de ejemplo; cargue su "
                 "propio conjunto de 20 imágenes y su referencia.csv vía el panel de "
@@ -228,7 +221,7 @@ INITIAL_PRACTICES: list[dict[str, Any]] = [
         "difficulty": "intermediate",
         "estimated_time_minutes": 35,
         "technologies": ["python"],
-        "tags": ["imagenes", "guia-02", "analisis-de-errores"],
+        "tags": ["imagenes", "conteo-objetos", "analisis-de-errores"],
         "objectives": [
             "Interpretar patrones de error de un método de conteo (iluminación, superposición, desenfoque)",
             "Proponer un ajuste a la regla de conteo a partir de evidencia",
@@ -260,7 +253,6 @@ INITIAL_PRACTICES: list[dict[str, Any]] = [
         "ai_configuration": {"hints_enabled": True},
         "embedding_configuration": {"embeddable": True, "layout": "standalone"},
         "metadata": {
-            "source_guide": "CEDIA 2026 · Guía 02 (paso 5, informe de errores)",
             "extends": "image-01-conteo-circulos",
         },
         "status": "published",
