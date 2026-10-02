@@ -1,10 +1,9 @@
 """Adaptador de EvaluationPort basado en reglas explicitas (sin IA), leidas de
-`practice.evaluation`. Dos estrategias derivadas directamente de las guias CEDIA:
+`practice.evaluation`. Dos estrategias:
 
-- "numeric_match": compara valores calculados contra casos esperados (Guia 18 — los
-  tres ejemplos numericos de `modelo.md` y la pregunta de transferencia).
-- "count_comparison": compara conteos por imagen contra una referencia humana
-  (Guia 02 — `referencia.csv` frente a `resultados.csv`).
+- "numeric_match": compara valores calculados contra casos esperados (los
+  ejemplos numericos del modelo fisico y la pregunta de transferencia).
+- "count_comparison": compara conteos por imagen contra una referencia humana.
 
 Cualquier otra estrategia (o ninguna) cae en revision manual explicita en vez de
 inventar un resultado."""

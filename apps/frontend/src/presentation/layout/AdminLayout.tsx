@@ -12,8 +12,10 @@ const NAV_ITEMS = [
 ];
 
 function navLinkClass({ isActive }: { isActive: boolean }): string {
-  return `block rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-    isActive ? 'bg-brand-50 text-brand-700' : 'text-ink-600 hover:bg-ink-50'
+  return `block rounded-lg border-l-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+    isActive
+      ? 'border-brand-400 bg-white/10 text-white'
+      : 'border-transparent text-ink-300 hover:bg-white/5 hover:text-white'
   }`;
 }
 
@@ -22,28 +24,42 @@ export function AdminLayout() {
 
   return (
     <div className="flex min-h-screen bg-ink-50">
-      <aside className="hidden w-64 shrink-0 border-r border-ink-100 bg-white px-4 py-6 md:block">
-        <Link to="/" className="flex items-center gap-2 px-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">
-            VC
+      {/* fixed (no sticky): el sidebar completo, incluido el bloque de
+          usuario/Salir anclado abajo con mt-auto, debe quedar fuera del flujo
+          de scroll de <main> sin importar cuanto crezca el contenido admin. */}
+      <aside className="fixed inset-y-0 left-0 hidden w-64 flex-col bg-navy-900 px-4 py-6 md:flex">
+        <Link to="/" className="flex shrink-0 items-center gap-2.5 px-2">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-500 text-white">
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h10M4 18h7" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l3 3-3 3" />
+            </svg>
           </span>
-          <span className="text-sm font-semibold text-ink-900">Administración</span>
+          <span>
+            <span className="block text-sm font-bold tracking-tight text-white">
+              Vibe<span className="text-brand-400">Coding</span>
+            </span>
+            <span className="block text-xs text-ink-400">Administración</span>
+          </span>
         </Link>
-        <nav className="mt-8 space-y-1">
+        <nav className="mt-8 flex-1 space-y-1 overflow-y-auto">
           {NAV_ITEMS.map((item) => (
             <NavLink key={item.to} to={item.to} end={item.end} className={navLinkClass}>
               {item.label}
             </NavLink>
           ))}
         </nav>
-        <div className="mt-8 border-t border-ink-100 pt-4">
+        <div className="mt-4 shrink-0 border-t border-white/10 pt-4">
           <p className="truncate px-2 text-xs text-ink-400">{user?.email}</p>
-          <button onClick={logout} className="btn-secondary mt-2 w-full">
+          <button
+            onClick={logout}
+            className="mt-2 w-full rounded-md bg-white/10 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/20"
+          >
             Salir
           </button>
         </div>
       </aside>
-      <main className="flex-1 px-4 py-8 sm:px-8">
+      <main className="flex-1 px-4 py-8 sm:px-8 md:ml-64">
         <Outlet />
       </main>
     </div>

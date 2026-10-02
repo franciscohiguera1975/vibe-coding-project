@@ -9,8 +9,8 @@ const NAV_LINKS = [
 ];
 
 function navLinkClass({ isActive }: { isActive: boolean }): string {
-  return `text-sm font-medium transition-colors ${
-    isActive ? 'text-brand-700' : 'text-ink-600 hover:text-brand-600'
+  return `relative py-1 text-sm font-semibold uppercase tracking-wide transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand-500 after:transition-transform after:content-[''] hover:after:scale-x-100 ${
+    isActive ? 'text-brand-600 after:scale-x-100' : 'text-navy-700 hover:text-brand-600'
   }`;
 }
 
@@ -19,16 +19,21 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-ink-100 bg-white shadow-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-600 text-sm font-bold text-white">
-            VC
+    <header className="sticky top-0 z-40 bg-white shadow-sm">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+        <Link to="/" className="flex items-center gap-2.5">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-500 text-white">
+            <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h10M4 18h7" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17 14l3 3-3 3" />
+            </svg>
           </span>
-          <span className="text-base font-semibold text-ink-900">Vibe Coding Platform</span>
+          <span className="text-lg font-bold tracking-tight text-navy-900">
+            Vibe<span className="text-brand-600">Coding</span>
+          </span>
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex">
+        <nav className="hidden items-center gap-8 md:flex">
           {NAV_LINKS.map((link) => (
             <NavLink key={link.to} to={link.to} className={navLinkClass} end={link.to === '/'}>
               {link.label}
@@ -36,30 +41,45 @@ export function Header() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-4 md:flex">
           {user ? (
             <>
               {user.roles.some((r) => r !== 'STUDENT') && (
-                <Link to="/admin" className="btn-secondary">
+                <Link
+                  to="/admin"
+                  className="text-sm font-semibold uppercase tracking-wide text-navy-700 hover:text-brand-600"
+                >
                   Administración
                 </Link>
               )}
-              <Link to="/perfil" className="text-sm font-medium text-ink-700 hover:text-brand-600">
+              <Link
+                to="/perfil"
+                className="text-sm font-semibold text-navy-700 hover:text-brand-600"
+              >
                 {user.fullName}
               </Link>
-              <button onClick={logout} className="btn-secondary">
+              <button
+                onClick={logout}
+                className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+              >
                 Salir
               </button>
             </>
           ) : (
-            <Link to="/login" className="btn-primary">
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+            >
               Ingresar
+              <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
             </Link>
           )}
         </div>
 
         <button
-          className="rounded-md p-2 text-ink-600 md:hidden"
+          className="rounded-md p-2 text-navy-700 md:hidden"
           onClick={() => setMenuOpen((v) => !v)}
           aria-label="Abrir menú"
         >
@@ -84,11 +104,17 @@ export function Header() {
               </NavLink>
             ))}
             {user ? (
-              <button onClick={logout} className="btn-secondary w-full">
+              <button
+                onClick={logout}
+                className="rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white"
+              >
                 Salir
               </button>
             ) : (
-              <Link to="/login" className="btn-primary w-full">
+              <Link
+                to="/login"
+                className="rounded-md bg-brand-500 px-5 py-2.5 text-center text-sm font-semibold text-white"
+              >
                 Ingresar
               </Link>
             )}

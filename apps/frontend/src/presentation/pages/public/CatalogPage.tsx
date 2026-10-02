@@ -2,6 +2,7 @@ import { usePractices } from '@/application/hooks/use-practices';
 import type { PracticeFilters } from '@/domain/entities/practice';
 import { PracticeCard } from '@/presentation/components/PracticeCard';
 import { useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 
 const TYPE_OPTIONS = [
   { value: '', label: 'Todos los tipos' },
@@ -17,7 +18,8 @@ const DIFFICULTY_OPTIONS = [
 ];
 
 export function CatalogPage() {
-  const [type, setType] = useState('');
+  const [searchParams] = useSearchParams();
+  const [type, setType] = useState(() => searchParams.get('type') ?? '');
   const [difficulty, setDifficulty] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);

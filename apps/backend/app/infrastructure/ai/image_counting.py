@@ -1,8 +1,8 @@
-"""Regla de conteo explicita para circulos de papel de colores (Guia 02 / skill
-cedia-guia-02-analisis-imagenes-investigacion): cuenta regiones de color saturado
-sobre fondo claro mediante componentes conexas, sin modelo entrenado. Es la
-implementacion de referencia local (MockAIAdapter); un proveedor real de vision
-(AnthropicAdapter) puede reemplazarla aplicando la misma regla con un modelo."""
+"""Regla de conteo explicita para circulos de papel de colores: cuenta regiones
+de color saturado sobre fondo claro mediante componentes conexas, sin modelo
+entrenado. Es la implementacion de referencia local (MockAIAdapter); un
+proveedor real de vision (AnthropicAdapter) puede reemplazarla aplicando la
+misma regla con un modelo."""
 
 import io
 from typing import Any

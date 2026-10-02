@@ -22,12 +22,20 @@ interface PracticeWorkspaceProps {
   slug: string | undefined;
   /** En modo embebido se omite el enlace "volver al catálogo" (no aplica fuera de la plataforma). */
   embedded?: boolean;
+  /** La página pública ya muestra el título/tipo/dificultad en su propio banner
+   * (PageHeader); en ese caso se omite aquí para no repetirlo. El embebido no
+   * tiene banner, así que siempre lo muestra. */
+  hideHeading?: boolean;
 }
 
 /** Contenido compartido entre la página pública de práctica y la vista embebida para
  * Moodle (`/practices/:slug/embed`): carga, inicio, ejecución y evaluación de una
  * práctica. Cada llamador decide su propio layout alrededor (header/footer o nada). */
-export function PracticeWorkspace({ slug, embedded = false }: PracticeWorkspaceProps) {
+export function PracticeWorkspace({
+  slug,
+  embedded = false,
+  hideHeading = false,
+}: PracticeWorkspaceProps) {
   const { user } = useAuth();
   const { data: practice, isLoading, isError } = usePractice(slug);
 
@@ -94,14 +102,16 @@ export function PracticeWorkspace({ slug, embedded = false }: PracticeWorkspaceP
   return (
     <div>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="badge bg-brand-50 text-brand-700">{practice.type}</span>
+        {!hideHeading && (
+          <span className="badge bg-brand-50 text-brand-700">{practice.type}</span>
+        )}
         <span className="badge bg-ink-100 text-ink-600">
           {DIFFICULTY_LABEL[practice.difficulty] ?? practice.difficulty}
         </span>
         <span className="text-xs text-ink-400">{practice.estimatedTimeMinutes} min</span>
       </div>
 
-      <h1 className="mt-3 text-3xl font-bold text-ink-900">{practice.title}</h1>
+      {!hideHeading && <h1 className="mt-3 text-3xl font-bold text-ink-900">{practice.title}</h1>}
       <p className="mt-2 text-ink-600">{practice.description}</p>
 
       {practice.objectives.length > 0 && (
