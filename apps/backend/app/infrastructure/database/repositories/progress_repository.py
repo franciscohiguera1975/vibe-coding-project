@@ -153,6 +153,14 @@ class SqlAlchemyPracticeEvaluationRepository:
         self._session.flush()
         return _evaluation_to_domain(model)
 
+    def get_by_submission_id(self, submission_id: uuid.UUID) -> PracticeEvaluation | None:
+        model = self._session.scalar(
+            select(PracticeEvaluationModel).where(
+                PracticeEvaluationModel.submission_id == submission_id
+            )
+        )
+        return _evaluation_to_domain(model) if model else None
+
 
 class SqlAlchemyStudentProgressRepository:
     def __init__(self, session: Session) -> None:

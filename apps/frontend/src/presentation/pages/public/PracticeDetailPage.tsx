@@ -1,4 +1,5 @@
 import { useAuth } from '@/application/hooks/auth-context';
+import { useGenerateFeedback, useGenerateHint } from '@/application/hooks/use-ai';
 import {
   useEvaluatePractice,
   usePractice,
@@ -24,9 +25,14 @@ export function PracticeDetailPage() {
   const startPractice = useStartPractice();
   const submitPractice = useSubmitPractice();
   const evaluatePractice = useEvaluatePractice();
+  const generateHint = useGenerateHint();
+  const generateFeedback = useGenerateFeedback();
 
   const [attempt, setAttempt] = useState<PracticeAttempt | null>(null);
+  const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [evaluation, setEvaluation] = useState<PracticeEvaluation | null>(null);
+  const [hint, setHint] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   if (isLoading) {
     return <p className="mx-auto max-w-3xl px-4 py-16 text-sm text-ink-500">Cargando...</p>;
@@ -50,13 +56,28 @@ export function PracticeDetailPage() {
     const newAttempt = await startPractice.mutateAsync(slug);
     setAttempt(newAttempt);
     setEvaluation(null);
+    setHint(null);
+    setFeedback(null);
   }
 
   async function handleSubmit(payload: Record<string, unknown>) {
     if (!attempt) return;
     const submission = await submitPractice.mutateAsync({ attemptId: attempt.id, payload });
+    setSubmissionId(submission.id);
     const result = await evaluatePractice.mutateAsync(submission.id);
     setEvaluation(result);
+  }
+
+  async function handleRequestHint() {
+    if (!slug) return;
+    const result = await generateHint.mutateAsync({ slug });
+    setHint(result.hint);
+  }
+
+  async function handleRequestFeedback() {
+    if (!submissionId) return;
+    const result = await generateFeedback.mutateAsync(submissionId);
+    setFeedback(result.feedback);
   }
 
   return (
@@ -111,11 +132,26 @@ export function PracticeDetailPage() {
         )}
 
         {user && attempt && !evaluation && (
-          <Runner
-            practice={practice}
-            onSubmit={handleSubmit}
-            isSubmitting={submitPractice.isPending || evaluatePractice.isPending}
-          />
+          <div className="space-y-4">
+            <Runner
+              practice={practice}
+              onSubmit={handleSubmit}
+              isSubmitting={submitPractice.isPending || evaluatePractice.isPending}
+            />
+
+            <div>
+              <button
+                className="btn-secondary"
+                onClick={handleRequestHint}
+                disabled={generateHint.isPending}
+              >
+                {generateHint.isPending ? 'Pidiendo pista...' : '💡 Pedir una pista'}
+              </button>
+              {hint && (
+                <p className="mt-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{hint}</p>
+              )}
+            </div>
+          </div>
         )}
 
         {evaluation && (
@@ -124,11 +160,28 @@ export function PracticeDetailPage() {
               Resultado: {evaluation.passed ? 'Aprobado' : 'No aprobado'} ({evaluation.score}/100)
             </h2>
             <p className="mt-2 text-sm text-ink-600">{evaluation.feedback}</p>
+
+            <div className="mt-4">
+              <button
+                className="btn-secondary"
+                onClick={handleRequestFeedback}
+                disabled={generateFeedback.isPending}
+              >
+                {generateFeedback.isPending ? 'Generando...' : '🤖 Generar retroalimentación de IA'}
+              </button>
+              {feedback && (
+                <p className="mt-2 rounded-lg bg-brand-50 p-3 text-sm text-brand-900">{feedback}</p>
+              )}
+            </div>
+
             <button
               className="btn-secondary mt-4"
               onClick={() => {
                 setAttempt(null);
+                setSubmissionId(null);
                 setEvaluation(null);
+                setHint(null);
+                setFeedback(null);
               }}
             >
               Intentar de nuevo

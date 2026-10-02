@@ -2,6 +2,7 @@
  * detalle de infraestructura (la instancia concreta de ApiClient). Todo lo demas
  * depende solo de los servicios de application/, que a su vez dependen solo del
  * puerto HttpClient. */
+import { AiService } from '@/application/services/ai-service';
 import { AuthService } from '@/application/services/auth-service';
 import { CatalogService } from '@/application/services/catalog-service';
 import { PracticeService } from '@/application/services/practice-service';
@@ -17,4 +18,5 @@ export const userService = new UserService(apiClient);
 export const roleService = new RoleService(apiClient);
 export const catalogService = new CatalogService(apiClient);
 export const systemService = new SystemService(apiClient);
+export const aiService = new AiService(apiClient);
 export { tokenStorage };

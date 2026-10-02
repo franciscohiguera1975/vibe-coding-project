@@ -28,6 +28,8 @@ class PracticeSubmissionRepository(Protocol):
 class PracticeEvaluationRepository(Protocol):
     def add(self, evaluation: PracticeEvaluation) -> PracticeEvaluation: ...
 
+    def get_by_submission_id(self, submission_id: uuid.UUID) -> PracticeEvaluation | None: ...
+
 
 class StudentProgressRepository(Protocol):
     def get_by_user_and_practice(
