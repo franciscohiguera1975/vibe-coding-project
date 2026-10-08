@@ -39,3 +39,10 @@ apps/backend/__pycache__/
 
 # Uploaded files (storage local adapter, desarrollo)
 **/storage/uploads/
+
+# Entregable del proyecto final CEDIA: publicado aparte en
+# github.com/franciscohiguera1975/vibe-coding-proyecto-final, no pertenece a este repo
+docs/CINCO MINUTOS PROYECTO/
+
+# Paquetes de skills CEDIA descargados (material personal del curso, no del producto)
+docs/skills/

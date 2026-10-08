@@ -1,0 +1,57 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+        run: npm run build --workspace apps/frontend
+
+      - name: Deploy dist/ to VPS
+        uses: burnett01/rsync-deployments@7.0.1
+        with:
+          switches: -az --delete
+          path: apps/frontend/dist/
+          remote_path: /var/www/vibe-coding-platform/
+          remote_host: ${{ secrets.DEPLOY_HOST }}
+          remote_user: ${{ secrets.DEPLOY_USER }}
+          remote_key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+  deploy-backend:
+    runs-on: ubuntu-latest
+    needs: deploy-frontend
+    steps:
+      - name: Pull latest and restart API
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script: |
+            set -e
+            cd /opt/vibe-coding-platform
+            git fetch origin main
+            git reset --hard origin/main
+            apps/backend/.venv/bin/pip install -q -e apps/backend
+            (cd apps/backend && .venv/bin/alembic upgrade head)
+            sudo systemctl restart vibe-coding-platform-api
+            sudo systemctl is-active vibe-coding-platform-api

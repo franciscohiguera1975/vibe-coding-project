@@ -19,7 +19,7 @@ interface HeroCarouselProps {
 /** Carousel del hero: sin dependencias externas (una franja de slides trasladada
  * por índice), con autoplay que se pausa al interactuar con las flechas o los
  * indicadores para no pelear con la elección del usuario. */
-export function HeroCarousel({ slides, intervalMs = 6000 }: HeroCarouselProps) {
+export function HeroCarousel({ slides, intervalMs = 7000 }: HeroCarouselProps) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {

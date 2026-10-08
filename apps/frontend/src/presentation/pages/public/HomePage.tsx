@@ -8,7 +8,7 @@ import logoUte from '@/assets/logos/ute.png';
 import logoUtpl from '@/assets/logos/utpl.png';
 import instructor1 from '@/assets/team/instructor1.jpeg';
 import instructor2 from '@/assets/team/instructor2.png';
-import instructor3 from '@/assets/team/instructor3.jpeg';
+import instructor3 from '@/assets/team/instructor3.png';
 import instructor4 from '@/assets/team/instructor4.png';
 import { AboutIntro } from '@/presentation/components/AboutIntro';
 import { FeatureHighlights } from '@/presentation/components/FeatureHighlights';
@@ -69,7 +69,7 @@ const INSTRUCTORS = [
   {
     photo: instructor1,
     name: 'Mtr. Francisco Javier Higuera González',
-    role: 'Docente-Investigador',
+    role: 'Docente de Programación',
     org: 'Universidad UTE',
     logo: logoUte,
   },
@@ -82,15 +82,15 @@ const INSTRUCTORS = [
   },
   {
     photo: instructor3,
-    name: 'Mgs. Yamilet García',
-    role: 'Docente-Investigador',
+    name: 'Cristian Guillermo Rivadeneira Cedeño',
+    role: 'Docente de Base de Datos',
     org: 'Universidad UTE',
     logo: logoUte,
   },
   {
     photo: instructor4,
     name: 'Mgs. José Francisco Silva Garcés',
-    role: 'Docente-Investigador',
+    role: 'Docente-Investigador-Unidad Académica Especializada en Formación Técnica y Tecnológica',
     org: 'Universidad UTE',
     logo: logoUte,
   },

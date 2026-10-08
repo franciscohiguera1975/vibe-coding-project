@@ -6,6 +6,7 @@ const NAV_LINKS = [
   { to: '/', label: 'Inicio' },
   { to: '/catalogo', label: 'Catálogo' },
   { to: '/acerca', label: 'La plataforma' },
+  { to: '/proyecto-final', label: 'Presentación' },
 ];
 
 function navLinkClass({ isActive }: { isActive: boolean }): string {

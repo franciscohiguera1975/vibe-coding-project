@@ -34,7 +34,14 @@ class MockAIAdapter:
             return ImageAnalysisResult(
                 count=0, warnings=[f"imagen ilegible: {exc}"], details={"illegible": True}
             )
-        warnings = [] if count > 0 else ["no se detectaron objetos; revisar manualmente"]
+        # Una escena vacia (conteo 0 con imagen nitida) es un resultado valido, no una
+        # advertencia: la regla de la guia distingue "vacia" (cuenta 0, sin aviso) de
+        # "borrosa" (ilegible, con aviso) — confundirlas produciria una advertencia falsa.
+        warnings = (
+            ["imagen ilegible: desenfoque impide distinguir los centros"]
+            if details.get("illegible")
+            else []
+        )
         return ImageAnalysisResult(count=count, warnings=warnings, details=details)
 
     def generate_feedback(self, *, context: dict[str, Any]) -> str:

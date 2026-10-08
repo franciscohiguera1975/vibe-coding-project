@@ -2,6 +2,7 @@ import { PublicLayout } from '@/presentation/layout/PublicLayout';
 import { AdminLayout } from '@/presentation/layout/AdminLayout';
 import { AboutPage } from '@/presentation/pages/public/AboutPage';
 import { CatalogPage } from '@/presentation/pages/public/CatalogPage';
+import { FinalProjectPage } from '@/presentation/pages/public/FinalProjectPage';
 import { HomePage } from '@/presentation/pages/public/HomePage';
 import { NotFoundPage } from '@/presentation/pages/public/NotFoundPage';
 import { PracticeDetailPage } from '@/presentation/pages/public/PracticeDetailPage';
@@ -27,6 +28,7 @@ export default function App() {
         <Route path="catalogo" element={<CatalogPage />} />
         <Route path="catalogo/:slug" element={<PracticeDetailPage />} />
         <Route path="acerca" element={<AboutPage />} />
+        <Route path="proyecto-final" element={<FinalProjectPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
