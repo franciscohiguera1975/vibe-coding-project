@@ -5,6 +5,16 @@ manejo de imágenes con apoyo de Inteligencia Artificial, orientada a un curso d
 Vibe Coding: prácticas interactivas, reutilizables y escalables, con IA
 desacoplada y un primer agente de IA tutor.
 
+## Enlaces
+
+| | |
+|---|---|
+| Plataforma (producción) | https://vibe-coding-platform.franciscohiguera.site |
+| API (producción) | https://vibe-coding-platform-api.franciscohiguera.site |
+| Presentación · proyecto final (videos ES/EN en la plataforma) | https://vibe-coding-platform.franciscohiguera.site/proyecto-final |
+| Repositorio del proyecto final (presentaciones, nota metodológica) | https://github.com/franciscohiguera1975/vibe-coding-proyecto-final |
+| Página del proyecto final (GitHub Pages) | https://franciscohiguera1975.github.io/vibe-coding-proyecto-final/ |
+
 ## Características
 
 - **Catálogo de prácticas** público, filtrable por categoría, dificultad,
