@@ -24,7 +24,7 @@ export function LanguageSwitcher() {
       >
         {LANGUAGES.map((lang) => (
           <option key={lang.code} value={lang.code}>
-            {lang.flag} {lang.label}
+            {lang.label}
           </option>
         ))}
       </select>
