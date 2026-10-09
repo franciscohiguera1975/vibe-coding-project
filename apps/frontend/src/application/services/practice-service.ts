@@ -1,9 +1,13 @@
 import type { HttpClient } from '@/application/ports/http-client';
 import type {
+  PracticeAdminDetail,
   PracticeAttempt,
   PracticeDetail,
   PracticeEvaluation,
   PracticeFilters,
+  PracticeNarration,
+  PracticeNarrationGenerateAllItem,
+  PracticeNarrationGenerated,
   PracticeSubmission,
   PracticeSummary,
 } from '@/domain/entities/practice';
@@ -26,33 +30,42 @@ export interface CreatePracticeInput {
   aiConfiguration?: Record<string, unknown>;
   embeddingConfiguration?: Record<string, unknown>;
   metadata?: Record<string, unknown>;
+  /** Overlay de traducciones por idioma (ver PracticeAdminDetail). Solo se
+   * envia/edita desde el panel de administracion. */
+  translations?: Record<string, unknown>;
 }
 
 export class PracticeService {
   constructor(private readonly http: HttpClient) {}
 
-  list(filters: PracticeFilters, page: number, pageSize: number): Promise<Page<PracticeSummary>> {
+  list(
+    filters: PracticeFilters,
+    page: number,
+    pageSize: number,
+    lang?: string,
+  ): Promise<Page<PracticeSummary>> {
     return this.http.get<Page<PracticeSummary>>('/practices', {
       ...filters,
       page,
       pageSize,
+      lang,
     });
   }
 
-  getBySlug(slug: string): Promise<PracticeDetail> {
-    return this.http.get<PracticeDetail>(`/practices/${slug}`);
+  getBySlug(slug: string, lang?: string): Promise<PracticeDetail> {
+    return this.http.get<PracticeDetail>(`/practices/${slug}`, { lang });
   }
 
-  create(input: CreatePracticeInput): Promise<PracticeDetail> {
-    return this.http.post<PracticeDetail>('/practices', input);
+  create(input: CreatePracticeInput): Promise<PracticeAdminDetail> {
+    return this.http.post<PracticeAdminDetail>('/practices', input);
   }
 
-  update(practiceId: string, input: Partial<CreatePracticeInput>): Promise<PracticeDetail> {
-    return this.http.patch<PracticeDetail>(`/practices/${practiceId}`, input);
+  update(practiceId: string, input: Partial<CreatePracticeInput>): Promise<PracticeAdminDetail> {
+    return this.http.patch<PracticeAdminDetail>(`/practices/${practiceId}`, input);
   }
 
-  publish(practiceId: string): Promise<PracticeDetail> {
-    return this.http.post<PracticeDetail>(`/practices/${practiceId}/publish`);
+  publish(practiceId: string): Promise<PracticeAdminDetail> {
+    return this.http.post<PracticeAdminDetail>(`/practices/${practiceId}/publish`);
   }
 
   start(slug: string): Promise<PracticeAttempt> {
@@ -68,5 +81,26 @@ export class PracticeService {
 
   evaluate(submissionId: string): Promise<PracticeEvaluation> {
     return this.http.post<PracticeEvaluation>(`/practices/submissions/${submissionId}/evaluate`);
+  }
+
+  /** Lectura publica del audio narrado ya generado (404 si aun no se genero para
+   * ese idioma: el llamador debe tratarlo como estado vacio, no como error). */
+  getNarration(slug: string, lang: string): Promise<PracticeNarration> {
+    return this.http.get<PracticeNarration>(`/practices/${slug}/narration`, { lang });
+  }
+
+  /** Accion deliberada de administracion: dispara la sintesis TTS para un idioma
+   * (o la reutiliza si el texto no cambio, ver `cached`). Nunca se llama desde la
+   * vista de estudiante. */
+  generateNarration(slug: string, lang: string): Promise<PracticeNarrationGenerated> {
+    return this.http.post<PracticeNarrationGenerated>(
+      `/practices/${slug}/narration?lang=${encodeURIComponent(lang)}`,
+    );
+  }
+
+  generateAllNarrations(slug: string): Promise<PracticeNarrationGenerateAllItem[]> {
+    return this.http.post<PracticeNarrationGenerateAllItem[]>(
+      `/practices/${slug}/narration/generate-all`,
+    );
   }
 }

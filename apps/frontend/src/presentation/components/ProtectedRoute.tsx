@@ -1,5 +1,6 @@
 import { useAuth } from '@/application/hooks/auth-context';
 import type { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation } from 'react-router-dom';
 
 export function ProtectedRoute({
@@ -11,11 +12,12 @@ export function ProtectedRoute({
 }) {
   const { user, isLoading, hasPermission } = useAuth();
   const location = useLocation();
+  const { t } = useTranslation();
 
   if (isLoading) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center text-sm text-ink-500">
-        Cargando sesión...
+        {t('protectedRoute.loadingSession')}
       </div>
     );
   }
@@ -27,9 +29,11 @@ export function ProtectedRoute({
   if (requirePermission && !hasPermission(requirePermission)) {
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
-        <h1 className="text-xl font-semibold text-ink-900">Acceso restringido</h1>
+        <h1 className="text-xl font-semibold text-ink-900">
+          {t('protectedRoute.restricted.title')}
+        </h1>
         <p className="mt-2 text-sm text-ink-500">
-          No tiene el permiso necesario ({requirePermission}) para ver esta sección.
+          {t('protectedRoute.restricted.description', { permission: requirePermission })}
         </p>
       </div>
     );

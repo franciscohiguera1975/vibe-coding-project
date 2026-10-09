@@ -9,6 +9,8 @@ como ejercicio de depuracion/diagnostico sobre sus propios criterios de aceptaci
 
 from typing import Any
 
+from database.seeds.practices_translations import PRACTICE_TRANSLATIONS
+
 INITIAL_PRACTICES: list[dict[str, Any]] = [
     {
         "slug": "software-01-simulacion-mru",
@@ -258,3 +260,6 @@ INITIAL_PRACTICES: list[dict[str, Any]] = [
         "status": "published",
     },
 ]
+
+for _practice in INITIAL_PRACTICES:
+    _practice["translations"] = PRACTICE_TRANSLATIONS.get(_practice["slug"], {})

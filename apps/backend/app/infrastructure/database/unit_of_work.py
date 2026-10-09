@@ -6,12 +6,14 @@ from app.infrastructure.database.repositories.ai_repository import (
     SqlAlchemyAIToolCallRepository,
 )
 from app.infrastructure.database.repositories.identity_repository import (
+    SqlAlchemyPasswordResetTokenRepository,
     SqlAlchemyPermissionRepository,
     SqlAlchemyRoleRepository,
     SqlAlchemyUserRepository,
 )
 from app.infrastructure.database.repositories.practice_repository import (
     SqlAlchemyPracticeCategoryRepository,
+    SqlAlchemyPracticeNarrationRepository,
     SqlAlchemyPracticeRepository,
     SqlAlchemyPracticeTagRepository,
 )
@@ -41,9 +43,11 @@ class SqlAlchemyUnitOfWork:
         self.users = SqlAlchemyUserRepository(self._session)
         self.roles = SqlAlchemyRoleRepository(self._session)
         self.permissions = SqlAlchemyPermissionRepository(self._session)
+        self.password_reset_tokens = SqlAlchemyPasswordResetTokenRepository(self._session)
         self.practices = SqlAlchemyPracticeRepository(self._session)
         self.practice_categories = SqlAlchemyPracticeCategoryRepository(self._session)
         self.practice_tags = SqlAlchemyPracticeTagRepository(self._session)
+        self.practice_narrations = SqlAlchemyPracticeNarrationRepository(self._session)
         self.practice_attempts = SqlAlchemyStudentPracticeAttemptRepository(self._session)
         self.practice_submissions = SqlAlchemyPracticeSubmissionRepository(self._session)
         self.practice_evaluations = SqlAlchemyPracticeEvaluationRepository(self._session)

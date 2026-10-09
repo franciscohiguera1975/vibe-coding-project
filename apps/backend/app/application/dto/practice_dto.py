@@ -20,6 +20,7 @@ class CreatePracticeInput:
     ai_configuration: dict[str, Any] = field(default_factory=dict)
     embedding_configuration: dict[str, Any] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
+    translations: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True, slots=True)
@@ -38,3 +39,4 @@ class UpdatePracticeInput:
     ai_configuration: dict[str, Any] | None = None
     embedding_configuration: dict[str, Any] | None = None
     metadata: dict[str, Any] | None = None
+    translations: dict[str, Any] | None = None

@@ -1,7 +1,9 @@
 import { useConfigurations, useUpdateConfiguration } from '@/application/hooks/use-admin';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function ConfigurationsAdminPage() {
+  const { t } = useTranslation();
   const { data: configurations, isLoading } = useConfigurations();
   const updateConfiguration = useUpdateConfiguration();
   const [drafts, setDrafts] = useState<Record<string, string>>({});
@@ -17,17 +19,17 @@ export function ConfigurationsAdminPage() {
       const value = JSON.parse(draftFor(key, {}));
       await updateConfiguration.mutateAsync({ key, value, description });
     } catch {
-      setErrors((e) => ({ ...e, [key]: 'JSON inválido' }));
+      setErrors((e) => ({ ...e, [key]: t('configurationsAdminPage.errors.invalidJson') }));
     }
   }
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-ink-900">Configuraciones</h1>
-      <p className="mt-1 text-sm text-ink-500">Valores clave/valor usados por la plataforma.</p>
+      <h1 className="text-2xl font-semibold text-ink-900">{t('configurationsAdminPage.title')}</h1>
+      <p className="mt-1 text-sm text-ink-500">{t('configurationsAdminPage.subtitle')}</p>
 
       <div className="mt-6 space-y-4">
-        {isLoading && <p className="text-sm text-ink-500">Cargando...</p>}
+        {isLoading && <p className="text-sm text-ink-500">{t('configurationsAdminPage.loading')}</p>}
         {configurations?.map((config) => (
           <div key={config.key} className="card p-5">
             <div className="flex items-center justify-between">
@@ -46,7 +48,7 @@ export function ConfigurationsAdminPage() {
               onClick={() => handleSave(config.key, config.description)}
               disabled={updateConfiguration.isPending}
             >
-              Guardar
+              {t('configurationsAdminPage.save')}
             </button>
           </div>
         ))}

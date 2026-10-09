@@ -1,6 +1,7 @@
 import { useAnalyzeImage } from '@/application/hooks/use-images';
 import type { PracticeRunnerProps } from '@/presentation/practices/types';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ImageSlotState {
   previewUrl?: string;
@@ -10,6 +11,7 @@ interface ImageSlotState {
 }
 
 export function ImagePracticeRunner({ practice, onSubmit, isSubmitting }: PracticeRunnerProps) {
+  const { t } = useTranslation();
   const evaluation = practice.evaluation as {
     strategy?: string;
     reference?: Record<string, number>;
@@ -42,7 +44,7 @@ export function ImagePracticeRunner({ practice, onSubmit, isSubmitting }: Practi
     } catch {
       setSlots((s) => ({
         ...s,
-        [imageId]: { previewUrl, isAnalyzing: false, warnings: ['error al analizar'] },
+        [imageId]: { previewUrl, isAnalyzing: false, warnings: [t('imagePracticeRunner.analyzeError')] },
       }));
     }
   }
@@ -66,16 +68,24 @@ export function ImagePracticeRunner({ practice, onSubmit, isSubmitting }: Practi
     <div className="space-y-6">
       {content.counting_rule && (
         <div className="card p-5">
-          <h3 className="font-semibold text-ink-900">Regla de conteo</h3>
-          <p className="mt-1 text-sm text-ink-600">Cuenta: {content.counting_rule.counts}</p>
+          <h3 className="font-semibold text-ink-900">
+            {t('imagePracticeRunner.countingRule.heading')}
+          </h3>
+          <p className="mt-1 text-sm text-ink-600">
+            {t('imagePracticeRunner.countingRule.counts', { value: content.counting_rule.counts })}
+          </p>
           {content.counting_rule.excludes && (
             <p className="mt-1 text-sm text-ink-500">
-              No cuenta: {content.counting_rule.excludes.join(', ')}
+              {t('imagePracticeRunner.countingRule.excludes', {
+                value: content.counting_rule.excludes.join(', '),
+              })}
             </p>
           )}
           {content.counting_rule.illegible_when && (
             <p className="mt-1 text-sm text-ink-500">
-              Ilegible cuando: {content.counting_rule.illegible_when.join(', ')}
+              {t('imagePracticeRunner.countingRule.illegibleWhen', {
+                value: content.counting_rule.illegible_when.join(', '),
+              })}
             </p>
           )}
         </div>
@@ -83,10 +93,11 @@ export function ImagePracticeRunner({ practice, onSubmit, isSubmitting }: Practi
 
       {evaluation.strategy === 'count_comparison' && imageIds.length > 0 && (
         <div className="card p-5">
-          <h3 className="font-semibold text-ink-900">Conteo por imagen</h3>
+          <h3 className="font-semibold text-ink-900">
+            {t('imagePracticeRunner.countPerImage.heading')}
+          </h3>
           <p className="mt-1 text-xs text-ink-500">
-            Suba cada imagen de referencia; el prototipo propone un conteo que usted puede revisar y
-            corregir antes de enviar (la decisión final es suya).
+            {t('imagePracticeRunner.countPerImage.description')}
           </p>
           <div className="mt-3 grid grid-cols-1 gap-4 sm:grid-cols-2">
             {imageIds.map((id) => {
@@ -103,16 +114,18 @@ export function ImagePracticeRunner({ practice, onSubmit, isSubmitting }: Practi
                   {slot.previewUrl && (
                     <img
                       src={slot.previewUrl}
-                      alt={`Vista previa de ${id}`}
+                      alt={t('imagePracticeRunner.previewAlt', { id })}
                       className="mt-2 h-24 w-full rounded object-cover"
                     />
                   )}
-                  {slot.isAnalyzing && <p className="mt-1 text-xs text-ink-400">Analizando...</p>}
+                  {slot.isAnalyzing && (
+                    <p className="mt-1 text-xs text-ink-400">{t('imagePracticeRunner.analyzing')}</p>
+                  )}
                   {slot.warnings && slot.warnings.length > 0 && (
                     <p className="mt-1 text-xs text-amber-700">⚠ {slot.warnings.join('; ')}</p>
                   )}
                   <div className="mt-2">
-                    <label className="label">Conteo propuesto (editable)</label>
+                    <label className="label">{t('imagePracticeRunner.proposedCountLabel')}</label>
                     <input
                       type="number"
                       min={0}
@@ -126,14 +139,16 @@ export function ImagePracticeRunner({ practice, onSubmit, isSubmitting }: Practi
             })}
           </div>
           <button className="btn-primary mt-4" onClick={handleSubmitCounts} disabled={isSubmitting}>
-            {isSubmitting ? 'Enviando...' : 'Enviar conteo'}
+            {isSubmitting
+              ? t('imagePracticeRunner.submitCounts.submitting')
+              : t('imagePracticeRunner.submitCounts.button')}
           </button>
         </div>
       )}
 
       {evaluation.strategy === 'manual' && (
         <div className="card p-5">
-          <h3 className="font-semibold text-ink-900">Informe</h3>
+          <h3 className="font-semibold text-ink-900">{t('imagePracticeRunner.report.heading')}</h3>
           {content.required_output && (
             <ul className="mt-1 list-inside list-disc text-sm text-ink-500">
               {content.required_output.map((item) => (
@@ -144,7 +159,7 @@ export function ImagePracticeRunner({ practice, onSubmit, isSubmitting }: Practi
           <textarea
             className="input mt-3"
             rows={6}
-            placeholder="Describa su diagnóstico, errores anotados y propuesta de ajuste..."
+            placeholder={t('imagePracticeRunner.report.placeholder')}
             value={report}
             onChange={(e) => setReport(e.target.value)}
           />
@@ -153,11 +168,12 @@ export function ImagePracticeRunner({ practice, onSubmit, isSubmitting }: Practi
             onClick={handleSubmitReport}
             disabled={isSubmitting || !report.trim()}
           >
-            {isSubmitting ? 'Enviando...' : 'Enviar informe'}
+            {isSubmitting
+              ? t('imagePracticeRunner.report.submitting')
+              : t('imagePracticeRunner.report.submit')}
           </button>
           <p className="mt-2 text-xs text-ink-400">
-            Esta práctica requiere revisión de un docente; el envío queda registrado para esa
-            revisión.
+            {t('imagePracticeRunner.report.reviewNotice')}
           </p>
         </div>
       )}

@@ -71,6 +71,58 @@ def test_create_user_rejected_without_token(random_email):
     assert response.status_code == 403
 
 
+def test_password_reset_request_returns_204_for_unknown_email():
+    response = client.post(
+        "/api/auth/password-reset/request", json={"email": "nobody@vibe-coding-platform.dev"}
+    )
+    assert response.status_code == 204
+
+
+def test_password_reset_full_flow(admin_user):
+    import app.interfaces.http.dependencies.email as email_deps
+
+    class _CapturingEmailSender:
+        def __init__(self) -> None:
+            self.reset_url: str | None = None
+
+        def send_password_reset_email(self, *, to_email, full_name, reset_url) -> None:
+            self.reset_url = reset_url
+
+    capturing_sender = _CapturingEmailSender()
+    email_deps.get_email_sender.cache_clear()
+    app.dependency_overrides[email_deps.get_email_sender] = lambda: capturing_sender
+    try:
+        request_response = client.post(
+            "/api/auth/password-reset/request",
+            json={"email": "admin@vibe-coding-platform.dev"},
+        )
+        assert request_response.status_code == 204
+        assert capturing_sender.reset_url is not None
+        token = capturing_sender.reset_url.split("token=", 1)[1]
+
+        confirm_response = client.post(
+            "/api/auth/password-reset/confirm",
+            json={"token": token, "new_password": "NuevaClave123!"},
+        )
+        assert confirm_response.status_code == 204
+
+        login_response = client.post(
+            "/api/auth/login",
+            json={"email": "admin@vibe-coding-platform.dev", "password": "NuevaClave123!"},
+        )
+        assert login_response.status_code == 200
+    finally:
+        app.dependency_overrides.pop(email_deps.get_email_sender, None)
+
+
+def test_password_reset_confirm_rejects_invalid_token():
+    response = client.post(
+        "/api/auth/password-reset/confirm",
+        json={"token": "token-invalido", "new_password": "NuevaClave123!"},
+    )
+    assert response.status_code == 400
+
+
 def test_assign_role_and_list_roles(admin_user, student_role, random_email):
     login = client.post(
         "/api/auth/login",

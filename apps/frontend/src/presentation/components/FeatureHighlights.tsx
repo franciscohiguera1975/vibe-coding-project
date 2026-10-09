@@ -1,52 +1,64 @@
-const HIGHLIGHTS = [
-  {
-    title: 'Vibe Coding guiado',
-    description:
-      'Practique desarrollo de software asistido por IA con instrucciones claras y criterios de evaluación explícitos.',
-    icon: (
-      <path strokeLinecap="round" strokeLinejoin="round" d="M9 8l-4 4 4 4m6-8l4 4-4 4M13 4l-2 16" />
-    ),
-  },
-  {
-    title: 'Manejo de imágenes',
-    description:
-      'Construya y evalúe prototipos de análisis de imágenes, comparando sus resultados contra una referencia humana.',
-    icon: (
-      <>
-        <rect x="3" y="4" width="18" height="16" rx="2" />
-        <circle cx="9" cy="10" r="2" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M21 16l-5.5-5.5L7 19" />
-      </>
-    ),
-  },
-  {
-    title: 'Tutor con IA',
-    description:
-      'Reciba pistas y retroalimentación de un agente con herramientas controladas, trazabilidad y límites claros.',
-    icon: (
-      <>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2m0 14v2M5 12H3m18 0h-2" />
-        <rect x="6" y="6" width="12" height="12" rx="3" />
-      </>
-    ),
-  },
-  {
-    title: 'Embebido en Moodle',
-    description:
-      'Cada práctica puede incrustarse directamente en un curso de Moodle, D2L o Canvas sin perder funcionalidad.',
-    icon: (
-      <>
-        <rect x="3" y="4" width="18" height="12" rx="2" />
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 20h8M12 16v4" />
-      </>
-    ),
-  },
+import { useTranslation } from 'react-i18next';
+
+const ICONS = [
+  (
+    <path
+      key="vibe-coding"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M9 8l-4 4 4 4m6-8l4 4-4 4M13 4l-2 16"
+    />
+  ),
+  (
+    <>
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <circle cx="9" cy="10" r="2" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M21 16l-5.5-5.5L7 19" />
+    </>
+  ),
+  (
+    <>
+      <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2m0 14v2M5 12H3m18 0h-2" />
+      <rect x="6" y="6" width="12" height="12" rx="3" />
+    </>
+  ),
+  (
+    <>
+      <rect x="3" y="4" width="18" height="12" rx="2" />
+      <path strokeLinecap="round" strokeLinejoin="round" d="M8 20h8M12 16v4" />
+    </>
+  ),
 ];
 
 /** Fila de 4 íconos con las características principales. Usada tanto en el
  * home como en "La plataforma" (AboutPage) para mantener el mismo patrón de
  * la referencia visual en ambas páginas. */
 export function FeatureHighlights() {
+  const { t } = useTranslation();
+
+  const HIGHLIGHTS = [
+    {
+      title: t('featureHighlights.items.vibeCoding.title'),
+      description: t('featureHighlights.items.vibeCoding.description'),
+      icon: ICONS[0],
+    },
+    {
+      title: t('featureHighlights.items.imageHandling.title'),
+      description: t('featureHighlights.items.imageHandling.description'),
+      icon: ICONS[1],
+    },
+    {
+      title: t('featureHighlights.items.aiTutor.title'),
+      description: t('featureHighlights.items.aiTutor.description'),
+      icon: ICONS[2],
+    },
+    {
+      title: t('featureHighlights.items.moodleEmbed.title'),
+      description: t('featureHighlights.items.moodleEmbed.description'),
+      icon: ICONS[3],
+    },
+  ];
+
   return (
     <section className="bg-white py-14">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">

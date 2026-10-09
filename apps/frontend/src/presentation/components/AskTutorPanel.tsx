@@ -1,7 +1,9 @@
 import { useAskTutor } from '@/application/hooks/use-ai';
 import { FormEvent, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function AskTutorPanel({ practiceSlug }: { practiceSlug: string }) {
+  const { t } = useTranslation();
   const askTutor = useAskTutor();
   const [message, setMessage] = useState('');
   const [response, setResponse] = useState<string | null>(null);
@@ -17,26 +19,24 @@ export function AskTutorPanel({ practiceSlug }: { practiceSlug: string }) {
   if (!open) {
     return (
       <button className="btn-secondary" onClick={() => setOpen(true)}>
-        🎓 Preguntar al tutor de IA
+        {t('askTutorPanel.openButton')}
       </button>
     );
   }
 
   return (
     <div className="card p-4">
-      <h3 className="text-sm font-semibold text-ink-900">Tutor de IA</h3>
-      <p className="mt-1 text-xs text-ink-500">
-        El tutor conoce la práctica y su progreso; no revelará la respuesta exacta.
-      </p>
+      <h3 className="text-sm font-semibold text-ink-900">{t('askTutorPanel.title')}</h3>
+      <p className="mt-1 text-xs text-ink-500">{t('askTutorPanel.description')}</p>
       <form onSubmit={handleSubmit} className="mt-3 flex gap-2">
         <input
           className="input"
-          placeholder="Escriba su pregunta..."
+          placeholder={t('askTutorPanel.placeholder')}
           value={message}
           onChange={(e) => setMessage(e.target.value)}
         />
         <button type="submit" className="btn-primary shrink-0" disabled={askTutor.isPending}>
-          {askTutor.isPending ? 'Pensando...' : 'Preguntar'}
+          {askTutor.isPending ? t('askTutorPanel.submitting') : t('askTutorPanel.submit')}
         </button>
       </form>
       {response && (

@@ -1,12 +1,7 @@
 import type { PracticeSummary } from '@/domain/entities/practice';
 import { getPracticeTypeCover } from '@/presentation/practices/type-images';
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-
-const DIFFICULTY_LABEL: Record<string, string> = {
-  beginner: 'Principiante',
-  intermediate: 'Intermedio',
-  advanced: 'Avanzado',
-};
 
 const DIFFICULTY_COLOR: Record<string, string> = {
   beginner: 'bg-emerald-50 text-emerald-700',
@@ -14,12 +9,20 @@ const DIFFICULTY_COLOR: Record<string, string> = {
   advanced: 'bg-rose-50 text-rose-700',
 };
 
-const TYPE_LABEL: Record<string, string> = {
-  software: 'Desarrollo de software',
-  image: 'Manejo de imágenes',
-};
-
 export function PracticeCard({ practice }: { practice: PracticeSummary }) {
+  const { t } = useTranslation();
+
+  const DIFFICULTY_LABEL: Record<string, string> = {
+    beginner: t('practiceCard.difficulty.beginner'),
+    intermediate: t('practiceCard.difficulty.intermediate'),
+    advanced: t('practiceCard.difficulty.advanced'),
+  };
+
+  const TYPE_LABEL: Record<string, string> = {
+    software: t('practiceCard.type.software'),
+    image: t('practiceCard.type.image'),
+  };
+
   return (
     <Link
       to={`/catalogo/${practice.slug}`}
@@ -53,7 +56,7 @@ export function PracticeCard({ practice }: { practice: PracticeSummary }) {
               <circle cx="12" cy="12" r="9" />
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 7v5l3 3" />
             </svg>
-            {practice.estimatedTimeMinutes} min
+            {t('practiceCard.minutesLabel', { count: practice.estimatedTimeMinutes })}
           </span>
           <span className="flex flex-wrap justify-end gap-1">
             {practice.technologies.slice(0, 2).map((tech) => (

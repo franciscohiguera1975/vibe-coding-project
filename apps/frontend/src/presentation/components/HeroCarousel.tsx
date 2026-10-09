@@ -1,5 +1,6 @@
-import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 
 export interface HeroSlide {
   image: string;
@@ -20,6 +21,7 @@ interface HeroCarouselProps {
  * por índice), con autoplay que se pausa al interactuar con las flechas o los
  * indicadores para no pelear con la elección del usuario. */
 export function HeroCarousel({ slides, intervalMs = 7000 }: HeroCarouselProps) {
+  const { t } = useTranslation();
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -79,7 +81,7 @@ export function HeroCarousel({ slides, intervalMs = 7000 }: HeroCarouselProps) {
           <div className="absolute right-6 top-1/2 hidden -translate-y-1/2 flex-col gap-3 sm:flex">
             <button
               type="button"
-              aria-label="Anterior"
+              aria-label={t('heroCarousel.previous')}
               onClick={() => goTo(index - 1)}
               className="flex h-10 w-10 items-center justify-center rounded border border-white/40 text-white transition-colors hover:bg-white/10"
             >
@@ -87,7 +89,7 @@ export function HeroCarousel({ slides, intervalMs = 7000 }: HeroCarouselProps) {
             </button>
             <button
               type="button"
-              aria-label="Siguiente"
+              aria-label={t('heroCarousel.next')}
               onClick={() => goTo(index + 1)}
               className="flex h-10 w-10 items-center justify-center rounded border border-white/40 text-white transition-colors hover:bg-white/10"
             >
@@ -100,7 +102,7 @@ export function HeroCarousel({ slides, intervalMs = 7000 }: HeroCarouselProps) {
               <button
                 key={slide.title}
                 type="button"
-                aria-label={`Ir a la diapositiva ${i + 1}`}
+                aria-label={t('heroCarousel.goToSlide', { number: i + 1 })}
                 onClick={() => goTo(i)}
                 className={`h-2 w-2 rounded-full transition-colors ${
                   i === index ? 'bg-brand-400' : 'bg-white/40 hover:bg-white/60'

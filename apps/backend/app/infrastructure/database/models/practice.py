@@ -3,7 +3,7 @@ import uuid
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Enum as SAEnum
-from sqlalchemy import ForeignKey, Integer, String, Text
+from sqlalchemy import ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -67,6 +67,14 @@ class PracticeModel(TimestampMixin, Base):
     )
     practice_metadata: Mapped[dict] = mapped_column(JSONB, default=dict, nullable=False)
 
+    # Traducciones opcionales del contenido pedagogico por idioma, p.ej.
+    # {"en": {"title": ..., "description": ..., "objectives": [...], "instructions": ...,
+    # "content": {...overlay parcial...}}, "pt": {...}}. Solo se incluyen las claves que
+    # difieren del espanol base (ver app.domain.services.practice_localization).
+    translations: Mapped[dict] = mapped_column(
+        JSONB, default=dict, server_default="{}", nullable=False
+    )
+
     created_by_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), nullable=True
     )
@@ -96,3 +104,22 @@ class PracticeContentModel(TimestampMixin, Base):
     )
 
     practice: Mapped["PracticeModel"] = relationship(back_populates="contents")
+
+
+class PracticeNarrationModel(TimestampMixin, Base):
+    """Audio narrado (TTS) de una practica por idioma (practice_narrations). Un unico
+    registro por (practice_id, lang): se sobrescribe cuando el texto fuente cambia
+    (ver app.domain.entities.practice.PracticeNarration y GeneratePracticeNarrationUseCase)."""
+
+    __tablename__ = "practice_narrations"
+    __table_args__ = (
+        UniqueConstraint("practice_id", "lang", name="uq_practice_narrations_practice_lang"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    practice_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("practices.id", ondelete="CASCADE"), nullable=False
+    )
+    lang: Mapped[str] = mapped_column(String(5), nullable=False)
+    storage_key: Mapped[str] = mapped_column(String(255), nullable=False)
+    text_hash: Mapped[str] = mapped_column(String(64), nullable=False)

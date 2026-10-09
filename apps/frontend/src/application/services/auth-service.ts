@@ -11,4 +11,15 @@ export class AuthService {
   me(): Promise<User> {
     return this.http.get<User>('/auth/me');
   }
+
+  requestPasswordReset(email: string): Promise<void> {
+    return this.http.post<void>('/auth/password-reset/request', { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Promise<void> {
+    return this.http.post<void>('/auth/password-reset/confirm', {
+      token,
+      newPassword,
+    });
+  }
 }

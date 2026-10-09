@@ -33,5 +33,21 @@ class InvalidCredentialsError(DomainError):
         super().__init__("Credenciales invalidas")
 
 
+class InvalidOrExpiredTokenError(DomainError):
+    def __init__(self) -> None:
+        super().__init__("El enlace de restablecimiento es invalido o ha expirado")
+
+
 class AgentLimitExceededError(DomainError):
     """El AI Tutor Agent alcanzo su limite de iteraciones/tokens (Prompt Maestro §11)."""
+
+
+class ExternalServiceError(DomainError):
+    """Un proveedor externo (p.ej. ElevenLabs) respondio con un error. Los adaptadores
+    de infrastructure traducen aqui cualquier excepcion de su cliente HTTP para que
+    la capa de aplicacion/interfaces nunca dependa de una libreria externa concreta."""
+
+    def __init__(self, service: str, detail: str) -> None:
+        self.service = service
+        self.detail = detail
+        super().__init__(f"Error del servicio externo '{service}': {detail}")

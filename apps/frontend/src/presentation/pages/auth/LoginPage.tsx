@@ -1,9 +1,11 @@
 import { useAuth } from '@/application/hooks/auth-context';
 import { ApiError } from '@/application/ports/http-client';
 import { FormEvent, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 export function LoginPage() {
+  const { t } = useTranslation();
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -21,7 +23,7 @@ export function LoginPage() {
       const redirectTo = (location.state as { from?: string } | null)?.from ?? '/';
       navigate(redirectTo, { replace: true });
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'No se pudo iniciar sesión.');
+      setError(err instanceof ApiError ? err.message : t('loginPage.errors.generic'));
     } finally {
       setIsSubmitting(false);
     }
@@ -29,13 +31,13 @@ export function LoginPage() {
 
   return (
     <div className="mx-auto flex min-h-[70vh] max-w-md flex-col justify-center px-4 py-16">
-      <h1 className="text-2xl font-semibold text-ink-900">Ingresar</h1>
-      <p className="mt-1 text-sm text-ink-500">Acceda con su cuenta de la plataforma.</p>
+      <h1 className="text-2xl font-semibold text-ink-900">{t('loginPage.title')}</h1>
+      <p className="mt-1 text-sm text-ink-500">{t('loginPage.subtitle')}</p>
 
       <form onSubmit={handleSubmit} className="card mt-6 space-y-4 p-6">
         <div>
           <label htmlFor="email" className="label">
-            Correo electrónico
+            {t('loginPage.emailLabel')}
           </label>
           <input
             id="email"
@@ -49,7 +51,7 @@ export function LoginPage() {
         </div>
         <div>
           <label htmlFor="password" className="label">
-            Contraseña
+            {t('loginPage.passwordLabel')}
           </label>
           <input
             id="password"
@@ -60,12 +62,18 @@ export function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
           />
+          <Link
+            to="/recuperar-contrasena"
+            className="mt-1 inline-block text-sm font-medium text-brand-600 hover:underline"
+          >
+            {t('loginPage.forgotPassword')}
+          </Link>
         </div>
 
         {error && <p className="text-sm text-rose-600">{error}</p>}
 
         <button type="submit" className="btn-primary w-full" disabled={isSubmitting}>
-          {isSubmitting ? 'Ingresando...' : 'Ingresar'}
+          {isSubmitting ? t('loginPage.submitting') : t('loginPage.submit')}
         </button>
       </form>
     </div>

@@ -1,7 +1,9 @@
 import { useAssignRole, useCreateUser, useRoles, useUsers } from '@/application/hooks/use-admin';
 import { FormEvent, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function UsersAdminPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const { data, isLoading } = useUsers(page);
   const { data: roles } = useRoles();
@@ -19,23 +21,23 @@ export function UsersAdminPage() {
       setShowForm(false);
       setForm({ email: '', fullName: '', password: '' });
     } catch {
-      setError('No se pudo crear el usuario (¿el correo ya está registrado?).');
+      setError(t('usersAdminPage.errors.createFailed'));
     }
   }
 
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold text-ink-900">Usuarios</h1>
+        <h1 className="text-2xl font-semibold text-ink-900">{t('usersAdminPage.title')}</h1>
         <button className="btn-primary" onClick={() => setShowForm((v) => !v)}>
-          {showForm ? 'Cancelar' : 'Nuevo usuario'}
+          {showForm ? t('usersAdminPage.cancel') : t('usersAdminPage.newUser')}
         </button>
       </div>
 
       {showForm && (
         <form onSubmit={handleCreate} className="card mt-4 space-y-3 p-5">
           <div>
-            <label className="label">Correo electrónico</label>
+            <label className="label">{t('usersAdminPage.form.emailLabel')}</label>
             <input
               type="email"
               required
@@ -45,7 +47,7 @@ export function UsersAdminPage() {
             />
           </div>
           <div>
-            <label className="label">Nombre completo</label>
+            <label className="label">{t('usersAdminPage.form.fullNameLabel')}</label>
             <input
               required
               className="input"
@@ -54,7 +56,7 @@ export function UsersAdminPage() {
             />
           </div>
           <div>
-            <label className="label">Contraseña</label>
+            <label className="label">{t('usersAdminPage.form.passwordLabel')}</label>
             <input
               type="password"
               required
@@ -66,20 +68,22 @@ export function UsersAdminPage() {
           </div>
           {error && <p className="text-sm text-rose-600">{error}</p>}
           <button type="submit" className="btn-primary" disabled={createUser.isPending}>
-            {createUser.isPending ? 'Creando...' : 'Crear usuario'}
+            {createUser.isPending
+              ? t('usersAdminPage.form.submitting')
+              : t('usersAdminPage.form.submit')}
           </button>
         </form>
       )}
 
       <div className="mt-6 overflow-x-auto">
-        {isLoading && <p className="text-sm text-ink-500">Cargando...</p>}
+        {isLoading && <p className="text-sm text-ink-500">{t('usersAdminPage.loading')}</p>}
         <table className="w-full min-w-[640px] text-left text-sm">
           <thead>
             <tr className="border-b border-ink-100 text-ink-500">
-              <th className="py-2">Nombre</th>
-              <th className="py-2">Correo</th>
-              <th className="py-2">Roles</th>
-              <th className="py-2">Asignar rol</th>
+              <th className="py-2">{t('usersAdminPage.table.name')}</th>
+              <th className="py-2">{t('usersAdminPage.table.email')}</th>
+              <th className="py-2">{t('usersAdminPage.table.roles')}</th>
+              <th className="py-2">{t('usersAdminPage.table.assignRole')}</th>
             </tr>
           </thead>
           <tbody>
@@ -108,7 +112,7 @@ export function UsersAdminPage() {
                     }}
                   >
                     <option value="" disabled>
-                      Elegir rol...
+                      {t('usersAdminPage.assignRolePlaceholder')}
                     </option>
                     {roles
                       ?.filter((r) => !user.roles.includes(r.name))
@@ -132,17 +136,20 @@ export function UsersAdminPage() {
             disabled={page <= 1}
             onClick={() => setPage((p) => p - 1)}
           >
-            Anterior
+            {t('usersAdminPage.pagination.previous')}
           </button>
           <span className="text-sm text-ink-500">
-            Página {data.page} de {data.totalPages}
+            {t('usersAdminPage.pagination.pageOf', {
+              page: data.page,
+              totalPages: data.totalPages,
+            })}
           </span>
           <button
             className="btn-secondary"
             disabled={page >= data.totalPages}
             onClick={() => setPage((p) => p + 1)}
           >
-            Siguiente
+            {t('usersAdminPage.pagination.next')}
           </button>
         </div>
       )}

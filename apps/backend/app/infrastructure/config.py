@@ -36,6 +36,14 @@ class Settings(BaseSettings):
     ai_agent_max_iterations: int = 8
     ai_agent_max_tokens: int = 4000
 
+    # --- Narracion TTS (ver docs/ai.md) ---
+    # NARRATION_PROVIDER=mock habilita MockNarrationAdapter sin consumir servicios
+    # externos (valor por defecto en dev/test, igual que AI_PROVIDER=mock).
+    narration_provider: Literal["mock", "elevenlabs"] = "mock"
+    elevenlabs_api_key: str = ""
+    elevenlabs_voice_id: str = "JBFqnCBsd6RMkjVDRZzb"
+    elevenlabs_model_id: str = "eleven_multilingual_v2"
+
     storage_provider: Literal["local", "minio", "s3"] = "local"
     storage_local_path: str = "./storage/uploads"
     storage_minio_endpoint: str = ""
@@ -46,6 +54,15 @@ class Settings(BaseSettings):
     storage_max_upload_mb: int = 10
 
     cors_allowed_origins: str = "http://localhost:5173"
+
+    email_provider: Literal["console", "smtp"] = "console"
+    smtp_host: str = ""
+    smtp_port: int = 587
+    smtp_user: str = ""
+    smtp_password: str = ""
+    smtp_from: str = "no-reply@vibecoding-platform.dev"
+    smtp_use_tls: bool = True
+    password_reset_token_expires_in: str = "1h"
 
     @field_validator("database_url")
     @classmethod
@@ -76,6 +93,10 @@ class Settings(BaseSettings):
     @property
     def jwt_refresh_expires_seconds(self) -> int:
         return self.jwt_expires_seconds(self.jwt_refresh_expires_in)
+
+    @property
+    def password_reset_token_expires_seconds(self) -> int:
+        return self.jwt_expires_seconds(self.password_reset_token_expires_in)
 
 
 @lru_cache

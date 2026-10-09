@@ -7,13 +7,14 @@ from app.domain.entities.practice import (
     Practice,
     PracticeCategory,
     PracticeDifficulty,
+    PracticeNarration,
     PracticeStatus,
     PracticeTag,
 )
 from app.domain.repositories.practice_repository import PracticeFilters
 from app.domain.value_objects.pagination import Page, PageRequest
 from app.infrastructure.database.models.catalog import PracticeCategoryModel, PracticeTagModel
-from app.infrastructure.database.models.practice import PracticeModel
+from app.infrastructure.database.models.practice import PracticeModel, PracticeNarrationModel
 
 
 def _category_to_domain(model: PracticeCategoryModel) -> PracticeCategory:
@@ -50,6 +51,7 @@ def _practice_to_domain(model: PracticeModel) -> Practice:
         embedding_configuration=dict(model.embedding_configuration),
         status=PracticeStatus(model.status.value),
         metadata=dict(model.practice_metadata),
+        translations=dict(model.translations),
         created_by_id=model.created_by_id,
         created_at=model.created_at,
         updated_at=model.updated_at,
@@ -96,6 +98,7 @@ class SqlAlchemyPracticeRepository:
             embedding_configuration=dict(practice.embedding_configuration),
             status=practice.status,
             practice_metadata=dict(practice.metadata),
+            translations=dict(practice.translations),
             created_by_id=practice.created_by_id,
             tags=tag_models,
         )
@@ -124,6 +127,7 @@ class SqlAlchemyPracticeRepository:
         model.embedding_configuration = dict(practice.embedding_configuration)
         model.status = practice.status
         model.practice_metadata = dict(practice.metadata)
+        model.translations = dict(practice.translations)
         if practice.tag_ids:
             model.tags = list(
                 self._session.scalars(
@@ -225,3 +229,52 @@ class SqlAlchemyPracticeTagRepository:
             self._session.add(model)
             self._session.flush()
         return _tag_to_domain(model)
+
+
+def _narration_to_domain(model: PracticeNarrationModel) -> PracticeNarration:
+    return PracticeNarration(
+        id=model.id,
+        practice_id=model.practice_id,
+        lang=model.lang,
+        storage_key=model.storage_key,
+        text_hash=model.text_hash,
+        created_at=model.created_at,
+        updated_at=model.updated_at,
+    )
+
+
+class SqlAlchemyPracticeNarrationRepository:
+    def __init__(self, session: Session) -> None:
+        self._session = session
+
+    def get_by_practice_and_lang(
+        self, practice_id: uuid.UUID, lang: str
+    ) -> PracticeNarration | None:
+        model = self._session.scalar(
+            select(PracticeNarrationModel).where(
+                PracticeNarrationModel.practice_id == practice_id,
+                PracticeNarrationModel.lang == lang,
+            )
+        )
+        return _narration_to_domain(model) if model else None
+
+    def upsert(self, narration: PracticeNarration) -> PracticeNarration:
+        model = self._session.scalar(
+            select(PracticeNarrationModel).where(
+                PracticeNarrationModel.practice_id == narration.practice_id,
+                PracticeNarrationModel.lang == narration.lang,
+            )
+        )
+        if model is None:
+            model = PracticeNarrationModel(
+                practice_id=narration.practice_id,
+                lang=narration.lang,
+                storage_key=narration.storage_key,
+                text_hash=narration.text_hash,
+            )
+            self._session.add(model)
+        else:
+            model.storage_key = narration.storage_key
+            model.text_hash = narration.text_hash
+        self._session.flush()
+        return _narration_to_domain(model)

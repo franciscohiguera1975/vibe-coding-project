@@ -3,6 +3,7 @@ import { useGenerateFeedback, useGenerateHint } from '@/application/hooks/use-ai
 import {
   useEvaluatePractice,
   usePractice,
+  usePracticeNarration,
   useStartPractice,
   useSubmitPractice,
 } from '@/application/hooks/use-practices';
@@ -10,13 +11,8 @@ import type { PracticeAttempt, PracticeEvaluation } from '@/domain/entities/prac
 import { AskTutorPanel } from '@/presentation/components/AskTutorPanel';
 import { getPracticeRunner } from '@/presentation/practices/registry';
 import { useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
-
-const DIFFICULTY_LABEL: Record<string, string> = {
-  beginner: 'Principiante',
-  intermediate: 'Intermedio',
-  advanced: 'Avanzado',
-};
 
 interface PracticeWorkspaceProps {
   slug: string | undefined;
@@ -36,8 +32,10 @@ export function PracticeWorkspace({
   embedded = false,
   hideHeading = false,
 }: PracticeWorkspaceProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { data: practice, isLoading, isError } = usePractice(slug);
+  const { data: narration, isLoading: isNarrationLoading } = usePracticeNarration(slug);
 
   const startPractice = useStartPractice();
   const submitPractice = useSubmitPractice();
@@ -51,17 +49,25 @@ export function PracticeWorkspace({
   const [hint, setHint] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<string | null>(null);
 
+  const DIFFICULTY_LABEL: Record<string, string> = {
+    beginner: t('practiceWorkspace.difficulty.beginner'),
+    intermediate: t('practiceWorkspace.difficulty.intermediate'),
+    advanced: t('practiceWorkspace.difficulty.advanced'),
+  };
+
   if (isLoading) {
-    return <p className="py-16 text-sm text-ink-500">Cargando...</p>;
+    return <p className="py-16 text-sm text-ink-500">{t('practiceWorkspace.loading')}</p>;
   }
 
   if (isError || !practice) {
     return (
       <div className="py-16 text-center">
-        <h1 className="text-xl font-semibold text-ink-900">Práctica no encontrada</h1>
+        <h1 className="text-xl font-semibold text-ink-900">
+          {t('practiceWorkspace.notFound.title')}
+        </h1>
         {!embedded && (
           <Link to="/catalogo" className="btn-primary mt-4 inline-flex">
-            Volver al catálogo
+            {t('practiceWorkspace.notFound.backToCatalog')}
           </Link>
         )}
       </div>
@@ -108,7 +114,9 @@ export function PracticeWorkspace({
         <span className="badge bg-ink-100 text-ink-600">
           {DIFFICULTY_LABEL[practice.difficulty] ?? practice.difficulty}
         </span>
-        <span className="text-xs text-ink-400">{practice.estimatedTimeMinutes} min</span>
+        <span className="text-xs text-ink-400">
+          {t('practiceWorkspace.minutesLabel', { count: practice.estimatedTimeMinutes })}
+        </span>
       </div>
 
       {!hideHeading && <h1 className="mt-3 text-3xl font-bold text-ink-900">{practice.title}</h1>}
@@ -116,7 +124,9 @@ export function PracticeWorkspace({
 
       {practice.objectives.length > 0 && (
         <div className="mt-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">Objetivos</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">
+            {t('practiceWorkspace.objectivesHeading')}
+          </h2>
           <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-ink-700">
             {practice.objectives.map((objective) => (
               <li key={objective}>{objective}</li>
@@ -127,28 +137,51 @@ export function PracticeWorkspace({
 
       <div className="mt-6">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">
-          Instrucciones
+          {t('practiceWorkspace.instructionsHeading')}
         </h2>
         <p className="mt-2 whitespace-pre-line text-sm text-ink-700">{practice.instructions}</p>
+      </div>
+
+      <div className="mt-6">
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">
+          {t('practiceWorkspace.narration.heading')}
+        </h2>
+        {isNarrationLoading && (
+          <p className="mt-2 text-sm text-ink-400">{t('practiceWorkspace.narration.loading')}</p>
+        )}
+        {!isNarrationLoading && narration && (
+          <audio className="mt-2 w-full max-w-md" controls src={narration.url}>
+            {t('practiceWorkspace.narration.notSupported')}
+          </audio>
+        )}
+        {!isNarrationLoading && !narration && (
+          <p className="mt-2 text-sm text-ink-400">{t('practiceWorkspace.narration.unavailable')}</p>
+        )}
       </div>
 
       <div className="mt-8 border-t border-ink-100 pt-8">
         {!user && (
           <div className="card p-5 text-sm text-ink-600">
-            <Link
-              to="/login"
-              state={{ from: embedded ? `/practices/${slug}/embed` : `/catalogo/${slug}` }}
-              className="font-medium text-brand-600"
-            >
-              Inicie sesión
-            </Link>{' '}
-            para comenzar esta práctica.
+            <Trans
+              i18nKey="practiceWorkspace.loginPrompt"
+              components={{
+                loginLink: (
+                  <Link
+                    to="/login"
+                    state={{ from: embedded ? `/practices/${slug}/embed` : `/catalogo/${slug}` }}
+                    className="font-medium text-brand-600"
+                  />
+                ),
+              }}
+            />
           </div>
         )}
 
         {user && !attempt && (
           <button className="btn-primary" onClick={handleStart} disabled={startPractice.isPending}>
-            {startPractice.isPending ? 'Iniciando...' : 'Iniciar práctica'}
+            {startPractice.isPending
+              ? t('practiceWorkspace.start.starting')
+              : t('practiceWorkspace.start.button')}
           </button>
         )}
 
@@ -166,7 +199,9 @@ export function PracticeWorkspace({
                 onClick={handleRequestHint}
                 disabled={generateHint.isPending}
               >
-                {generateHint.isPending ? 'Pidiendo pista...' : '💡 Pedir una pista'}
+                {generateHint.isPending
+                  ? t('practiceWorkspace.hint.loading')
+                  : t('practiceWorkspace.hint.button')}
               </button>
               {hint && (
                 <p className="mt-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">{hint}</p>
@@ -180,7 +215,12 @@ export function PracticeWorkspace({
         {evaluation && (
           <div className="card p-5">
             <h2 className="font-semibold text-ink-900">
-              Resultado: {evaluation.passed ? 'Aprobado' : 'No aprobado'} ({evaluation.score}/100)
+              {t('practiceWorkspace.result.heading', {
+                status: evaluation.passed
+                  ? t('practiceWorkspace.result.passed')
+                  : t('practiceWorkspace.result.notPassed'),
+                score: evaluation.score,
+              })}
             </h2>
             <p className="mt-2 text-sm text-ink-600">{evaluation.feedback}</p>
 
@@ -190,7 +230,9 @@ export function PracticeWorkspace({
                 onClick={handleRequestFeedback}
                 disabled={generateFeedback.isPending}
               >
-                {generateFeedback.isPending ? 'Generando...' : '🤖 Generar retroalimentación de IA'}
+                {generateFeedback.isPending
+                  ? t('practiceWorkspace.result.generating')
+                  : t('practiceWorkspace.result.feedbackButton')}
               </button>
               {feedback && (
                 <p className="mt-2 rounded-lg bg-brand-50 p-3 text-sm text-brand-900">{feedback}</p>
@@ -207,7 +249,7 @@ export function PracticeWorkspace({
                 setFeedback(null);
               }}
             >
-              Intentar de nuevo
+              {t('practiceWorkspace.result.retry')}
             </button>
           </div>
         )}

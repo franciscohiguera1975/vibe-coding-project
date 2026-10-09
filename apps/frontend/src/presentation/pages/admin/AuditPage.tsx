@@ -1,24 +1,26 @@
 import { useAuditLogs } from '@/application/hooks/use-admin';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export function AuditPage() {
+  const { t } = useTranslation();
   const [page, setPage] = useState(1);
   const { data, isLoading } = useAuditLogs(page);
 
   return (
     <div>
-      <h1 className="text-2xl font-semibold text-ink-900">Auditoría</h1>
-      <p className="mt-1 text-sm text-ink-500">Registro de acciones administrativas sensibles.</p>
+      <h1 className="text-2xl font-semibold text-ink-900">{t('auditPage.title')}</h1>
+      <p className="mt-1 text-sm text-ink-500">{t('auditPage.subtitle')}</p>
 
       <div className="mt-6 overflow-x-auto">
-        {isLoading && <p className="text-sm text-ink-500">Cargando...</p>}
+        {isLoading && <p className="text-sm text-ink-500">{t('auditPage.loading')}</p>}
         <table className="w-full min-w-[720px] text-left text-sm">
           <thead>
             <tr className="border-b border-ink-100 text-ink-500">
-              <th className="py-2">Fecha</th>
-              <th className="py-2">Acción</th>
-              <th className="py-2">Entidad</th>
-              <th className="py-2">Detalle</th>
+              <th className="py-2">{t('auditPage.table.date')}</th>
+              <th className="py-2">{t('auditPage.table.action')}</th>
+              <th className="py-2">{t('auditPage.table.entity')}</th>
+              <th className="py-2">{t('auditPage.table.detail')}</th>
             </tr>
           </thead>
           <tbody>
@@ -48,17 +50,17 @@ export function AuditPage() {
             disabled={page <= 1}
             onClick={() => setPage((p) => p - 1)}
           >
-            Anterior
+            {t('auditPage.pagination.previous')}
           </button>
           <span className="text-sm text-ink-500">
-            Página {data.page} de {data.totalPages}
+            {t('auditPage.pagination.pageOf', { page: data.page, totalPages: data.totalPages })}
           </span>
           <button
             className="btn-secondary"
             disabled={page >= data.totalPages}
             onClick={() => setPage((p) => p + 1)}
           >
-            Siguiente
+            {t('auditPage.pagination.next')}
           </button>
         </div>
       )}

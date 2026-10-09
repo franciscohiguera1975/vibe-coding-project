@@ -1,13 +1,8 @@
 import { useAuth } from '@/application/hooks/auth-context';
+import { LanguageSwitcher } from '@/presentation/components/LanguageSwitcher';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Link, NavLink } from 'react-router-dom';
-
-const NAV_LINKS = [
-  { to: '/', label: 'Inicio' },
-  { to: '/catalogo', label: 'Catálogo' },
-  { to: '/acerca', label: 'La plataforma' },
-  { to: '/proyecto-final', label: 'Presentación' },
-];
 
 function navLinkClass({ isActive }: { isActive: boolean }): string {
   return `relative py-1 text-sm font-semibold uppercase tracking-wide transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand-500 after:transition-transform after:content-[''] hover:after:scale-x-100 ${
@@ -17,7 +12,15 @@ function navLinkClass({ isActive }: { isActive: boolean }): string {
 
 export function Header() {
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const navLinks = [
+    { to: '/', label: t('header.nav.home') },
+    { to: '/catalogo', label: t('header.nav.catalog') },
+    { to: '/acerca', label: t('header.nav.about') },
+    { to: '/proyecto-final', label: t('header.nav.presentation') },
+  ];
 
   return (
     <header className="sticky top-0 z-40 bg-white shadow-sm">
@@ -35,7 +38,7 @@ export function Header() {
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
-          {NAV_LINKS.map((link) => (
+          {navLinks.map((link) => (
             <NavLink key={link.to} to={link.to} className={navLinkClass} end={link.to === '/'}>
               {link.label}
             </NavLink>
@@ -43,6 +46,7 @@ export function Header() {
         </nav>
 
         <div className="hidden items-center gap-4 md:flex">
+          <LanguageSwitcher />
           {user ? (
             <>
               {user.roles.some((r) => r !== 'STUDENT') && (
@@ -50,7 +54,7 @@ export function Header() {
                   to="/admin"
                   className="text-sm font-semibold uppercase tracking-wide text-navy-700 hover:text-brand-600"
                 >
-                  Administración
+                  {t('header.admin')}
                 </Link>
               )}
               <Link
@@ -63,7 +67,7 @@ export function Header() {
                 onClick={logout}
                 className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
               >
-                Salir
+                {t('header.logout')}
               </button>
             </>
           ) : (
@@ -71,7 +75,7 @@ export function Header() {
               to="/login"
               className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
             >
-              Ingresar
+              {t('header.login')}
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14M13 6l6 6-6 6" />
               </svg>
@@ -82,7 +86,7 @@ export function Header() {
         <button
           className="rounded-md p-2 text-navy-700 md:hidden"
           onClick={() => setMenuOpen((v) => !v)}
-          aria-label="Abrir menú"
+          aria-label={t('header.openMenu')}
         >
           <svg
             viewBox="0 0 24 24"
@@ -99,24 +103,25 @@ export function Header() {
       {menuOpen && (
         <div className="border-t border-ink-100 px-4 py-3 md:hidden">
           <nav className="flex flex-col gap-3">
-            {NAV_LINKS.map((link) => (
+            {navLinks.map((link) => (
               <NavLink key={link.to} to={link.to} className={navLinkClass} end={link.to === '/'}>
                 {link.label}
               </NavLink>
             ))}
+            <LanguageSwitcher />
             {user ? (
               <button
                 onClick={logout}
                 className="rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white"
               >
-                Salir
+                {t('header.logout')}
               </button>
             ) : (
               <Link
                 to="/login"
                 className="rounded-md bg-brand-500 px-5 py-2.5 text-center text-sm font-semibold text-white"
               >
-                Ingresar
+                {t('header.login')}
               </Link>
             )}
           </nav>

@@ -1,15 +1,6 @@
 import { useAuth } from '@/application/hooks/auth-context';
+import { useTranslation } from 'react-i18next';
 import { NavLink, Outlet, Link } from 'react-router-dom';
-
-const NAV_ITEMS = [
-  { to: '/admin', label: 'Dashboard', end: true },
-  { to: '/admin/practicas', label: 'Prácticas' },
-  { to: '/admin/categorias', label: 'Categorías' },
-  { to: '/admin/usuarios', label: 'Usuarios' },
-  { to: '/admin/roles', label: 'Roles y permisos' },
-  { to: '/admin/configuraciones', label: 'Configuraciones' },
-  { to: '/admin/auditoria', label: 'Auditoría' },
-];
 
 function navLinkClass({ isActive }: { isActive: boolean }): string {
   return `block rounded-lg border-l-2 px-4 py-2.5 text-sm font-medium transition-colors ${
@@ -21,6 +12,17 @@ function navLinkClass({ isActive }: { isActive: boolean }): string {
 
 export function AdminLayout() {
   const { user, logout } = useAuth();
+  const { t } = useTranslation();
+
+  const NAV_ITEMS = [
+    { to: '/admin', label: t('adminLayout.nav.dashboard'), end: true },
+    { to: '/admin/practicas', label: t('adminLayout.nav.practices') },
+    { to: '/admin/categorias', label: t('adminLayout.nav.categories') },
+    { to: '/admin/usuarios', label: t('adminLayout.nav.users') },
+    { to: '/admin/roles', label: t('adminLayout.nav.roles') },
+    { to: '/admin/configuraciones', label: t('adminLayout.nav.configurations') },
+    { to: '/admin/auditoria', label: t('adminLayout.nav.audit') },
+  ];
 
   return (
     <div className="flex min-h-screen bg-ink-50">
@@ -39,7 +41,7 @@ export function AdminLayout() {
             <span className="block text-sm font-bold tracking-tight text-white">
               Vibe<span className="text-brand-400">Coding</span>
             </span>
-            <span className="block text-xs text-ink-400">Administración</span>
+            <span className="block text-xs text-ink-400">{t('adminLayout.subtitle')}</span>
           </span>
         </Link>
         <nav className="mt-8 flex-1 space-y-1 overflow-y-auto">
@@ -55,7 +57,7 @@ export function AdminLayout() {
             onClick={logout}
             className="mt-2 w-full rounded-md bg-white/10 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/20"
           >
-            Salir
+            {t('adminLayout.logout')}
           </button>
         </div>
       </aside>

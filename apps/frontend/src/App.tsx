@@ -8,6 +8,8 @@ import { NotFoundPage } from '@/presentation/pages/public/NotFoundPage';
 import { PracticeDetailPage } from '@/presentation/pages/public/PracticeDetailPage';
 import { PracticeEmbedPage } from '@/presentation/pages/public/PracticeEmbedPage';
 import { LoginPage } from '@/presentation/pages/auth/LoginPage';
+import { ForgotPasswordPage } from '@/presentation/pages/auth/ForgotPasswordPage';
+import { ResetPasswordPage } from '@/presentation/pages/auth/ResetPasswordPage';
 import { DashboardPage } from '@/presentation/pages/admin/DashboardPage';
 import { PracticesAdminPage } from '@/presentation/pages/admin/PracticesAdminPage';
 import { CategoriesAdminPage } from '@/presentation/pages/admin/CategoriesAdminPage';
@@ -30,6 +32,8 @@ export default function App() {
         <Route path="acerca" element={<AboutPage />} />
         <Route path="proyecto-final" element={<FinalProjectPage />} />
         <Route path="login" element={<LoginPage />} />
+        <Route path="recuperar-contrasena" element={<ForgotPasswordPage />} />
+        <Route path="restablecer-contrasena" element={<ResetPasswordPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
 

@@ -60,6 +60,8 @@ class UpdatePracticeUseCase:
                 practice.embedding_configuration = dict(data.embedding_configuration)
             if data.metadata is not None:
                 practice.metadata = dict(data.metadata)
+            if data.translations is not None:
+                practice.translations = dict(data.translations)
 
             updated = uow.practices.update(practice)
             uow.commit()

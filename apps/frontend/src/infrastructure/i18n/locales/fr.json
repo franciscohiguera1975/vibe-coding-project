@@ -1,0 +1,558 @@
+{
+  "header": {
+    "nav": {
+      "home": "Accueil",
+      "catalog": "Catalogue",
+      "about": "La plateforme",
+      "presentation": "Présentation"
+    },
+    "admin": "Administration",
+    "login": "Se connecter",
+    "logout": "Se déconnecter",
+    "openMenu": "Ouvrir le menu"
+  },
+  "language": {
+    "label": "Langue",
+    "es": "Espagnol",
+    "en": "Anglais",
+    "pt": "Portugais",
+    "fr": "Français"
+  },
+  "homePage": {
+    "hero": {
+      "slide1": {
+        "eyebrow": "DÉVELOPPEMENT LOGICIEL",
+        "title": "Apprenez à créer des logiciels avec l'IA, en pratiquant pour de vrai",
+        "description": "Des pratiques interactives de Vibe Coding avec la rétroaction d'un tuteur IA et une évaluation fondée sur des critères explicites.",
+        "primaryCta": "Explorer le catalogue",
+        "secondaryCta": "Comment ça marche"
+      },
+      "slide2": {
+        "eyebrow": "IA AGENTIQUE",
+        "title": "Un tuteur IA avec des outils contrôlés et une traçabilité totale",
+        "description": "Indices et rétroaction d'un agent avec des limites claires d'itérations et de jetons — chaque décision est enregistrée.",
+        "primaryCta": "Découvrir le tuteur IA",
+        "secondaryCta": "Voir les pratiques"
+      },
+      "slide3": {
+        "eyebrow": "ANALYSE D'IMAGES",
+        "title": "Construisez des prototypes de comptage d'objets avec une règle explicite",
+        "description": "Comparez vos résultats à une référence humaine et comprenez les limites de ce qu'un modèle peut déduire d'une image.",
+        "primaryCta": "Pratiques d'images",
+        "secondaryCta": "Comment ça marche"
+      }
+    },
+    "steps": {
+      "eyebrow": "Comment ça marche",
+      "title": "Le déroulement d'une pratique",
+      "step1": {
+        "title": "Choisissez une pratique",
+        "description": "Filtrez le catalogue par type, niveau ou technologie et lisez ses objectifs."
+      },
+      "step2": {
+        "title": "Pratiquez avec l'IA",
+        "description": "Construisez ou déboguez votre solution avec l'aide d'un tuteur IA à la demande."
+      },
+      "step3": {
+        "title": "Soumettez et évaluez",
+        "description": "Votre résultat est évalué selon des critères explicites : numériques, de comptage ou manuels."
+      },
+      "step4": {
+        "title": "Recevez une rétroaction",
+        "description": "Comparez votre prédiction, recevez un retour et recommencez autant de fois que vous le souhaitez."
+      }
+    },
+    "categories": {
+      "eyebrow": "Catégories",
+      "title": "Catégories de pratiques",
+      "software": "Développement logiciel",
+      "image": "Analyse d'images"
+    },
+    "featured": {
+      "eyebrow": "Pratiques",
+      "title": "Pratiques en vedette",
+      "viewAll": "Voir toutes les pratiques"
+    },
+    "instructors": {
+      "eyebrow": "Enseignants",
+      "title": "Qui la construit",
+      "instructor1Role": "Enseignant de programmation",
+      "instructor2Role": "Faculté des sciences sociales, de l'éducation et des humanités · Département de communication et des arts",
+      "instructor3Role": "Enseignant de bases de données",
+      "instructor4Role": "Enseignant-chercheur · Unité académique spécialisée en formation technique et technologique"
+    },
+    "testimonials": {
+      "eyebrow": "Témoignages",
+      "title": "Ce qu'en disent ceux qui l'utilisent",
+      "voice1": {
+        "role": "Étudiant · Développement logiciel",
+        "quote": "Devoir prédire le résultat avant de l'exécuter m'a obligé à comprendre le modèle, et pas seulement à copier du code généré par l'IA."
+      },
+      "voice2": {
+        "role": "Étudiant · Analyse d'images",
+        "quote": "Comparer mon comptage à la référence humaine m'a montré exactement où ma règle échouait et comment la corriger."
+      },
+      "voice3": {
+        "role": "Enseignant",
+        "quote": "La traçabilité du tuteur IA — quel outil il a utilisé et pourquoi — me permet de faire confiance à ce que l'agent rapporte."
+      }
+    }
+  },
+  "aboutPage": {
+    "pageTitle": "À propos de la plateforme",
+    "breadcrumbs": {
+      "home": "Accueil",
+      "about": "La plateforme"
+    },
+    "steps": {
+      "eyebrow": "Étape par étape",
+      "title": "Comment fonctionne une pratique",
+      "step1": {
+        "title": "Sélectionnez une pratique",
+        "description": "Explorez le catalogue filtré par type, niveau ou technologie."
+      },
+      "step2": {
+        "title": "Lisez les objectifs",
+        "description": "Chaque pratique indique ce que vous allez apprendre et ce qui est attendu de vous."
+      },
+      "step3": {
+        "title": "Réalisez l'activité",
+        "description": "Suivez les instructions et utilisez le contenu interactif de la pratique."
+      },
+      "step4": {
+        "title": "Soumettez votre résultat",
+        "description": "Votre soumission est évaluée selon des critères explicites définis par la pratique."
+      },
+      "step5": {
+        "title": "Recevez une rétroaction",
+        "description": "Consultez votre score, le détail de l'évaluation et les suggestions d'un tuteur IA."
+      }
+    }
+  },
+  "catalogPage": {
+    "pageTitle": "Catalogue de pratiques",
+    "breadcrumbs": {
+      "home": "Accueil",
+      "catalog": "Catalogue"
+    },
+    "filters": {
+      "description": "Filtrez par type, niveau ou mot-clé pour trouver la pratique adaptée.",
+      "searchPlaceholder": "Rechercher par titre...",
+      "typeAll": "Tous les types",
+      "typeSoftware": "Développement logiciel",
+      "typeImage": "Analyse d'images",
+      "difficultyAll": "Tous les niveaux",
+      "difficultyBeginner": "Débutant",
+      "difficultyIntermediate": "Intermédiaire",
+      "difficultyAdvanced": "Avancé"
+    },
+    "errors": {
+      "loadFailed": "Impossible de charger le catalogue."
+    },
+    "empty": "Aucune pratique ne correspond aux filtres.",
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "pageOf": "Page {{page}} sur {{totalPages}}"
+    }
+  },
+  "practiceDetailPage": {
+    "fallbackTitle": "Pratique",
+    "breadcrumbs": {
+      "home": "Accueil",
+      "catalog": "Catalogue"
+    }
+  },
+  "finalProjectPage": {
+    "pageTitle": "Projet final · Vibe Coding CEDIA 2026",
+    "breadcrumbs": {
+      "home": "Accueil",
+      "presentation": "Présentation"
+    },
+    "eyebrow": "Présentation",
+    "heading": "Vibe Coding Platform, présentée par ses auteurs",
+    "description": "Francisco Javier Higuera González (Universidad UTE) et Carlos Byron Bermeo León (Universidad UTPL) présentent la plateforme construite pendant le cours Vibe Coding CEDIA 2026, avec une narration générée par une voix IA (ElevenLabs) et relue par les auteurs.",
+    "videoLabel": "Vidéo · {{lang}}",
+    "repoLink": "Dépôt du projet final (présentations et note méthodologique) →"
+  },
+  "notFoundPage": {
+    "title": "Page introuvable",
+    "description": "Le contenu que vous cherchez n'existe pas ou a été déplacé.",
+    "backHome": "Retour à l'accueil"
+  },
+  "loginPage": {
+    "title": "Se connecter",
+    "subtitle": "Accédez avec votre compte de la plateforme.",
+    "emailLabel": "Adresse e-mail",
+    "passwordLabel": "Mot de passe",
+    "forgotPassword": "Mot de passe oublié ?",
+    "submit": "Se connecter",
+    "submitting": "Connexion...",
+    "errors": {
+      "generic": "Impossible de se connecter."
+    }
+  },
+  "forgotPasswordPage": {
+    "title": "Récupérer le mot de passe",
+    "subtitle": "Indiquez votre e-mail et nous vous enverrons un lien pour réinitialiser votre mot de passe.",
+    "emailLabel": "Adresse e-mail",
+    "submit": "Envoyer le lien de récupération",
+    "submitting": "Envoi...",
+    "backToLogin": "Retour à la connexion",
+    "sentMessage": "S'il existe un compte associé à <strong>{{email}}</strong>, vous recevrez un e-mail avec les instructions pour réinitialiser votre mot de passe sous peu.",
+    "errors": {
+      "generic": "Impossible de traiter la demande."
+    }
+  },
+  "resetPasswordPage": {
+    "errors": {
+      "mismatch": "Les mots de passe ne correspondent pas.",
+      "generic": "Impossible de réinitialiser le mot de passe."
+    },
+    "invalidLink": {
+      "title": "Lien invalide",
+      "description": "Ce lien de réinitialisation n'est pas valide. Demandez-en un nouveau depuis la page de récupération de mot de passe.",
+      "requestNew": "Demander un nouveau lien"
+    },
+    "title": "Réinitialiser le mot de passe",
+    "subtitle": "Entrez votre nouveau mot de passe.",
+    "success": {
+      "message": "Votre mot de passe a été mis à jour avec succès. Vous pouvez maintenant vous connecter avec celui-ci.",
+      "goToLogin": "Aller à la connexion"
+    },
+    "newPasswordLabel": "Nouveau mot de passe",
+    "confirmPasswordLabel": "Confirmer le mot de passe",
+    "submit": "Réinitialiser le mot de passe",
+    "submitting": "Enregistrement..."
+  },
+  "dashboardPage": {
+    "title": "Panneau d'administration",
+    "welcome": "Bienvenue, {{name}}.",
+    "cards": {
+      "practices": {
+        "title": "Pratiques",
+        "description": "Créer, modifier et publier des pratiques du catalogue."
+      },
+      "categories": {
+        "title": "Catégories",
+        "description": "Organiser le catalogue par catégories."
+      },
+      "users": {
+        "title": "Utilisateurs",
+        "description": "Créer des utilisateurs et attribuer des rôles."
+      },
+      "roles": {
+        "title": "Rôles et permissions",
+        "description": "Consulter les rôles et attribuer des permissions."
+      },
+      "configurations": {
+        "title": "Configurations",
+        "description": "Ajuster les paramètres de la plateforme."
+      },
+      "audit": {
+        "title": "Audit",
+        "description": "Voir le journal des actions administratives."
+      }
+    }
+  },
+  "auditPage": {
+    "title": "Audit",
+    "subtitle": "Journal des actions administratives sensibles.",
+    "loading": "Chargement...",
+    "table": {
+      "date": "Date",
+      "action": "Action",
+      "entity": "Entité",
+      "detail": "Détail"
+    },
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "pageOf": "Page {{page}} sur {{totalPages}}"
+    }
+  },
+  "categoriesAdminPage": {
+    "title": "Catégories",
+    "nameLabel": "Nom de la catégorie",
+    "namePlaceholder": "ex. Intelligence Artificielle",
+    "submit": "Créer",
+    "loading": "Chargement...",
+    "errors": {
+      "createFailed": "Impossible de créer la catégorie (le nom existe peut-être déjà)."
+    }
+  },
+  "configurationsAdminPage": {
+    "title": "Configurations",
+    "subtitle": "Valeurs clé/valeur utilisées par la plateforme.",
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "errors": {
+      "invalidJson": "JSON invalide"
+    }
+  },
+  "rolesAdminPage": {
+    "title": "Rôles et permissions",
+    "subtitle": "Chaque rôle regroupe des permissions. Attribuez une permission supplémentaire à un rôle si besoin.",
+    "loading": "Chargement...",
+    "addPermissionPlaceholder": "Ajouter une permission..."
+  },
+  "practicesAdminPage": {
+    "title": "Pratiques",
+    "newPractice": "Nouvelle pratique",
+    "cancel": "Annuler",
+    "form": {
+      "titleLabel": "Titre",
+      "typeLabel": "Type",
+      "instructionsLabel": "Instructions",
+      "contentLabel": "Contenu (JSON)",
+      "evaluationLabel": "Évaluation (JSON)",
+      "submit": "Créer la pratique",
+      "submitting": "Création..."
+    },
+    "errors": {
+      "invalidJson": "Vérifiez le formulaire : le contenu et l'évaluation doivent être un JSON valide."
+    },
+    "table": {
+      "title": "Titre",
+      "type": "Type",
+      "status": "Statut"
+    },
+    "publish": "Publier",
+    "narration": {
+      "generateButton": "🔊 Générer les narrations",
+      "generating": "Génération...",
+      "cached": "réutilisée",
+      "generated": "générée"
+    },
+    "loading": "Chargement...",
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "pageOf": "Page {{page}} sur {{totalPages}}"
+    }
+  },
+  "usersAdminPage": {
+    "title": "Utilisateurs",
+    "newUser": "Nouvel utilisateur",
+    "cancel": "Annuler",
+    "form": {
+      "emailLabel": "Adresse e-mail",
+      "fullNameLabel": "Nom complet",
+      "passwordLabel": "Mot de passe",
+      "submit": "Créer l'utilisateur",
+      "submitting": "Création..."
+    },
+    "errors": {
+      "createFailed": "Impossible de créer l'utilisateur (l'e-mail est peut-être déjà enregistré)."
+    },
+    "table": {
+      "name": "Nom",
+      "email": "E-mail",
+      "roles": "Rôles",
+      "assignRole": "Attribuer un rôle"
+    },
+    "assignRolePlaceholder": "Choisir un rôle...",
+    "loading": "Chargement...",
+    "pagination": {
+      "previous": "Précédent",
+      "next": "Suivant",
+      "pageOf": "Page {{page}} sur {{totalPages}}"
+    }
+  },
+  "aboutIntro": {
+    "imageAlt": "Étudiant suivant un cours de programmation en ligne",
+    "eyebrow": "À propos",
+    "title": "Bienvenue sur Vibe Coding",
+    "description": "Une plateforme éducative indépendante, créée pour enseigner le développement logiciel et l'analyse d'images avec le soutien de l'Intelligence Artificielle — avec des pratiques réutilisables, une évaluation fondée sur des critères explicites et un tuteur IA qui aide sans résoudre l'exercice à votre place.",
+    "bullets": {
+      "reusablePractices": "Pratiques interactives réutilisables",
+      "explicitEvaluation": "Évaluation à critères explicites",
+      "aiTutor": "Tuteur IA avec limites et traçabilité",
+      "embeddable": "Intégrable à Moodle, D2L et Canvas"
+    },
+    "readMore": "En savoir plus"
+  },
+  "askTutorPanel": {
+    "openButton": "🎓 Demander au tuteur IA",
+    "title": "Tuteur IA",
+    "description": "Le tuteur connaît la pratique et votre progression ; il ne révélera pas la réponse exacte.",
+    "placeholder": "Écrivez votre question...",
+    "submit": "Demander",
+    "submitting": "Réflexion..."
+  },
+  "featureHighlights": {
+    "items": {
+      "vibeCoding": {
+        "title": "Vibe Coding guidé",
+        "description": "Pratiquez le développement logiciel assisté par IA avec des instructions claires et des critères d'évaluation explicites."
+      },
+      "imageHandling": {
+        "title": "Analyse d'images",
+        "description": "Construisez et évaluez des prototypes d'analyse d'images, en comparant vos résultats à une référence humaine."
+      },
+      "aiTutor": {
+        "title": "Tuteur IA",
+        "description": "Recevez des indices et une rétroaction d'un agent avec des outils contrôlés, une traçabilité et des limites claires."
+      },
+      "moodleEmbed": {
+        "title": "Intégré à Moodle",
+        "description": "Chaque pratique peut s'intégrer directement dans un cours Moodle, D2L ou Canvas sans perdre de fonctionnalité."
+      }
+    }
+  },
+  "heroCarousel": {
+    "previous": "Précédent",
+    "next": "Suivant",
+    "goToSlide": "Aller à la diapositive {{number}}"
+  },
+  "practiceCard": {
+    "difficulty": {
+      "beginner": "Débutant",
+      "intermediate": "Intermédiaire",
+      "advanced": "Avancé"
+    },
+    "type": {
+      "software": "Développement logiciel",
+      "image": "Analyse d'images"
+    },
+    "minutesLabel": "{{count}} min"
+  },
+  "protectedRoute": {
+    "loadingSession": "Chargement de la session...",
+    "restricted": {
+      "title": "Accès restreint",
+      "description": "Vous n'avez pas la permission nécessaire ({{permission}}) pour voir cette section."
+    }
+  },
+  "adminLayout": {
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "practices": "Pratiques",
+      "categories": "Catégories",
+      "users": "Utilisateurs",
+      "roles": "Rôles et permissions",
+      "configurations": "Configurations",
+      "audit": "Audit"
+    },
+    "subtitle": "Administration",
+    "logout": "Se déconnecter"
+  },
+  "footer": {
+    "description": "Plateforme éducative indépendante pour l'enseignement pratique du développement logiciel et de l'analyse d'images avec l'IA et l'IA agentique.",
+    "explore": {
+      "heading": "Explorer",
+      "catalog": "Catalogue de pratiques",
+      "software": "Développement logiciel",
+      "image": "Analyse d'images",
+      "about": "À propos de la plateforme"
+    },
+    "integration": {
+      "heading": "Intégration",
+      "embed": "Intégrable à Moodle, D2L et Canvas",
+      "api": "API documentée (OpenAPI/Swagger)",
+      "tutor": "Tuteur IA avec rétroaction automatique"
+    },
+    "access": {
+      "heading": "Accès",
+      "login": "Se connecter",
+      "viewPractices": "Voir les pratiques publiées"
+    },
+    "copyright": "© {{year}} Vibe Coding Platform · Projet éducatif UTE",
+    "tagline": "Plateforme indépendante d'enseignement pratique de Vibe Coding",
+    "scrollToTop": "Retour en haut"
+  },
+  "practiceWorkspace": {
+    "difficulty": {
+      "beginner": "Débutant",
+      "intermediate": "Intermédiaire",
+      "advanced": "Avancé"
+    },
+    "loading": "Chargement...",
+    "notFound": {
+      "title": "Pratique introuvable",
+      "backToCatalog": "Retour au catalogue"
+    },
+    "minutesLabel": "{{count}} min",
+    "objectivesHeading": "Objectifs",
+    "instructionsHeading": "Instructions",
+    "narration": {
+      "heading": "Narration",
+      "loading": "Chargement de la narration...",
+      "unavailable": "La narration n'est pas encore disponible dans cette langue.",
+      "notSupported": "Votre navigateur ne prend pas en charge la lecture audio."
+    },
+    "loginPrompt": "<loginLink>Connectez-vous</loginLink> pour commencer cette pratique.",
+    "start": {
+      "button": "Démarrer la pratique",
+      "starting": "Démarrage..."
+    },
+    "hint": {
+      "button": "💡 Demander un indice",
+      "loading": "Demande d'indice..."
+    },
+    "result": {
+      "heading": "Résultat : {{status}} ({{score}}/100)",
+      "passed": "Réussi",
+      "notPassed": "Non réussi",
+      "feedbackButton": "🤖 Générer une rétroaction IA",
+      "generating": "Génération...",
+      "retry": "Réessayer"
+    }
+  },
+  "imagePracticeRunner": {
+    "countingRule": {
+      "heading": "Règle de comptage",
+      "counts": "Compte : {{value}}",
+      "excludes": "Ne compte pas : {{value}}",
+      "illegibleWhen": "Illisible quand : {{value}}"
+    },
+    "countPerImage": {
+      "heading": "Comptage par image",
+      "description": "Téléversez chaque image de référence ; le prototype propose un comptage que vous pouvez revoir et corriger avant de soumettre (la décision finale vous appartient)."
+    },
+    "previewAlt": "Aperçu de {{id}}",
+    "analyzing": "Analyse en cours...",
+    "analyzeError": "erreur lors de l'analyse",
+    "proposedCountLabel": "Comptage proposé (modifiable)",
+    "submitCounts": {
+      "button": "Envoyer le comptage",
+      "submitting": "Envoi..."
+    },
+    "report": {
+      "heading": "Rapport",
+      "placeholder": "Décrivez votre diagnostic, les erreurs relevées et la proposition d'ajustement...",
+      "submit": "Envoyer le rapport",
+      "submitting": "Envoi...",
+      "reviewNotice": "Cette pratique nécessite la révision d'un enseignant ; la soumission est enregistrée pour cette révision."
+    }
+  },
+  "softwarePracticeRunner": {
+    "simulation": {
+      "heading": "Simulation interactive",
+      "assumptions": "Hypothèses : {{value}}",
+      "predictLabel": "Prédisez : quelle distance sera parcourue ?",
+      "predictPlaceholder": "Votre prédiction en km",
+      "speedLabel": "Vitesse ({{unit}})",
+      "timeLabel": "Temps ({{unit}})",
+      "calculate": "Calculer",
+      "resultText": "Résultat : <strong>{{result}} km</strong> — équivalent textuel : à {{speed}} km/h pendant {{time}} h, on parcourt {{result}} km.",
+      "predictionMatch": "Votre prédiction était {{predicted}} km ; le modèle donne {{result}} km — cela correspond au modèle.",
+      "predictionMismatch": "Votre prédiction était {{predicted}} km ; le modèle donne {{result}} km — la distance croît en proportion directe du temps et de la vitesse.",
+      "transfer": "<strong>Transfert :</strong> {{question}}"
+    },
+    "bugs": {
+      "heading": "Erreurs à corriger"
+    },
+    "selfCheck": {
+      "heading": "Auto-évaluation selon les critères",
+      "description": "Testez votre correction et notez 1 si le critère est rempli, 0 sinon."
+    },
+    "submit": {
+      "button": "Envoyer le résultat",
+      "submitting": "Envoi..."
+    }
+  },
+  "unknownPracticeType": {
+    "message": "Aucun contenu interactif n'est enregistré pour le type de pratique « {{type}} ». Un administrateur peut ajouter un nouveau composant dans le registre des types sans modifier le reste de la plateforme."
+  }
+}

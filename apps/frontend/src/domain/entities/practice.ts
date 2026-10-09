@@ -57,3 +57,28 @@ export interface PracticeFilters {
   hasAi?: boolean;
   search?: string;
 }
+
+export interface PracticeNarration {
+  lang: string;
+  url: string;
+}
+
+export interface PracticeNarrationGenerated extends PracticeNarration {
+  cached: boolean;
+}
+
+export interface PracticeNarrationGenerateAllItem {
+  lang: string;
+  status: 'ok' | 'error';
+  url?: string | null;
+  cached?: boolean | null;
+  message?: string | null;
+}
+
+export interface PracticeAdminDetail extends PracticeDetail {
+  /** Traducciones crudas por idioma (solo expuestas por los endpoints de
+   * administracion: crear/actualizar/publicar). No se usa para renderizar la
+   * practica — eso ya viene localizado en los campos de PracticeDetail segun el
+   * `lang` enviado en la solicitud. */
+  translations: Record<string, unknown>;
+}

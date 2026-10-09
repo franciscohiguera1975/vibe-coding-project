@@ -101,3 +101,147 @@ def test_full_flow_via_api(admin_user, student_role, random_email):
     )
     assert evaluate.status_code == 200
     assert evaluate.json()["passed"] is True
+
+
+def test_practice_detail_lang_en_returns_translation(admin_user):
+    token = _login("admin@vibe-coding-platform.dev", "AdminPass123!")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/practices",
+        json={
+            "title": "Simulacion de MRU",
+            "type": "software",
+            "instructions": "Instrucciones en espanol",
+            "content": {"model": "distance = speed * time"},
+            "translations": {
+                "en": {"title": "MRU simulation", "instructions": "Instructions in English"},
+                "pt": {"title": "Simulacao de MRU"},
+            },
+        },
+        headers=headers,
+    ).json()
+    client.post(f"/api/practices/{created['id']}/publish", headers=headers)
+    slug = created["slug"]
+
+    en_detail = client.get(f"/api/practices/{slug}", params={"lang": "en"})
+    assert en_detail.status_code == 200
+    assert en_detail.json()["title"] == "MRU simulation"
+    assert en_detail.json()["instructions"] == "Instructions in English"
+    # El esquema publico nunca expone el diccionario crudo de traducciones.
+    assert "translations" not in en_detail.json()
+
+    pt_detail = client.get(f"/api/practices/{slug}", params={"lang": "pt"})
+    assert pt_detail.status_code == 200
+    assert pt_detail.json()["title"] == "Simulacao de MRU"
+
+
+def test_practice_detail_defaults_to_spanish_without_lang(admin_user):
+    token = _login("admin@vibe-coding-platform.dev", "AdminPass123!")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/practices",
+        json={
+            "title": "Simulacion de MRU",
+            "type": "software",
+            "instructions": "Instrucciones en espanol",
+            "content": {"model": "distance = speed * time"},
+            "translations": {"en": {"title": "MRU simulation"}},
+        },
+        headers=headers,
+    ).json()
+    client.post(f"/api/practices/{created['id']}/publish", headers=headers)
+    slug = created["slug"]
+
+    no_lang = client.get(f"/api/practices/{slug}")
+    assert no_lang.json()["title"] == "Simulacion de MRU"
+
+    explicit_es = client.get(f"/api/practices/{slug}", params={"lang": "es"})
+    assert explicit_es.json()["title"] == "Simulacion de MRU"
+
+
+def test_practice_detail_partial_translation_falls_back_per_field(admin_user):
+    token = _login("admin@vibe-coding-platform.dev", "AdminPass123!")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/practices",
+        json={
+            "title": "Simulacion de MRU",
+            "type": "software",
+            "instructions": "Instrucciones en espanol",
+            "objectives": ["Objetivo original"],
+            "content": {"model": "distance = speed * time"},
+            # Traduccion parcial: solo title e instructions, sin objectives.
+            "translations": {
+                "en": {"title": "MRU simulation", "instructions": "Instructions in English"}
+            },
+        },
+        headers=headers,
+    ).json()
+    client.post(f"/api/practices/{created['id']}/publish", headers=headers)
+    slug = created["slug"]
+
+    detail = client.get(f"/api/practices/{slug}", params={"lang": "en"}).json()
+    assert detail["title"] == "MRU simulation"
+    assert detail["instructions"] == "Instructions in English"
+    # objectives no fue traducido: cae de vuelta al espanol, nunca queda vacio.
+    assert detail["objectives"] == ["Objetivo original"]
+
+
+def test_practice_list_lang_localizes_title_and_description(admin_user):
+    token = _login("admin@vibe-coding-platform.dev", "AdminPass123!")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/practices",
+        json={
+            "title": "Simulacion de MRU",
+            "type": "software",
+            "description": "Descripcion en espanol",
+            "instructions": "x",
+            "content": {"model": "distance = speed * time"},
+            "translations": {
+                "en": {"title": "MRU simulation", "description": "Description in English"}
+            },
+        },
+        headers=headers,
+    ).json()
+    client.post(f"/api/practices/{created['id']}/publish", headers=headers)
+
+    en_list = client.get("/api/practices", params={"lang": "en"})
+    assert en_list.status_code == 200
+    item = next(i for i in en_list.json()["items"] if i["id"] == created["id"])
+    assert item["title"] == "MRU simulation"
+    assert item["description"] == "Description in English"
+
+
+def test_admin_create_and_update_expose_translations_field(admin_user):
+    token = _login("admin@vibe-coding-platform.dev", "AdminPass123!")
+    headers = {"Authorization": f"Bearer {token}"}
+
+    created = client.post(
+        "/api/practices",
+        json={
+            "title": "Practica con traducciones",
+            "type": "software",
+            "instructions": "x",
+            "content": {"model": "distance = speed * time"},
+            "translations": {"en": {"title": "Practice with translations"}},
+        },
+        headers=headers,
+    )
+    assert created.status_code == 201
+    assert created.json()["translations"] == {"en": {"title": "Practice with translations"}}
+
+    updated = client.patch(
+        f"/api/practices/{created.json()['id']}",
+        json={"translations": {"en": {"title": "Updated"}, "pt": {"title": "Atualizado"}}},
+        headers=headers,
+    )
+    assert updated.status_code == 200
+    assert updated.json()["translations"] == {
+        "en": {"title": "Updated"},
+        "pt": {"title": "Atualizado"},
+    }

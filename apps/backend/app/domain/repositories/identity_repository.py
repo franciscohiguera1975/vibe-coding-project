@@ -1,7 +1,7 @@
 import uuid
 from typing import Protocol
 
-from app.domain.entities.identity import Permission, Role, User
+from app.domain.entities.identity import PasswordResetToken, Permission, Role, User
 from app.domain.value_objects.pagination import Page, PageRequest
 
 
@@ -35,3 +35,13 @@ class PermissionRepository(Protocol):
     def list_all(self) -> list[Permission]: ...
 
     def add(self, permission: Permission) -> Permission: ...
+
+
+class PasswordResetTokenRepository(Protocol):
+    def add(self, token: PasswordResetToken) -> PasswordResetToken: ...
+
+    def get_by_token_hash(self, token_hash: str) -> PasswordResetToken | None: ...
+
+    def mark_used(self, token_id: uuid.UUID) -> None: ...
+
+    def delete_for_user(self, user_id: uuid.UUID) -> None: ...

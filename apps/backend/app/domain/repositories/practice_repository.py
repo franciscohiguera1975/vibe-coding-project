@@ -6,6 +6,7 @@ from app.domain.entities.practice import (
     Practice,
     PracticeCategory,
     PracticeDifficulty,
+    PracticeNarration,
     PracticeStatus,
     PracticeTag,
 )
@@ -55,3 +56,11 @@ class PracticeTagRepository(Protocol):
     def list_all(self) -> list[PracticeTag]: ...
 
     def get_or_create(self, name: str, slug: str) -> PracticeTag: ...
+
+
+class PracticeNarrationRepository(Protocol):
+    def get_by_practice_and_lang(
+        self, practice_id: uuid.UUID, lang: str
+    ) -> PracticeNarration | None: ...
+
+    def upsert(self, narration: PracticeNarration) -> PracticeNarration: ...

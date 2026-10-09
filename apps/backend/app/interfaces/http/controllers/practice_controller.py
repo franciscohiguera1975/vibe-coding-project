@@ -4,10 +4,12 @@ from app.domain.entities.progress import (
     PracticeSubmission,
     StudentPracticeAttempt,
 )
+from app.domain.services.practice_localization import localize_practice
 from app.domain.value_objects.pagination import Page
 from app.interfaces.http.schemas.practice import (
     AttemptResponse,
     EvaluationResponse,
+    PracticeAdminDetail,
     PracticeDetail,
     PracticeListResponse,
     PracticeSummary,
@@ -15,12 +17,13 @@ from app.interfaces.http.schemas.practice import (
 )
 
 
-def practice_to_summary(practice: Practice) -> PracticeSummary:
+def practice_to_summary(practice: Practice, lang: str | None = None) -> PracticeSummary:
+    localized = localize_practice(practice, lang)
     return PracticeSummary(
         id=str(practice.id),
         slug=practice.slug,
-        title=practice.title,
-        description=practice.description,
+        title=localized.title,
+        description=localized.description,
         type=practice.type,
         difficulty=practice.difficulty.value,
         estimated_time_minutes=practice.estimated_time_minutes,
@@ -30,13 +33,14 @@ def practice_to_summary(practice: Practice) -> PracticeSummary:
     )
 
 
-def practice_to_detail(practice: Practice) -> PracticeDetail:
-    summary = practice_to_summary(practice)
+def practice_to_detail(practice: Practice, lang: str | None = None) -> PracticeDetail:
+    summary = practice_to_summary(practice, lang)
+    localized = localize_practice(practice, lang)
     return PracticeDetail(
         **summary.model_dump(),
-        objectives=practice.objectives,
-        instructions=practice.instructions,
-        content=practice.content,
+        objectives=localized.objectives,
+        instructions=localized.instructions,
+        content=localized.content,
         evaluation=practice.evaluation,
         ai_configuration=practice.ai_configuration,
         embedding_configuration=practice.embedding_configuration,
@@ -44,9 +48,17 @@ def practice_to_detail(practice: Practice) -> PracticeDetail:
     )
 
 
-def page_to_response(page: Page[Practice]) -> PracticeListResponse:
+def practice_to_admin_detail(practice: Practice) -> PracticeAdminDetail:
+    """Respuesta para los endpoints de administracion (crear/actualizar/publicar):
+    igual que `practice_to_detail` en espanol (la base editable) mas el diccionario
+    crudo `translations`, nunca expuesto en los endpoints publicos."""
+    detail = practice_to_detail(practice, lang=None)
+    return PracticeAdminDetail(**detail.model_dump(), translations=practice.translations)
+
+
+def page_to_response(page: Page[Practice], lang: str | None = None) -> PracticeListResponse:
     return PracticeListResponse(
-        items=[practice_to_summary(p) for p in page.items],
+        items=[practice_to_summary(p, lang) for p in page.items],
         total=page.total,
         page=page.page,
         page_size=page.page_size,

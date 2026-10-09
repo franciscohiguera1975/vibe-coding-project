@@ -3,27 +3,29 @@ import type { PracticeFilters } from '@/domain/entities/practice';
 import { PracticeCard } from '@/presentation/components/PracticeCard';
 import { PageHeader } from '@/presentation/components/PageHeader';
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 
-const TYPE_OPTIONS = [
-  { value: '', label: 'Todos los tipos' },
-  { value: 'software', label: 'Desarrollo de software' },
-  { value: 'image', label: 'Manejo de imágenes' },
-];
-
-const DIFFICULTY_OPTIONS = [
-  { value: '', label: 'Todos los niveles' },
-  { value: 'beginner', label: 'Principiante' },
-  { value: 'intermediate', label: 'Intermedio' },
-  { value: 'advanced', label: 'Avanzado' },
-];
-
 export function CatalogPage() {
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [type, setType] = useState(() => searchParams.get('type') ?? '');
   const [difficulty, setDifficulty] = useState('');
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+
+  const TYPE_OPTIONS = [
+    { value: '', label: t('catalogPage.filters.typeAll') },
+    { value: 'software', label: t('catalogPage.filters.typeSoftware') },
+    { value: 'image', label: t('catalogPage.filters.typeImage') },
+  ];
+
+  const DIFFICULTY_OPTIONS = [
+    { value: '', label: t('catalogPage.filters.difficultyAll') },
+    { value: 'beginner', label: t('catalogPage.filters.difficultyBeginner') },
+    { value: 'intermediate', label: t('catalogPage.filters.difficultyIntermediate') },
+    { value: 'advanced', label: t('catalogPage.filters.difficultyAdvanced') },
+  ];
 
   const filters: PracticeFilters = useMemo(
     () => ({
@@ -40,19 +42,20 @@ export function CatalogPage() {
   return (
     <div>
       <PageHeader
-        title="Catálogo de prácticas"
-        breadcrumbs={[{ label: 'Inicio', to: '/' }, { label: 'Catálogo' }]}
+        title={t('catalogPage.pageTitle')}
+        breadcrumbs={[
+          { label: t('catalogPage.breadcrumbs.home'), to: '/' },
+          { label: t('catalogPage.breadcrumbs.catalog') },
+        ]}
       />
 
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-        <p className="max-w-2xl text-ink-500">
-          Filtre por tipo, nivel o palabra clave para encontrar la práctica adecuada.
-        </p>
+        <p className="max-w-2xl text-ink-500">{t('catalogPage.filters.description')}</p>
 
         <div className="mt-6 flex flex-wrap gap-3">
           <input
             className="input max-w-xs"
-            placeholder="Buscar por título..."
+            placeholder={t('catalogPage.filters.searchPlaceholder')}
             value={search}
             onChange={(e) => {
               setPage(1);
@@ -104,9 +107,9 @@ export function CatalogPage() {
               ))}
             </div>
           )}
-          {isError && <p className="text-sm text-rose-600">No se pudo cargar el catálogo.</p>}
+          {isError && <p className="text-sm text-rose-600">{t('catalogPage.errors.loadFailed')}</p>}
           {data && data.items.length === 0 && (
-            <p className="text-sm text-ink-500">No hay prácticas que coincidan con los filtros.</p>
+            <p className="text-sm text-ink-500">{t('catalogPage.empty')}</p>
           )}
 
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -122,17 +125,17 @@ export function CatalogPage() {
                 disabled={page <= 1}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
               >
-                Anterior
+                {t('catalogPage.pagination.previous')}
               </button>
               <span className="text-sm text-ink-500">
-                Página {data.page} de {data.totalPages}
+                {t('catalogPage.pagination.pageOf', { page: data.page, totalPages: data.totalPages })}
               </span>
               <button
                 className="btn-secondary"
                 disabled={page >= data.totalPages}
                 onClick={() => setPage((p) => p + 1)}
               >
-                Siguiente
+                {t('catalogPage.pagination.next')}
               </button>
             </div>
           )}

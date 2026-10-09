@@ -1,5 +1,6 @@
 import type { PracticeRunnerProps } from '@/presentation/practices/types';
 import { useMemo, useState } from 'react';
+import { Trans, useTranslation } from 'react-i18next';
 
 interface Variable {
   label?: string;
@@ -25,6 +26,7 @@ function humanizeField(field: string): string {
 }
 
 export function SoftwarePracticeRunner({ practice, onSubmit, isSubmitting }: PracticeRunnerProps) {
+  const { t } = useTranslation();
   const content = practice.content as {
     model?: { variables?: Record<string, Variable>; assumptions?: string[] };
     worked_examples?: WorkedExample[];
@@ -77,28 +79,34 @@ export function SoftwarePracticeRunner({ practice, onSubmit, isSubmitting }: Pra
     <div className="space-y-6">
       {hasSimulator && (
         <div className="card p-5">
-          <h3 className="font-semibold text-ink-900">Simulación interactiva</h3>
+          <h3 className="font-semibold text-ink-900">
+            {t('softwarePracticeRunner.simulation.heading')}
+          </h3>
           {content.model?.assumptions && (
             <p className="mt-1 text-xs text-ink-400">
-              Supuestos: {content.model.assumptions.join(', ')}
+              {t('softwarePracticeRunner.simulation.assumptions', {
+                value: content.model.assumptions.join(', '),
+              })}
             </p>
           )}
 
           <div className="mt-4">
-            <label className="label">Prediga: ¿qué distancia recorrerá?</label>
+            <label className="label">{t('softwarePracticeRunner.simulation.predictLabel')}</label>
             <input
               type="number"
               className="input max-w-xs"
               value={predicted}
               onChange={(e) => setPredicted(e.target.value)}
-              placeholder="Su predicción en km"
+              placeholder={t('softwarePracticeRunner.simulation.predictPlaceholder')}
             />
           </div>
 
           <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label className="label" htmlFor="speed-range">
-                Velocidad ({variables.speed_kmh?.unit ?? 'km/h'})
+                {t('softwarePracticeRunner.simulation.speedLabel', {
+                  unit: variables.speed_kmh?.unit ?? 'km/h',
+                })}
               </label>
               <input
                 id="speed-range"
@@ -114,7 +122,9 @@ export function SoftwarePracticeRunner({ practice, onSubmit, isSubmitting }: Pra
             </div>
             <div>
               <label className="label" htmlFor="time-range">
-                Tiempo ({variables.time_h?.unit ?? 'h'})
+                {t('softwarePracticeRunner.simulation.timeLabel', {
+                  unit: variables.time_h?.unit ?? 'h',
+                })}
               </label>
               <input
                 id="time-range"
@@ -136,14 +146,17 @@ export function SoftwarePracticeRunner({ practice, onSubmit, isSubmitting }: Pra
             disabled={!predicted}
             onClick={() => setExecuted(true)}
           >
-            Calcular
+            {t('softwarePracticeRunner.simulation.calculate')}
           </button>
 
           {executed && (
             <div className="mt-4 rounded-lg bg-ink-50 p-4">
               <p className="text-sm text-ink-700">
-                Resultado: <strong>{result} km</strong> — equivalente textual: a {speed} km/h
-                durante {time} h se recorren {result} km.
+                <Trans
+                  i18nKey="softwarePracticeRunner.simulation.resultText"
+                  values={{ result, speed, time }}
+                  components={{ strong: <strong /> }}
+                />
               </p>
               <div className="mt-2 h-3 w-full rounded-full bg-ink-200">
                 <div
@@ -153,10 +166,9 @@ export function SoftwarePracticeRunner({ practice, onSubmit, isSubmitting }: Pra
               </div>
               {predicted && (
                 <p className="mt-2 text-sm text-ink-500">
-                  Su predicción fue {predicted} km; el modelo da {result} km
                   {Number(predicted) !== result
-                    ? ' — la distancia crece en proporción directa al tiempo y a la velocidad.'
-                    : ' — coincide con el modelo.'}
+                    ? t('softwarePracticeRunner.simulation.predictionMismatch', { predicted, result })
+                    : t('softwarePracticeRunner.simulation.predictionMatch', { predicted, result })}
                 </p>
               )}
             </div>
@@ -164,7 +176,11 @@ export function SoftwarePracticeRunner({ practice, onSubmit, isSubmitting }: Pra
 
           {content.transfer_question && (
             <p className="mt-4 text-sm text-ink-600">
-              <strong>Transferencia:</strong> {content.transfer_question}
+              <Trans
+                i18nKey="softwarePracticeRunner.simulation.transfer"
+                values={{ question: content.transfer_question }}
+                components={{ strong: <strong /> }}
+              />
             </p>
           )}
         </div>
@@ -172,7 +188,7 @@ export function SoftwarePracticeRunner({ practice, onSubmit, isSubmitting }: Pra
 
       {content.buggy_version_description && (
         <div className="card p-5">
-          <h3 className="font-semibold text-ink-900">Errores a corregir</h3>
+          <h3 className="font-semibold text-ink-900">{t('softwarePracticeRunner.bugs.heading')}</h3>
           <ul className="mt-2 list-inside list-disc space-y-1 text-sm text-ink-600">
             {Object.values(content.buggy_version_description).map((bug) => (
               <li key={bug}>{bug}</li>
@@ -183,9 +199,11 @@ export function SoftwarePracticeRunner({ practice, onSubmit, isSubmitting }: Pra
 
       {manualFields.length > 0 && (
         <div className="card p-5">
-          <h3 className="font-semibold text-ink-900">Autoevaluación contra los criterios</h3>
+          <h3 className="font-semibold text-ink-900">
+            {t('softwarePracticeRunner.selfCheck.heading')}
+          </h3>
           <p className="mt-1 text-xs text-ink-500">
-            Pruebe su corrección y marque 1 si cumple el criterio, 0 si no.
+            {t('softwarePracticeRunner.selfCheck.description')}
           </p>
           <div className="mt-3 space-y-2">
             {manualFields.map((check) => (
@@ -206,7 +224,9 @@ export function SoftwarePracticeRunner({ practice, onSubmit, isSubmitting }: Pra
       )}
 
       <button className="btn-primary" onClick={handleSubmit} disabled={isSubmitting}>
-        {isSubmitting ? 'Enviando...' : 'Enviar resultado'}
+        {isSubmitting
+          ? t('softwarePracticeRunner.submit.submitting')
+          : t('softwarePracticeRunner.submit.button')}
       </button>
     </div>
   );

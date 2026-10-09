@@ -119,7 +119,15 @@ def seed_categories(uow) -> dict[str, PracticeCategory]:
 
 def seed_practices(uow, admin: User, categories_by_slug: dict[str, PracticeCategory]) -> None:
     for entry in INITIAL_PRACTICES:
-        if uow.practices.get_by_slug(entry["slug"]) is not None:
+        translations = entry.get("translations", {})
+        existing = uow.practices.get_by_slug(entry["slug"])
+        if existing is not None:
+            # Re-ejecutar el seed despues de agregar/editar traducciones debe
+            # propagarlas a practicas ya sembradas, sin tocar el resto de sus campos
+            # (que pueden haber sido editados desde el panel de administracion).
+            if existing.translations != translations:
+                existing.translations = translations
+                uow.practices.update(existing)
             continue
 
         tags = [
@@ -146,6 +154,7 @@ def seed_practices(uow, admin: User, categories_by_slug: dict[str, PracticeCateg
             embedding_configuration=entry.get("embedding_configuration", {}),
             status=PracticeStatus(entry["status"]),
             metadata=entry.get("metadata", {}),
+            translations=translations,
             created_by_id=admin.id,
         )
         uow.practices.add(practice)

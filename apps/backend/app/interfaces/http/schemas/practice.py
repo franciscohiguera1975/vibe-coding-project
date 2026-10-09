@@ -27,6 +27,15 @@ class PracticeDetail(PracticeSummary):
     metadata: dict[str, Any]
 
 
+class PracticeAdminDetail(PracticeDetail):
+    """Variante de PracticeDetail para el panel de administracion: ademas de los
+    campos publicos (ya localizados segun `lang`) expone el diccionario crudo de
+    `translations` para que un futuro editor de traducciones pueda leerlo/escribirlo.
+    Nunca se usa en los endpoints publicos de catalogo/detalle."""
+
+    translations: dict[str, Any] = Field(default_factory=dict)
+
+
 class PracticeListResponse(BaseModel):
     items: list[PracticeSummary]
     total: int
@@ -52,6 +61,7 @@ class CreatePracticeRequest(BaseModel):
     ai_configuration: dict[str, Any] = Field(default_factory=dict)
     embedding_configuration: dict[str, Any] = Field(default_factory=dict)
     metadata: dict[str, Any] = Field(default_factory=dict)
+    translations: dict[str, Any] = Field(default_factory=dict)
 
 
 class UpdatePracticeRequest(BaseModel):
@@ -69,6 +79,7 @@ class UpdatePracticeRequest(BaseModel):
     ai_configuration: dict[str, Any] | None = None
     embedding_configuration: dict[str, Any] | None = None
     metadata: dict[str, Any] | None = None
+    translations: dict[str, Any] | None = None
 
 
 class AttemptResponse(BaseModel):
@@ -98,3 +109,21 @@ class EvaluationResponse(BaseModel):
     passed: bool
     feedback: str
     details: dict[str, Any]
+
+
+class NarrationResponse(BaseModel):
+    lang: str
+    url: str
+    cached: bool
+
+
+class NarrationPublicResponse(BaseModel):
+    url: str
+
+
+class NarrationGenerateAllItem(BaseModel):
+    lang: str
+    status: str
+    url: str | None = None
+    cached: bool | None = None
+    message: str | None = None

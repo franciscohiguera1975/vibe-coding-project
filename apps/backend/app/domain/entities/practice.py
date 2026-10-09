@@ -56,9 +56,26 @@ class Practice:
     embedding_configuration: dict[str, Any] = field(default_factory=dict)
     status: PracticeStatus = PracticeStatus.DRAFT
     metadata: dict[str, Any] = field(default_factory=dict)
+    translations: dict[str, Any] = field(default_factory=dict)
     created_by_id: uuid.UUID | None = None
     created_at: datetime | None = None
     updated_at: datetime | None = None
 
     def is_published(self) -> bool:
         return self.status == PracticeStatus.PUBLISHED
+
+
+@dataclass(slots=True)
+class PracticeNarration:
+    """Audio narrado (TTS) de una practica para un idioma concreto (Prompt Maestro
+    §10/§20): `text_hash` permite detectar si el guion subyacente cambio desde la
+    ultima generacion, para no volver a llamar al proveedor de narracion sin
+    necesidad (control de costo)."""
+
+    practice_id: uuid.UUID
+    lang: str
+    storage_key: str
+    text_hash: str
+    id: uuid.UUID | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None

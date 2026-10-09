@@ -6,12 +6,14 @@ from app.domain.repositories.ai_repository import (
     AIToolCallRepository,
 )
 from app.domain.repositories.identity_repository import (
+    PasswordResetTokenRepository,
     PermissionRepository,
     RoleRepository,
     UserRepository,
 )
 from app.domain.repositories.practice_repository import (
     PracticeCategoryRepository,
+    PracticeNarrationRepository,
     PracticeRepository,
     PracticeTagRepository,
 )
@@ -32,9 +34,11 @@ class UnitOfWork(Protocol):
     users: UserRepository
     roles: RoleRepository
     permissions: PermissionRepository
+    password_reset_tokens: PasswordResetTokenRepository
     practices: PracticeRepository
     practice_categories: PracticeCategoryRepository
     practice_tags: PracticeTagRepository
+    practice_narrations: PracticeNarrationRepository
     practice_attempts: StudentPracticeAttemptRepository
     practice_submissions: PracticeSubmissionRepository
     practice_evaluations: PracticeEvaluationRepository

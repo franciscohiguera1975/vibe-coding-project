@@ -52,6 +52,7 @@ class CreatePracticeUseCase:
                 ai_configuration=dict(data.ai_configuration),
                 embedding_configuration=dict(data.embedding_configuration),
                 metadata=dict(data.metadata),
+                translations=dict(data.translations),
                 created_by_id=actor.id,
             )
             created = uow.practices.add(practice)

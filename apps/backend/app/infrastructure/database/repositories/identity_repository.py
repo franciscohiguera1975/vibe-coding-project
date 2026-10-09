@@ -1,11 +1,17 @@
 import uuid
 
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.orm import Session, selectinload
 
-from app.domain.entities.identity import Permission, Role, User
+from app.domain.entities.identity import PasswordResetToken, Permission, Role, User
 from app.domain.value_objects.pagination import Page, PageRequest
-from app.infrastructure.database.models.identity import PermissionModel, RoleModel, UserModel
+from app.infrastructure.database.base import utcnow
+from app.infrastructure.database.models.identity import (
+    PasswordResetTokenModel,
+    PermissionModel,
+    RoleModel,
+    UserModel,
+)
 
 
 def _permission_to_domain(model: PermissionModel) -> Permission:
@@ -167,3 +173,44 @@ class SqlAlchemyPermissionRepository:
         self._session.add(model)
         self._session.flush()
         return _permission_to_domain(model)
+
+
+def _password_reset_token_to_domain(model: PasswordResetTokenModel) -> PasswordResetToken:
+    return PasswordResetToken(
+        id=model.id,
+        user_id=model.user_id,
+        token_hash=model.token_hash,
+        expires_at=model.expires_at,
+        used_at=model.used_at,
+        created_at=model.created_at,
+    )
+
+
+class SqlAlchemyPasswordResetTokenRepository:
+    def __init__(self, session: Session) -> None:
+        self._session = session
+
+    def add(self, token: PasswordResetToken) -> PasswordResetToken:
+        model = PasswordResetTokenModel(
+            user_id=token.user_id, token_hash=token.token_hash, expires_at=token.expires_at
+        )
+        self._session.add(model)
+        self._session.flush()
+        return _password_reset_token_to_domain(model)
+
+    def get_by_token_hash(self, token_hash: str) -> PasswordResetToken | None:
+        model = self._session.scalar(
+            select(PasswordResetTokenModel).where(PasswordResetTokenModel.token_hash == token_hash)
+        )
+        return _password_reset_token_to_domain(model) if model else None
+
+    def mark_used(self, token_id: uuid.UUID) -> None:
+        model = self._session.get(PasswordResetTokenModel, token_id)
+        if model is not None:
+            model.used_at = utcnow()
+            self._session.flush()
+
+    def delete_for_user(self, user_id: uuid.UUID) -> None:
+        self._session.execute(
+            delete(PasswordResetTokenModel).where(PasswordResetTokenModel.user_id == user_id)
+        )
