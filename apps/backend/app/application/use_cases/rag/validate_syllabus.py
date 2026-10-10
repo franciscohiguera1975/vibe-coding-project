@@ -75,7 +75,7 @@ class ValidateSyllabusUseCase:
         # clave (no el silabo completo): buscamos el articulo que define ESE
         # requisito, no uno parecido al texto libre del estudiante.
         query = f"{item.label}: {' '.join(item.keywords)}"
-        query_embedding = self._embedding_port.embed(query)
+        query_embedding = self._embedding_port.embed(query, is_query=True)
         retrieved = retrieve_top_k(query_embedding, all_chunks, k=3)
 
         if not retrieved:

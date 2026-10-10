@@ -13,12 +13,17 @@ class TeiEmbeddingAdapter:
     def __init__(self, base_url: str) -> None:
         self._base_url = base_url.rstrip("/")
 
-    def embed(self, text: str) -> list[float]:
+    def embed(self, text: str, *, is_query: bool = False) -> list[float]:
+        # Convencion de la familia E5 (intfloat/multilingual-e5-large, el modelo
+        # usado aqui): sin este prefijo la recuperacion es muy pobre (ver
+        # docstring de EmbeddingPort). Si en el futuro se cambia a un modelo que
+        # no lo necesita, este prefijo no le hace dano (queda como texto normal).
+        prefixed = f"{'query' if is_query else 'passage'}: {text}"
         try:
             response = httpx.post(
                 f"{self._base_url}/embed",
                 headers={"Content-Type": "application/json"},
-                json={"inputs": text},
+                json={"inputs": prefixed},
                 timeout=60.0,
             )
         except httpx.HTTPError as exc:

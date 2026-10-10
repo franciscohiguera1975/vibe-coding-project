@@ -88,7 +88,7 @@ class RunRagEvaluationUseCase:
             question["question"], system=_BASELINE_SYSTEM_PROMPT, max_tokens=300
         )
 
-        query_embedding = self._embedding_port.embed(question["question"])
+        query_embedding = self._embedding_port.embed(question["question"], is_query=True)
         retrieved = retrieve_top_k(query_embedding, all_chunks, k=3)
         context_block = "\n\n".join(
             f"[{r.chunk.source_document} - {r.chunk.article_label}]\n{r.chunk.text}"

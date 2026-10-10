@@ -11,7 +11,7 @@ EMBEDDING_DIMENSIONS = 128
 
 
 class MockRagAdapter:
-    def embed(self, text: str) -> list[float]:
+    def embed(self, text: str, *, is_query: bool = False) -> list[float]:
         normalized = text.strip().lower()
         vector: list[float] = []
         counter = 0
