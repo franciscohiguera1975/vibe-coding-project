@@ -8,6 +8,12 @@ export class RagService {
     return this.http.post<ChecklistItemResult[]>('/rag/validate-syllabus', { text });
   }
 
+  validateSyllabusFile(file: File): Promise<ChecklistItemResult[]> {
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.uploadFile<ChecklistItemResult[]>('/rag/validate-syllabus/upload', formData);
+  }
+
   getLatestEvaluation(): Promise<RagEvaluationRun> {
     return this.http.get<RagEvaluationRun>('/rag/evaluation');
   }

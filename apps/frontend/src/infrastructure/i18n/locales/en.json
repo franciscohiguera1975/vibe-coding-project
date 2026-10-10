@@ -570,6 +570,15 @@
     "submit": "Validate syllabus",
     "submitting": "Validating…",
     "error": "The syllabus could not be validated. Please try again.",
+    "modeToggle": {
+      "pasteText": "Paste text",
+      "uploadFile": "Upload Word file"
+    },
+    "fileLabel": "Syllabus file (.docx)",
+    "fileInputHint": "Drag and drop or select a .docx file with the syllabus content",
+    "fileSubmit": "Validate file",
+    "fileSubmitting": "Validating file…",
+    "fileTypeError": "The file must have a .docx (Word) extension. Please check the selected file.",
     "resultsHeading": "Validation results",
     "citationsLabel": "Cited regulations",
     "badge": {

@@ -9,6 +9,12 @@ export function useValidateSyllabus() {
   });
 }
 
+export function useValidateSyllabusFile() {
+  return useMutation({
+    mutationFn: (file: File) => ragService.validateSyllabusFile(file),
+  });
+}
+
 /** Un 404 (aun no se corrio ninguna evaluacion) es un estado vacio normal, no un
  * error de carga — mismo patron que usePracticeNarration. */
 export function useLatestRagEvaluation() {

@@ -570,6 +570,15 @@
     "submit": "Valider le syllabus",
     "submitting": "Validation en cours…",
     "error": "Impossible de valider le syllabus. Veuillez réessayer.",
+    "modeToggle": {
+      "pasteText": "Coller le texte",
+      "uploadFile": "Importer un fichier Word"
+    },
+    "fileLabel": "Fichier du syllabus (.docx)",
+    "fileInputHint": "Glissez-déposez ou sélectionnez un fichier .docx contenant le syllabus",
+    "fileSubmit": "Valider le fichier",
+    "fileSubmitting": "Validation du fichier en cours…",
+    "fileTypeError": "Le fichier doit avoir l'extension .docx (Word). Vérifiez le fichier sélectionné.",
     "resultsHeading": "Résultat de la validation",
     "citationsLabel": "Réglementation citée",
     "badge": {

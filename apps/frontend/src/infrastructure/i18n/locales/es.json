@@ -570,6 +570,15 @@
     "submit": "Validar sílabo",
     "submitting": "Validando…",
     "error": "No se pudo validar el sílabo. Intente nuevamente.",
+    "modeToggle": {
+      "pasteText": "Pegar texto",
+      "uploadFile": "Subir archivo Word"
+    },
+    "fileLabel": "Archivo del sílabo (.docx)",
+    "fileInputHint": "Arrastra o selecciona un archivo .docx con el contenido del sílabo",
+    "fileSubmit": "Validar archivo",
+    "fileSubmitting": "Validando archivo…",
+    "fileTypeError": "El archivo debe tener extensión .docx (Word). Revise el archivo seleccionado.",
     "resultsHeading": "Resultado de la validación",
     "citationsLabel": "Normativa citada",
     "badge": {

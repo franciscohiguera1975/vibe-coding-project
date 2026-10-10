@@ -570,6 +570,15 @@
     "submit": "Validar plano de ensino",
     "submitting": "Validando…",
     "error": "Não foi possível validar o plano de ensino. Tente novamente.",
+    "modeToggle": {
+      "pasteText": "Colar texto",
+      "uploadFile": "Enviar arquivo Word"
+    },
+    "fileLabel": "Arquivo do plano de ensino (.docx)",
+    "fileInputHint": "Arraste ou selecione um arquivo .docx com o conteúdo do plano de ensino",
+    "fileSubmit": "Validar arquivo",
+    "fileSubmitting": "Validando arquivo…",
+    "fileTypeError": "O arquivo deve ter extensão .docx (Word). Verifique o arquivo selecionado.",
     "resultsHeading": "Resultado da validação",
     "citationsLabel": "Normativa citada",
     "badge": {
