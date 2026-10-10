@@ -7,6 +7,8 @@ import { HomePage } from '@/presentation/pages/public/HomePage';
 import { NotFoundPage } from '@/presentation/pages/public/NotFoundPage';
 import { PracticeDetailPage } from '@/presentation/pages/public/PracticeDetailPage';
 import { PracticeEmbedPage } from '@/presentation/pages/public/PracticeEmbedPage';
+import { SyllabusValidationPage } from '@/presentation/pages/public/SyllabusValidationPage';
+import { RagEvaluationPage } from '@/presentation/pages/public/RagEvaluationPage';
 import { LoginPage } from '@/presentation/pages/auth/LoginPage';
 import { ForgotPasswordPage } from '@/presentation/pages/auth/ForgotPasswordPage';
 import { ResetPasswordPage } from '@/presentation/pages/auth/ResetPasswordPage';
@@ -31,6 +33,15 @@ export default function App() {
         <Route path="catalogo/:slug" element={<PracticeDetailPage />} />
         <Route path="acerca" element={<AboutPage />} />
         <Route path="proyecto-final" element={<FinalProjectPage />} />
+        <Route
+          path="validacion-silabos"
+          element={
+            <ProtectedRoute>
+              <SyllabusValidationPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="evaluacion-rag" element={<RagEvaluationPage />} />
         <Route path="login" element={<LoginPage />} />
         <Route path="recuperar-contrasena" element={<ForgotPasswordPage />} />
         <Route path="restablecer-contrasena" element={<ResetPasswordPage />} />

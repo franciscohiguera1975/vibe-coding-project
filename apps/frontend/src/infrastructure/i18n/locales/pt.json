@@ -4,7 +4,10 @@
       "home": "Início",
       "catalog": "Catálogo",
       "about": "A plataforma",
-      "presentation": "Apresentação"
+      "presentation": "Apresentação",
+      "rag": "Validação RAG",
+      "syllabusValidation": "Validação de Planos de Ensino",
+      "ragEvaluation": "Avaliação"
     },
     "admin": "Administração",
     "login": "Entrar",
@@ -554,5 +557,49 @@
   },
   "unknownPracticeType": {
     "message": "Não há conteúdo interativo registrado para o tipo de prática «{{type}}». Um administrador pode adicionar um novo componente ao registro de tipos sem modificar o restante da plataforma."
+  },
+  "syllabusValidationPage": {
+    "pageTitle": "Validação de Planos de Ensino com IA",
+    "breadcrumbs": {
+      "home": "Início",
+      "current": "Validação de Planos de Ensino"
+    },
+    "description": "Cole o texto de um plano de ensino (sílabo) e a plataforma verificará, item por item, se ele atende aos requisitos de conteúdo exigidos pela normativa acadêmica da UTE, citando a fonte exata de cada constatação.",
+    "textareaLabel": "Texto do plano de ensino",
+    "textareaPlaceholder": "Cole aqui o conteúdo completo do plano de ensino a validar…",
+    "submit": "Validar plano de ensino",
+    "submitting": "Validando…",
+    "error": "Não foi possível validar o plano de ensino. Tente novamente.",
+    "resultsHeading": "Resultado da validação",
+    "citationsLabel": "Normativa citada",
+    "badge": {
+      "compliant": "Cumpre",
+      "nonCompliant": "Não cumpre",
+      "undetermined": "Não determinado"
+    }
+  },
+  "ragEvaluationPage": {
+    "pageTitle": "Avaliação: linha de base vs. RAG",
+    "breadcrumbs": {
+      "home": "Início",
+      "current": "Avaliação"
+    },
+    "description": "Comparação objetiva entre responder sem recuperação (linha de base) e responder fundamentado na normativa recuperada (RAG), sobre um conjunto de 15 perguntas ancoradas em artigos reais da normativa da UTE.",
+    "runButton": "Executar avaliação",
+    "running": "Executando…",
+    "loading": "Carregando a última avaliação…",
+    "empty": "Ainda não foi executada nenhuma avaliação.",
+    "stats": {
+      "total": "Perguntas avaliadas",
+      "ragMatches": "Acertos de citação (RAG)",
+      "baselineMatches": "Acertos de citação (linha de base)"
+    },
+    "summarySentence": "O RAG acertou a citação em {{ragMatches}}/{{total}} casos; a linha de base, em {{baselineMatches}}/{{total}}.",
+    "table": {
+      "question": "Pergunta",
+      "expectedCitation": "Citação esperada",
+      "baseline": "Linha de base (sem RAG)",
+      "rag": "Com RAG"
+    }
   }
 }

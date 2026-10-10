@@ -14,12 +14,18 @@ export function Header() {
   const { user, logout } = useAuth();
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [ragMenuOpen, setRagMenuOpen] = useState(false);
 
   const navLinks = [
     { to: '/', label: t('header.nav.home') },
     { to: '/catalogo', label: t('header.nav.catalog') },
     { to: '/acerca', label: t('header.nav.about') },
     { to: '/proyecto-final', label: t('header.nav.presentation') },
+  ];
+
+  const ragLinks = [
+    { to: '/validacion-silabos', label: t('header.nav.syllabusValidation') },
+    { to: '/evaluacion-rag', label: t('header.nav.ragEvaluation') },
   ];
 
   return (
@@ -43,6 +49,34 @@ export function Header() {
               {link.label}
             </NavLink>
           ))}
+          <div
+            className="relative"
+            onMouseEnter={() => setRagMenuOpen(true)}
+            onMouseLeave={() => setRagMenuOpen(false)}
+          >
+            <button
+              type="button"
+              className="relative py-1 text-sm font-semibold uppercase tracking-wide text-navy-700 transition-colors hover:text-brand-600"
+              onClick={() => setRagMenuOpen((v) => !v)}
+              aria-expanded={ragMenuOpen}
+            >
+              {t('header.nav.rag')}
+            </button>
+            {ragMenuOpen && (
+              <div className="absolute left-0 top-full z-50 mt-2 w-56 rounded-md border border-ink-100 bg-white py-2 shadow-lg">
+                {ragLinks.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    className="block px-4 py-2 text-sm font-medium text-navy-700 hover:bg-brand-50 hover:text-brand-600"
+                    onClick={() => setRagMenuOpen(false)}
+                  >
+                    {link.label}
+                  </NavLink>
+                ))}
+              </div>
+            )}
+          </div>
         </nav>
 
         <div className="hidden items-center gap-4 md:flex">
@@ -105,6 +139,14 @@ export function Header() {
           <nav className="flex flex-col gap-3">
             {navLinks.map((link) => (
               <NavLink key={link.to} to={link.to} className={navLinkClass} end={link.to === '/'}>
+                {link.label}
+              </NavLink>
+            ))}
+            <span className="text-xs font-semibold uppercase tracking-wide text-ink-400">
+              {t('header.nav.rag')}
+            </span>
+            {ragLinks.map((link) => (
+              <NavLink key={link.to} to={link.to} className={navLinkClass}>
                 {link.label}
               </NavLink>
             ))}

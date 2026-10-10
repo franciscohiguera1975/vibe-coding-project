@@ -4,7 +4,10 @@
       "home": "Home",
       "catalog": "Catalog",
       "about": "The platform",
-      "presentation": "Presentation"
+      "presentation": "Presentation",
+      "rag": "RAG Validation",
+      "syllabusValidation": "Syllabus Validation",
+      "ragEvaluation": "Evaluation"
     },
     "admin": "Administration",
     "login": "Sign in",
@@ -554,5 +557,49 @@
   },
   "unknownPracticeType": {
     "message": "No interactive content is registered for the practice type \"{{type}}\". An administrator can add a new component to the type registry without modifying the rest of the platform."
+  },
+  "syllabusValidationPage": {
+    "pageTitle": "AI Syllabus Validation",
+    "breadcrumbs": {
+      "home": "Home",
+      "current": "Syllabus Validation"
+    },
+    "description": "Paste a syllabus and the platform will check, item by item, whether it meets the content requirements set by UTE's academic regulations, citing the exact source for every finding.",
+    "textareaLabel": "Syllabus text",
+    "textareaPlaceholder": "Paste the full syllabus content to validate here…",
+    "submit": "Validate syllabus",
+    "submitting": "Validating…",
+    "error": "The syllabus could not be validated. Please try again.",
+    "resultsHeading": "Validation results",
+    "citationsLabel": "Cited regulations",
+    "badge": {
+      "compliant": "Compliant",
+      "nonCompliant": "Non-compliant",
+      "undetermined": "Undetermined"
+    }
+  },
+  "ragEvaluationPage": {
+    "pageTitle": "Evaluation: Baseline vs. RAG",
+    "breadcrumbs": {
+      "home": "Home",
+      "current": "Evaluation"
+    },
+    "description": "An objective comparison between answering with no retrieval (baseline) and answering grounded in retrieved regulations (RAG), over a set of 15 questions anchored in real articles from UTE's regulations.",
+    "runButton": "Run evaluation",
+    "running": "Running…",
+    "loading": "Loading the latest evaluation…",
+    "empty": "No evaluation has been run yet.",
+    "stats": {
+      "total": "Questions evaluated",
+      "ragMatches": "Citation hits (RAG)",
+      "baselineMatches": "Citation hits (baseline)"
+    },
+    "summarySentence": "RAG got the citation right in {{ragMatches}}/{{total}} cases; the baseline, in {{baselineMatches}}/{{total}}.",
+    "table": {
+      "question": "Question",
+      "expectedCitation": "Expected citation",
+      "baseline": "Baseline (no RAG)",
+      "rag": "With RAG"
+    }
   }
 }

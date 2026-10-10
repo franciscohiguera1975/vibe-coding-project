@@ -44,6 +44,31 @@ class Settings(BaseSettings):
     elevenlabs_voice_id: str = "JBFqnCBsd6RMkjVDRZzb"
     elevenlabs_model_id: str = "eleven_multilingual_v2"
 
+    # --- RAG de validacion de silabos (ver docs/saturdays_ai/00-plan.md) ---
+    # Generacion y embeddings son proveedores INDEPENDIENTES entre si y de
+    # AI_PROVIDER (el del tutor) — ver docs/saturdays_ai/00-plan.md §3 y §5.
+    # *_PROVIDER=mock habilita los adaptadores mock sin consumir servicios
+    # externos (valor por defecto en dev/test, igual que AI_PROVIDER/
+    # NARRATION_PROVIDER). El proveedor real por defecto es un vLLM + TEI
+    # corridos en el HPC de CEDIA y tunelados al VPS via SSH inverso (no un
+    # servicio permanente); RAG_BASE_URL/EMBEDDING_BASE_URL apuntan a esos
+    # puertos tunelados. GitHub Models (u otro endpoint compatible con la API
+    # de OpenAI) sirve de respaldo intercambiable cambiando solo esas dos
+    # variables, sin tocar codigo.
+    rag_llm_provider: Literal["mock", "openai_compatible"] = "mock"
+    rag_base_url: str = ""
+    rag_api_key: str = ""
+    rag_chat_model: str = "Qwen/Qwen2.5-7B-Instruct"
+
+    embedding_provider: Literal["mock", "tei"] = "mock"
+    embedding_base_url: str = ""
+    embedding_model: str = "intfloat/multilingual-e5-large"
+
+    # Chunks + embeddings de la normativa viven en una tabla LanceDB embebida
+    # (co-ubicada con este proceso, no en el HPC — ver docs/saturdays_ai/00-plan.md
+    # §5) en vez de Postgres JSONB; mismo patron que storage_local_path.
+    lancedb_path: str = "./storage/lancedb"
+
     storage_provider: Literal["local", "minio", "s3"] = "local"
     storage_local_path: str = "./storage/uploads"
     storage_minio_endpoint: str = ""

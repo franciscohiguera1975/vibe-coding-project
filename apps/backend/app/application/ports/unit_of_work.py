@@ -23,6 +23,10 @@ from app.domain.repositories.progress_repository import (
     StudentPracticeAttemptRepository,
     StudentProgressRepository,
 )
+from app.domain.repositories.rag_repository import (
+    NormativaChunkRepository,
+    RagEvaluationRunRepository,
+)
 from app.domain.repositories.system_repository import AuditLogRepository, ConfigurationRepository
 
 
@@ -48,6 +52,8 @@ class UnitOfWork(Protocol):
     ai_sessions: AISessionRepository
     ai_messages: AIMessageRepository
     ai_tool_calls: AIToolCallRepository
+    normativa_chunks: NormativaChunkRepository
+    rag_evaluation_runs: RagEvaluationRunRepository
 
     def __enter__(self) -> "UnitOfWork": ...
 

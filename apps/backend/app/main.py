@@ -12,6 +12,7 @@ from app.interfaces.http.routers.configurations import router as configurations_
 from app.interfaces.http.routers.health import router as health_router
 from app.interfaces.http.routers.images import router as images_router
 from app.interfaces.http.routers.practices import router as practices_router
+from app.interfaces.http.routers.rag import router as rag_router
 from app.interfaces.http.routers.roles import permissions_router
 from app.interfaces.http.routers.roles import router as roles_router
 from app.interfaces.http.routers.storage import router as storage_router
@@ -48,3 +49,4 @@ app.include_router(ai_router, prefix="/api")
 app.include_router(agent_router, prefix="/api")
 app.include_router(images_router, prefix="/api")
 app.include_router(storage_router, prefix="/api")
+app.include_router(rag_router, prefix="/api")

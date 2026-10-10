@@ -4,7 +4,10 @@
       "home": "Accueil",
       "catalog": "Catalogue",
       "about": "La plateforme",
-      "presentation": "Présentation"
+      "presentation": "Présentation",
+      "rag": "Validation RAG",
+      "syllabusValidation": "Validation des syllabus",
+      "ragEvaluation": "Évaluation"
     },
     "admin": "Administration",
     "login": "Se connecter",
@@ -554,5 +557,49 @@
   },
   "unknownPracticeType": {
     "message": "Aucun contenu interactif n'est enregistré pour le type de pratique « {{type}} ». Un administrateur peut ajouter un nouveau composant dans le registre des types sans modifier le reste de la plateforme."
+  },
+  "syllabusValidationPage": {
+    "pageTitle": "Validation des syllabus par IA",
+    "breadcrumbs": {
+      "home": "Accueil",
+      "current": "Validation des syllabus"
+    },
+    "description": "Collez le texte d'un syllabus : la plateforme vérifie, point par point, s'il respecte les exigences de contenu fixées par la réglementation académique de l'UTE, en citant la source exacte de chaque constat.",
+    "textareaLabel": "Texte du syllabus",
+    "textareaPlaceholder": "Collez ici le contenu complet du syllabus à valider…",
+    "submit": "Valider le syllabus",
+    "submitting": "Validation en cours…",
+    "error": "Impossible de valider le syllabus. Veuillez réessayer.",
+    "resultsHeading": "Résultat de la validation",
+    "citationsLabel": "Réglementation citée",
+    "badge": {
+      "compliant": "Conforme",
+      "nonCompliant": "Non conforme",
+      "undetermined": "Indéterminé"
+    }
+  },
+  "ragEvaluationPage": {
+    "pageTitle": "Évaluation : référence vs. RAG",
+    "breadcrumbs": {
+      "home": "Accueil",
+      "current": "Évaluation"
+    },
+    "description": "Comparaison objective entre répondre sans recherche documentaire (référence) et répondre en s'appuyant sur la réglementation récupérée (RAG), sur un ensemble de 15 questions ancrées dans des articles réels de la réglementation de l'UTE.",
+    "runButton": "Lancer l'évaluation",
+    "running": "Exécution en cours…",
+    "loading": "Chargement de la dernière évaluation…",
+    "empty": "Aucune évaluation n'a encore été exécutée.",
+    "stats": {
+      "total": "Questions évaluées",
+      "ragMatches": "Citations correctes (RAG)",
+      "baselineMatches": "Citations correctes (référence)"
+    },
+    "summarySentence": "Le RAG a cité la bonne source dans {{ragMatches}}/{{total}} cas ; la référence, dans {{baselineMatches}}/{{total}}.",
+    "table": {
+      "question": "Question",
+      "expectedCitation": "Citation attendue",
+      "baseline": "Référence (sans RAG)",
+      "rag": "Avec RAG"
+    }
   }
 }

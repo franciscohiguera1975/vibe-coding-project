@@ -4,7 +4,10 @@
       "home": "Inicio",
       "catalog": "Catálogo",
       "about": "La plataforma",
-      "presentation": "Presentación"
+      "presentation": "Presentación",
+      "rag": "Validación RAG",
+      "syllabusValidation": "Validación de sílabos",
+      "ragEvaluation": "Evaluación"
     },
     "admin": "Administración",
     "login": "Ingresar",
@@ -554,5 +557,49 @@
   },
   "unknownPracticeType": {
     "message": "No hay un contenido interactivo registrado para el tipo de práctica «{{type}}». Un administrador puede agregar un nuevo componente en el registro de tipos sin modificar el resto de la plataforma."
+  },
+  "syllabusValidationPage": {
+    "pageTitle": "Validación de sílabos con IA",
+    "breadcrumbs": {
+      "home": "Inicio",
+      "current": "Validación de sílabos"
+    },
+    "description": "Pegue el texto de un sílabo y la plataforma verificará, artículo por artículo, si cumple con los requisitos de contenido exigidos por la normativa académica de la UTE, citando la fuente exacta de cada hallazgo.",
+    "textareaLabel": "Texto del sílabo",
+    "textareaPlaceholder": "Pegue aquí el contenido completo del sílabo a validar…",
+    "submit": "Validar sílabo",
+    "submitting": "Validando…",
+    "error": "No se pudo validar el sílabo. Intente nuevamente.",
+    "resultsHeading": "Resultado de la validación",
+    "citationsLabel": "Normativa citada",
+    "badge": {
+      "compliant": "Cumple",
+      "nonCompliant": "No cumple",
+      "undetermined": "No determinado"
+    }
+  },
+  "ragEvaluationPage": {
+    "pageTitle": "Evaluación: línea base vs. RAG",
+    "breadcrumbs": {
+      "home": "Inicio",
+      "current": "Evaluación"
+    },
+    "description": "Comparación objetiva entre responder sin recuperación (línea base) y responder fundamentado en la normativa recuperada (RAG), sobre un set de 15 preguntas ancladas en artículos reales de la normativa de la UTE.",
+    "runButton": "Ejecutar evaluación",
+    "running": "Ejecutando…",
+    "loading": "Cargando la última evaluación…",
+    "empty": "Aún no se ha ejecutado ninguna evaluación.",
+    "stats": {
+      "total": "Preguntas evaluadas",
+      "ragMatches": "Aciertos de cita (RAG)",
+      "baselineMatches": "Aciertos de cita (línea base)"
+    },
+    "summarySentence": "RAG acertó la cita en {{ragMatches}}/{{total}} casos; la línea base, en {{baselineMatches}}/{{total}}.",
+    "table": {
+      "question": "Pregunta",
+      "expectedCitation": "Cita esperada",
+      "baseline": "Línea base (sin RAG)",
+      "rag": "Con RAG"
+    }
   }
 }

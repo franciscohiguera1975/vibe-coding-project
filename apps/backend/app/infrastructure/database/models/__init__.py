@@ -25,6 +25,7 @@ from app.infrastructure.database.models.progress import (  # noqa: F401
     StudentPracticeAttemptModel,
     StudentProgressModel,
 )
+from app.infrastructure.database.models.rag import RagEvaluationRunModel  # noqa: F401
 from app.infrastructure.database.models.system import (  # noqa: F401
     AuditLogModel,
     ConfigurationModel,
@@ -47,4 +48,5 @@ __all__ = [
     "AIToolCallModel",
     "ConfigurationModel",
     "AuditLogModel",
+    "RagEvaluationRunModel",
 ]

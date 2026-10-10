@@ -40,9 +40,21 @@ apps/backend/__pycache__/
 # Uploaded files (storage local adapter, desarrollo)
 **/storage/uploads/
 
+# Tabla LanceDB embebida de chunks+embeddings de la normativa (dato local
+# regenerable via scripts/rag/load_chunks.py, ver docs/saturdays_ai/00-plan.md §5)
+**/storage/lancedb/
+
 # Entregable del proyecto final CEDIA: publicado aparte en
 # github.com/franciscohiguera1975/vibe-coding-proyecto-final, no pertenece a este repo
 docs/CINCO MINUTOS PROYECTO/
 
 # Paquetes de skills CEDIA descargados (material personal del curso, no del producto)
 docs/skills/
+
+# Normativa institucional de la UTE (dato real para el RAG del proyecto Saturdays AI,
+# no es contenido del producto ni debe publicarse en el repo)
+docs/reglamentos_ute/
+apps/backend/scripts/rag/data/*
+# ...salvo el set de evaluacion (15 preguntas, sin contenido sensible): se versiona
+# para que el proyecto Saturdays AI sea reproducible sin el corpus institucional.
+!apps/backend/scripts/rag/data/eval_set.jsonl

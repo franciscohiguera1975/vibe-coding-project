@@ -1,18 +1,36 @@
+import atexit
+import os
+import shutil
+import tempfile
 import uuid
+from pathlib import Path
 
-import pytest
-from sqlalchemy import text
+# LANCEDB_PATH debe fijarse ANTES de importar cualquier modulo de `app` (abajo),
+# porque app.infrastructure.database.session construye el engine de SQLAlchemy a
+# nivel de modulo llamando a get_settings(), que cachea la instancia de Settings
+# (@lru_cache) la primera vez que se construye — si este override llegara tarde,
+# las pruebas usarian el LANCEDB_PATH real de desarrollo (./storage/lancedb) en
+# vez de un directorio aislado y descartable (ver docs/saturdays_ai/00-plan.md §5
+# y la nota junto a _clean_lancedb mas abajo).
+_TEST_LANCEDB_ROOT = tempfile.mkdtemp(prefix="vibe-coding-test-lancedb-")
+os.environ["LANCEDB_PATH"] = _TEST_LANCEDB_ROOT
+atexit.register(shutil.rmtree, _TEST_LANCEDB_ROOT, ignore_errors=True)
 
-from app.domain import permissions as perm
-from app.domain.entities.identity import Permission, Role, User
-from app.infrastructure.database.unit_of_work import SqlAlchemyUnitOfWork
-from app.infrastructure.security.password_hasher import BcryptPasswordHasher
+import pytest  # noqa: E402
+from sqlalchemy import text  # noqa: E402
+
+from app.domain import permissions as perm  # noqa: E402
+from app.domain.entities.identity import Permission, Role, User  # noqa: E402
+from app.infrastructure.config import get_settings  # noqa: E402
+from app.infrastructure.database.unit_of_work import SqlAlchemyUnitOfWork  # noqa: E402
+from app.infrastructure.security.password_hasher import BcryptPasswordHasher  # noqa: E402
 
 TRUNCATE_TABLES = (
     "audit_logs",
     "ai_tool_calls",
     "ai_messages",
     "ai_sessions",
+    "rag_evaluation_runs",
     "practice_evaluations",
     "practice_submissions",
     "student_practice_attempts",
@@ -41,6 +59,21 @@ def _clean_database():
     with SqlAlchemyUnitOfWork() as uow:
         uow._session.execute(text(f"TRUNCATE TABLE {', '.join(TRUNCATE_TABLES)} CASCADE"))
         uow.commit()
+    yield
+
+
+@pytest.fixture(autouse=True)
+def _clean_lancedb():
+    """Equivalente de `_clean_database` para `normativa_chunks`, que ya no vive en
+    Postgres (ver docs/saturdays_ai/00-plan.md §5): en vez de TRUNCATE, se borra el
+    directorio LanceDB completo antes de cada prueba. `LANCEDB_PATH` ya apunta a un
+    directorio temporal exclusivo de esta sesion de pruebas (ver el override al
+    inicio de este archivo), asi que esto nunca toca `./storage/lancedb` de
+    desarrollo ni dato real."""
+    path = Path(get_settings().lancedb_path)
+    if path.exists():
+        shutil.rmtree(path)
+    path.mkdir(parents=True, exist_ok=True)
     yield
 
 
