@@ -57,19 +57,21 @@ Copia esa línea completa y pásasela a Claude Code — la autoriza en el VPS (`
 scancel <JOBID_VIEJO>
 ```
 
-Antes de reservar, revisa qué nodo está menos cargado (ver §9 — otros usuarios pueden estar saturando uno de los dos):
+Antes de reservar, revisa qué nodo está menos cargado (otros usuarios pueden estar saturando uno de los dos — ver §9 para más detalle):
 ```bash
-sinfo -N -o "%N %C %O" -p gpu-dev
+sinfo -N -o "%N %C %O" -p gpu
 ```
 
 ```bash
 ssh francisco.higuera__ute.edu.ec@hpc.cedia.edu.ec
-salloc -p gpu-dev -n 1 -c 20 --mem=48G --gres=gpu:a100-sxm4-40gb:2 --time=04:00:00
+salloc -p gpu -n 1 -c 20 --mem=48G --gres=gpu:a100-sxm4-40gb:2 --time=04:00:00
 ```
 
 (`-c 20 --mem=48G`: casi el doble que antes, porque esta misma reserva ahora corre **3 procesos** — dos vLLM y un TEI — en vez de dos. `:2` en `--gres` pide las 2 GPUs completas, una para cada vLLM; TEI toca la GPU 0 levemente pero no necesita una propia. Si quieres fijar un nodo en particular tras revisar `sinfo`, agrega `--nodelist=compute-0-X`.)
 
-**Nota (descubierto 2026-10-09)**: los tipos MIG del Anexo 1 del manual (`a100_1g.5gb`, `a100_2g.10gb`, `a100_3g.20gb`) no están configurados en los nodos de `gpu-dev` — ahí solo existe el GPU completo `a100-sxm4-40gb`. Por eso se pide ese tipo exacto.
+**Nota (descubierto 2026-10-09)**: los tipos MIG del Anexo 1 del manual (`a100_1g.5gb`, `a100_2g.10gb`, `a100_3g.20gb`) no están configurados en los nodos de `gpu-dev`/`gpu` — ahí solo existe el GPU completo `a100-sxm4-40gb`. Por eso se pide ese tipo exacto.
+
+**Nota (descubierto 2026-10-11, importante)**: la partición **`gpu-dev`** (la que usa todo este documento desde el inicio del proyecto) tiene un límite de QOS de **máximo 1 GPU por job** (`QOSMaxGRESPerJob`) — pedir `:2` ahí falla siempre, sin importar cuánta CPU/memoria pidas. La partición **`gpu`** (mismos nodos físicos, `compute-0-[1-2]`, solo que con otra QOS) sí permite hasta 2 GPUs por job, con más margen de CPU (`cpu=160` vs `cpu=16`) — por eso el comando de arriba usa `-p gpu`, no `-p gpu-dev`. Si en algún momento vuelves a necesitar solo 1 GPU (el diseño original de 2 servicios), `gpu-dev` sigue siendo válido y es la partición "de siempre" para ese caso.
 
 La salida muestra el `JOBID` y el nodo asignado — **anótalos, los necesitas para las otras 5 pestañas**:
 
@@ -286,23 +288,30 @@ Anota aquí la fecha y duración real de la sesión, para la diapositiva de "arq
   ```
 - **El túnel no conecta**: revisar que la llave pública sigue en `/home/deploy/.ssh/authorized_keys` del VPS.
 - **vLLM no carga el modelo a tiempo**: hay respaldo — `RAG_LLM_PROVIDER` puede apuntar a GitHub Models (capa gratuita) cambiando una sola variable de entorno, sin tocar código. Vale la pena probarlo una vez antes del día de la demo.
-- **La GPU pedida (`a100-sxm4-40gb`) no está disponible**: revisar `sinfo -p gpu-dev`; si está ocupado, la partición `interactive` con `a100_2g.10gb` es la alternativa más chica.
+- **La GPU pedida (`a100-sxm4-40gb`) no está disponible**: revisar `sinfo -p gpu`; si está ocupado, la partición `interactive` con `a100_2g.10gb` es la alternativa más chica (pero no permite 2 GPUs completas — solo sirve para volver al diseño de 1 GPU).
 - **Un `salloc`/`srun` nuevo se queda en `PD` con razón `(QOSMaxJobsPerUserLimit)`**: tu cuenta solo permite **1 reserva activa a la vez** — no es falta de recursos del clúster, es un tope de tu cuenta. Por eso todo este documento usa una sola reserva compartida para los 3 servicios (secciones 1-6) en vez de varias independientes. No intentar una segunda reserva mientras la primera siga activa.
 - **Un `srun --jobid=...` se queda colgado o da `Job/step already completing or completed`**: estás tratando de crear un segundo "paso" en la misma reserva (`-n 1` solo da un cupo). Para cualquier conexión adicional al mismo nodo, usar `ssh <nodo>` directo, nunca `srun` otra vez.
 - **Viste un `JOBID` de otro usuario con tu mismo nombre en `squeue`**: la columna `USER` se corta a 8 caracteres — puede coincidir con la de alguien más (pasó con `francisco.mendoza__yachaytech.edu.ec`, truncado igual que `francisco.higuera__ute.edu.ec`). Antes de cancelar un job que no reconoces, confirmar con `scontrol show job <JOBID>` (revisar el campo `Command`/`WorkDir`, ahí se ve el usuario real) — nunca cancelar un job que no sea tuyo.
 - **Cerraste por error la pestaña de la Pestaña 1 (el `salloc`)**: la reserva murió, y con ella todo lo que corría adentro (los 3 servicios). No hay que recuperarla — repetir desde la sección 1 (los contenedores y modelos siguen descargados, así que es rápido).
 - **Los dos vLLM intentan usar la misma GPU / uno falla con un error de memoria al arrancar el segundo**: falta el `CUDA_VISIBLE_DEVICES` (0 para el de texto, 1 para el de visión, secciones 1.2 y 3.2) — revisa que cada `enroot start` lo tenga.
 - **El modelo de visión da un error de "contexto insuficiente" (context length exceeded) al analizar una imagen**: sube `--max-model-len` en la sección 3.2 (empezar en 8192, subir a 16384 si persiste) — las imágenes consumen más tokens de contexto que el texto solo.
+- **`salloc: error: QOSMaxGRESPerJob`** al pedir `--gres=gpu:a100-sxm4-40gb:2`: estás en la partición equivocada — `gpu-dev` no permite más de 1 GPU por job. Usa `-p gpu` en vez de `-p gpu-dev` (ver la nota de la sección 1 y el diagnóstico de §9 para confirmar el límite exacto de cada partición).
+- **`salloc: error: QOSMaxCpuPerUserLimit`** al pedir `-c 20` (o más): esa partición tiene un tope de CPU por job más bajo de lo que pediste (p. ej. `gpu-dev` tope en `cpu=16`) — baja el `-c` o cambia de partición (`-p gpu` admite hasta `cpu=160`). Confirmar el tope exacto con el comando de `sacctmgr` en §9.
 
 ## 9. Comandos de diagnóstico (de consulta, no reservan ni cambian nada)
 
 ```bash
-sinfo -p gpu-dev
+sacctmgr show qos format=Name,MaxTRESPerJob%40
 ```
-Estado de los nodos de `gpu-dev`: `idle` (libres), `mix` (parcialmente ocupados) o `alloc` (llenos).
+**El más importante para decidir qué partición pedir** (descubierto 2026-10-11): límites reales de recursos *por job* de cada QOS/partición — `cpu=`, `gres/gpu=` (cuántas GPUs permite un solo job), `mem=`, `node=`. En este clúster: `gpu-dev` solo permite 1 GPU por job (`gres/gpu` efectivamente 0-1) con `cpu=16`; **`gpu` permite 2 GPUs por job con `cpu=160`** (la que usa este documento para los 3 servicios); `gpu-max` permite 4 GPUs con `cpu=128`; `multinodo` permite 2 GPUs pero repartidas en 2 nodos (`node=2`, no sirve para este caso que necesita ambas GPUs en el mismo nodo). Hay una variante `format=Name,MaxTRESPerUser%40` (sin la `Job`) para el tope acumulado por *usuario* en vez de por *job* — son límites distintos y ambos pueden bloquear un `salloc` con mensajes de error diferentes (`QOSMaxGRESPerJob` vs `QOSMaxCpuPerUserLimit`).
 
 ```bash
-scontrol show partition gpu-dev
+sinfo -p gpu
+```
+Estado de los nodos de la partición `gpu` (la que se usa ahora, 2 GPUs por job): `idle` (libres), `mix` (parcialmente ocupados) o `alloc` (llenos). Cambiar `gpu` por `gpu-dev` si alguna vez vuelves al diseño de 1 sola GPU.
+
+```bash
+scontrol show partition gpu
 ```
 Detalle de la partición: tiempo máximo de reserva, límites de CPU/memoria, y el total de GPUs configuradas.
 
@@ -322,11 +331,11 @@ scontrol show job <JOBID>
 Detalle de una reserva específica — nodo asignado, tiempo restante, recursos otorgados, y el usuario real que la lanzó (útil para confirmar si un job visto en `squeue` es tuyo o de alguien con nombre parecido).
 
 ```bash
-sinfo -N -o "%N %C %O" -p gpu-dev
+sinfo -N -o "%N %C %O" -p gpu
 ```
-**Carga real de CPU por nodo** (descubierto el 2026-10-11, cuando `vLLM` tardó 10+ minutos sin error en `compute-0-1`): `%C` son los CPUs asignados/libres/otros/totales de cada nodo, `%O` es su `CPU_LOAD` (promedio de carga). Si un nodo tiene `CPU_LOAD` muy por encima del otro (p. ej. 87 contra 26), significa que **otros usuarios** tienen trabajos ajenos saturando ese nodo — nada que ver con tu propia reserva, pero sí explica una importación de `torch` anormalmente lenta (es un cuello de botella de CPU/I-O, no de GPU: revisa con `nvidia-smi` si tu proceso ya está tocando la GPU o sigue atascado antes de eso). Si ves esto, cancela (`scancel <JOBID>`) y vuelve a reservar apuntando al nodo más libre:
+**Carga real de CPU por nodo** (descubierto el 2026-10-11, cuando `vLLM` tardó 10+ minutos sin error en `compute-0-1`): `%C` son los CPUs asignados/libres/otros/totales de cada nodo, `%O` es su `CPU_LOAD` (promedio de carga). Si un nodo tiene `CPU_LOAD` muy por encima del otro (p. ej. 87 contra 26), significa que **otros usuarios** tienen trabajos ajenos saturando ese nodo — nada que ver con tu propia reserva, pero sí explica una importación de `torch` anormalmente lenta (es un cuello de botella de CPU/I-O, no de GPU: revisa con `nvidia-smi` si tu proceso ya está tocando la GPU o sigue atascado antes de eso). Nota: `compute-0-1` y `compute-0-2` son los mismos nodos físicos sin importar la partición (`gpu-dev`, `gpu`, `cpu`, etc. son solo políticas de acceso distintas sobre el mismo hardware) — la carga que veas aplica igual sin importar con qué partición consultes. Si un nodo está claramente más cargado, cancela (`scancel <JOBID>`) y vuelve a reservar apuntando al nodo más libre:
 ```bash
-salloc -p gpu-dev -n 1 -c 20 --mem=48G --gres=gpu:a100-sxm4-40gb:2 --time=04:00:00 --nodelist=<nodo-mas-libre>
+salloc -p gpu -n 1 -c 20 --mem=48G --gres=gpu:a100-sxm4-40gb:2 --time=04:00:00 --nodelist=<nodo-mas-libre>
 ```
 
 ---
@@ -337,7 +346,7 @@ Mismo resultado que las 6 pestañas de arriba, pero con los 6 procesos en segund
 
 ```bash
 ssh francisco.higuera__ute.edu.ec@hpc.cedia.edu.ec
-salloc -p gpu-dev -n 1 -c 20 --mem=48G --gres=gpu:a100-sxm4-40gb:2 --time=04:00:00
+salloc -p gpu -n 1 -c 20 --mem=48G --gres=gpu:a100-sxm4-40gb:2 --time=04:00:00
 ```
 Anota el `JOBID` y el `NODO` que te asigne (igual que en la sección 1).
 ```bash
