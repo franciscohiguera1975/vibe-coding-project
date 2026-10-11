@@ -279,6 +279,7 @@ Anota aquí la fecha y duración real de la sesión, para la diapositiva de "arq
 
 ## 8. Si algo falla
 
+- **`enroot start ... vllm-vl-server` da `[ERROR] No such file or directory: .../enroot/vllm-vl-server`** (descubierto 2026-10-11): te saltaste el paso de creación (sección 3.1) — `enroot start` no crea el contenedor, solo lo arranca si ya existe. No es un problema del nodo (`$HOME` es almacenamiento compartido NFS, visible desde cualquier nodo) — corre primero `enroot create --name vllm-vl-server vllm+vllm-openai+latest.sqsh` (reutiliza la imagen ya descargada, no baja nada nuevo) y luego reintenta el arranque.
 - **Un `enroot start` de vLLM da `ModuleNotFoundError: No module named 'vllm'` (no el error de "modelo no válido")**: el contenedor quedó corrupto. Reconstruir desde cero (cambiar `vllm-server` por `vllm-vl-server` si es el de visión el que falló):
   ```bash
   enroot remove vllm-server
