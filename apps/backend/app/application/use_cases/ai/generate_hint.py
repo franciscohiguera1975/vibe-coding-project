@@ -74,7 +74,7 @@ class GenerateAIHintUseCase:
             if not query:
                 return ""
             query_embedding = self._embedding_port.embed(query)
-            retrieved = retrieve_top_k(query_embedding, chunks, k=2)
+            retrieved = retrieve_top_k(query_embedding, query, chunks, k=2)
             if not retrieved:
                 return ""
             citations = "; ".join(

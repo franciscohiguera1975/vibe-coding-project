@@ -8,7 +8,7 @@ from app.domain import permissions as perm
 from app.domain.entities.identity import User
 from app.domain.entities.rag import RagEvaluationRun
 from app.domain.exceptions import PermissionDeniedError
-from app.domain.services.rag_retrieval import retrieve_top_k
+from app.domain.services.rag_retrieval import Bm25Index, build_bm25_index, retrieve_top_k
 
 # apps/backend/app/application/use_cases/rag/run_evaluation.py -> apps/backend
 _BACKEND_DIR = Path(__file__).resolve().parents[4]
@@ -64,11 +64,14 @@ class RunRagEvaluationUseCase:
 
         with self._uow_factory() as uow:
             all_chunks = uow.normativa_chunks.list_all()
+        # Un solo indice BM25 para las ~15 preguntas de abajo en vez de
+        # reconstruirlo una vez por pregunta sobre los mismos ~900 chunks.
+        bm25_index = build_bm25_index(all_chunks)
 
         results: list[dict] = []
         rag_matches = 0
         for question in questions:
-            results.append(self._evaluate_question(question, all_chunks))
+            results.append(self._evaluate_question(question, all_chunks, bm25_index))
             if results[-1]["rag_citation_match"]:
                 rag_matches += 1
 
@@ -83,13 +86,15 @@ class RunRagEvaluationUseCase:
             uow.commit()
         return saved
 
-    def _evaluate_question(self, question: dict, all_chunks) -> dict:
+    def _evaluate_question(self, question: dict, all_chunks, bm25_index: Bm25Index) -> dict:
         baseline_answer = self._rag_port.generate(
             question["question"], system=_BASELINE_SYSTEM_PROMPT, max_tokens=300
         )
 
         query_embedding = self._embedding_port.embed(question["question"], is_query=True)
-        retrieved = retrieve_top_k(query_embedding, all_chunks, k=3)
+        retrieved = retrieve_top_k(
+            query_embedding, question["question"], all_chunks, k=3, bm25_index=bm25_index
+        )
         context_block = "\n\n".join(
             f"[{r.chunk.source_document} - {r.chunk.article_label}]\n{r.chunk.text}"
             for r in retrieved

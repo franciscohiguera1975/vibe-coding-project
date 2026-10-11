@@ -152,3 +152,21 @@ Para que el propietario del proyecto pueda revisar la calidad del grounding ante
 
 - Ejecutar `02-hpc-pasos.md` (reservar GPU, levantar vLLM+TEI, túnel SSH, `RAG_LLM_PROVIDER=openai_compatible`/`EMBEDDING_PROVIDER=tei` en el `.env` de producción) y volver a correr `scripts/rag/load_chunks.py` contra el VPS para recalcular embeddings reales (los embeddings mock no son compatibles con TEI — distinto espacio vectorial).
 - Correr `POST /api/rag/evaluation/run` de nuevo una vez el HPC esté arriba, para tener un número real de "RAG acertó N/15" que mostrar en la diapositiva de resultados (ahora mismo el run persistido es el de modo mock, 0/15 en ambos, solo para fines de desarrollo).
+
+## 9. Recuperación híbrida — BM25 + vectorial + RRF (2026-10-10)
+
+Se generó un informe (.docx) y una presentación (.pptx) detallados para el DemoDay (`docs/saturdays_ai/`, entregados al usuario fuera del repo, no versionados aquí). A partir de ahí el usuario preguntó si convenía adoptar un esquema de recuperación híbrida (BM25 + búsqueda vectorial + Reciprocal Rank Fusion), con la intención explícita de que este prototipo sirva de base real para el futuro proyecto institucional de la UTE, no solo para la demo. Se decidió implementarlo ya, antes del Demo Day.
+
+**Qué cambió**: `app/domain/services/rag_retrieval.py` dejó de ser solo coseno — ahora `retrieve_top_k(query_embedding, query_text, chunks, *, k=3)` calcula dos rankings independientes sobre el mismo subconjunto de chunks (los que ya tienen embedding cargado) y los fusiona:
+
+- **Ranking vectorial**: coseno sobre `query_embedding`, igual que antes.
+- **Ranking BM25**: `rank-bm25` (`BM25Okapi`, nueva dependencia, puro Python, sin servidor aparte — coherente con la decisión ya tomada de no usar infraestructura de búsqueda pesada) sobre el texto crudo de los chunks, tokenizado con una regex simple (minúsculas, letras/dígitos, soporta tildes y eñe).
+- **Fusión (RRF)**: `score(chunk) = Σ 1 / (60 + rank)` sobre los rankings donde aparece (rank 1-indexado) — la misma constante (`k=60`) que usan Elasticsearch/OpenSearch por defecto, no un valor ajustado a mano. `RetrievedChunk.score` pasa a ser ese score RRF, no el coseno crudo.
+
+**Por qué**: la búsqueda puramente vectorial puede fallar cuando la consulta y la normativa comparten una palabra exacta (p. ej. "calificación", "asistencia") pero el embedding no la recupera entre el top-k por razones semánticas no evidentes; BM25 la recupera por coincidencia léxica exacta, y RRF deja que ambas señales se refuercen sin que una domine a la otra por escala (BM25 no está acotado, coseno sí).
+
+**Dónde se propagó**: los 3 llamadores de `retrieve_top_k` (`ValidateSyllabusUseCase`, `RunRagEvaluationUseCase`, `GenerateAIHintUseCase._retrieve_grounding`) ya tenían el texto de la consulta disponible antes de calcular el embedding — se les pasó ese mismo texto, sin cambiar ninguna otra firma ni los puertos (`EmbeddingPort`/`RagPort` no se tocaron).
+
+**Verificación**: `tests/unit/test_rag_retrieval.py` reescrito (nueva firma + un test que confirma que un chunk con coincidencia léxica exacta pero embedding lejano entra al top-k gracias a BM25, algo que el ranking puramente vectorial anterior no garantizaba). Suite completa: **118 passed** (antes 116; +2 netos), `ruff check` limpio. Nada en los routers, schemas o frontend cambió — la fusión es interna a la capa de dominio.
+
+**Pendiente de reflejar en los entregables del DemoDay**: el informe (.docx) y la presentación (.pptx) ya enviados describen la arquitectura de recuperación como "solo vectorial" — quedó pendiente decidir con el usuario si se regeneran con la sección de arquitectura actualizada (fortalece "Calidad técnica y arquitectura" e "Innovación/creatividad" de la rúbrica) antes del 17 de octubre.
