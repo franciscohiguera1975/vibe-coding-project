@@ -128,7 +128,11 @@ def test_run_evaluation_and_get_latest(admin_user):
     assert run_response.status_code == 200
     run_body = run_response.json()
     assert run_body["summary"]["total"] == 15
-    assert run_body["summary"]["baseline_citation_matches"] == 0
+    # No es 0 en todos los casos: con MockRagAdapter el baseline hace eco de la
+    # pregunta, y la pregunta q15 del eval set real menciona su propio articulo
+    # ("...segun su articulo 1?") — _mentions_expected_article lo detecta, igual
+    # que detectaria a un LLM real que ya conoce la normativa de memoria.
+    assert run_body["summary"]["baseline_citation_matches"] == 1
     assert len(run_body["results"]) == 15
 
     latest = client.get("/api/rag/evaluation")

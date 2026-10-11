@@ -1,4 +1,5 @@
 import json
+import re
 from collections.abc import Callable
 from pathlib import Path
 
@@ -35,14 +36,33 @@ def _load_eval_set(path: Path) -> list[dict]:
         return [json.loads(line) for line in f if line.strip()]
 
 
+def _mentions_expected_article(answer: str, article_label: str) -> bool:
+    """El baseline no recibe ningun fragmento recuperado, asi que solo puede
+    citar el articulo correcto si lo conoce de su propio entrenamiento (nunca
+    por recuperacion) — por eso esta verificacion es textual, no estructural
+    como `rag_citation_match`. Extrae el numero del articulo esperado
+    (`article_label` viene como "Articulo 67" o "Art. 1") y busca una mencion
+    equivalente en la respuesta libre del LLM, sin exigir el formato exacto
+    del corpus (acentos, abreviatura, puntuacion)."""
+    match = re.search(r"\d+", article_label)
+    if not match:
+        return False
+    number = re.escape(match.group(0))
+    pattern = rf"\bart[íi]culo\.?\s*{number}\b|\bart\.?\s*{number}\b"
+    return bool(re.search(pattern, answer, re.IGNORECASE))
+
+
 class RunRagEvaluationUseCase:
     """RunRagEvaluation (docs/saturdays_ai/00-plan.md §6): corre el set de ~15
     preguntas de scripts/rag/data/eval_set.jsonl por dos caminos — baseline (el
     LLM responde solo con la pregunta, sin recuperacion) y RAG (recupera top-3
     chunks y los pasa como contexto, igual mecanismo que ValidateSyllabusUseCase)
-    — y persiste la comparacion para la pantalla "Evaluacion". El baseline nunca
-    puede acertar una cita porque no recibe ninguna: su `baseline_citation_match`
-    es siempre False, ese es justamente el punto de la comparacion."""
+    — y persiste la comparacion para la pantalla "Evaluacion". Las dos metricas
+    miden cosas distintas a proposito: `rag_citation_match` es estructural (¿el
+    chunk recuperado es el correcto?), mientras que `baseline_citation_match` es
+    textual (¿la respuesta libre del LLM, sin ningun contexto, menciona el
+    articulo correcto porque ya lo sabia de su entrenamiento?) — ver
+    `_mentions_expected_article`."""
 
     def __init__(
         self,
@@ -70,15 +90,18 @@ class RunRagEvaluationUseCase:
 
         results: list[dict] = []
         rag_matches = 0
+        baseline_matches = 0
         for question in questions:
             results.append(self._evaluate_question(question, all_chunks, bm25_index))
             if results[-1]["rag_citation_match"]:
                 rag_matches += 1
+            if results[-1]["baseline_citation_match"]:
+                baseline_matches += 1
 
         summary = {
             "total": len(questions),
             "rag_citation_matches": rag_matches,
-            "baseline_citation_matches": 0,
+            "baseline_citation_matches": baseline_matches,
         }
         run = RagEvaluationRun(results=results, summary=summary)
         with self._uow_factory() as uow:
@@ -112,6 +135,9 @@ class RunRagEvaluationUseCase:
             and r.chunk.article_label == expected["article_label"]
             for r in retrieved
         )
+        baseline_citation_match = _mentions_expected_article(
+            baseline_answer, expected["article_label"]
+        )
 
         return {
             "id": question["id"],
@@ -120,5 +146,5 @@ class RunRagEvaluationUseCase:
             "baseline_answer": baseline_answer,
             "rag_answer": rag_answer,
             "rag_citation_match": rag_citation_match,
-            "baseline_citation_match": False,
+            "baseline_citation_match": baseline_citation_match,
         }

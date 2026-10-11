@@ -21,9 +21,24 @@ def seeded_chunks(rag_mock: MockRagAdapter) -> list[NormativaChunk]:
     """Un corpus minimo pero real para ejercitar la recuperacion sin depender de
     chunks.jsonl (dato local, gitignored, no disponible en CI)."""
     texts = [
-        ("chunk-67", "Reglamento de Régimen Académico.pdf", "Artículo 67", "objetivos contenidos rubrica criterios de calificacion medios ambientes instrumentos"),
-        ("chunk-40", "Reglamento del Estudiante.pdf", "Artículo 40", "recalificacion resultados de aprendizaje incluidos en el silabo"),
-        ("chunk-35", "Reglamento del Estudiante.pdf", "Artículo 35", "principios evaluacion transparente metodologia"),
+        (
+            "chunk-67",
+            "Reglamento de Régimen Académico.pdf",
+            "Artículo 67",
+            "objetivos contenidos rubrica criterios de calificacion medios ambientes instrumentos",
+        ),
+        (
+            "chunk-40",
+            "Reglamento del Estudiante.pdf",
+            "Artículo 40",
+            "recalificacion resultados de aprendizaje incluidos en el silabo",
+        ),
+        (
+            "chunk-35",
+            "Reglamento del Estudiante.pdf",
+            "Artículo 35",
+            "principios evaluacion transparente metodologia",
+        ),
     ]
     chunks = []
     with SqlAlchemyUnitOfWork() as uow:
@@ -73,7 +88,7 @@ def test_validate_syllabus_returns_no_citations_without_loaded_chunks(admin_user
         assert result.cumple is None
 
 
-def test_run_evaluation_scores_rag_citation_matches_and_baseline_is_always_zero(
+def test_run_evaluation_scores_rag_and_baseline_citation_matches(
     admin_user, rag_mock, seeded_chunks, tmp_path
 ):
     # Preguntas controladas: la primera y la tercera piden exactamente el texto de
@@ -81,10 +96,22 @@ def test_run_evaluation_scores_rag_citation_matches_and_baseline_is_always_zero(
     # texto, produce el mismo vector y la recuperacion las encuentra con score 1.0);
     # la segunda espera una cita que no corresponde a ningun chunk cargado, para
     # verificar que el score de "no coincide" tambien se calcula correctamente.
+    # La cuarta ("baseline-hit") verifica `baseline_citation_match`: su propia
+    # pregunta menciona el articulo esperado, y MockRagAdapter.generate() hace eco
+    # del prompt — asi el baseline "acierta" la cita sin haber recuperado nada,
+    # igual que lo haria un LLM real que ya conoce la normativa de memoria. Su
+    # `rag_citation_match` tambien da True, pero no porque la recuperacion haya
+    # sido buena: con solo 3 chunks sembrados y k=3, `retrieve_top_k` siempre
+    # devuelve los 3 (cualquier cita entre esos 3 "acierta" sin importar el
+    # ranking) — por eso "mismatch-1" (que pide un documento no cargado) es la
+    # unica forma real de ver un `rag_citation_match` en False en este fixture.
     eval_set = [
         {
             "id": "ok-1",
-            "question": "objetivos contenidos rubrica criterios de calificacion medios ambientes instrumentos",
+            "question": (
+                "objetivos contenidos rubrica criterios de calificacion medios "
+                "ambientes instrumentos"
+            ),
             "expected_citation": {
                 "source_document": "Reglamento de Régimen Académico.pdf",
                 "article_label": "Artículo 67",
@@ -109,6 +136,15 @@ def test_run_evaluation_scores_rag_citation_matches_and_baseline_is_always_zero(
             },
             "expected_answer_summary": "resumen 3",
         },
+        {
+            "id": "baseline-hit",
+            "question": "segun el articulo 35, que principios debe garantizar la evaluacion",
+            "expected_citation": {
+                "source_document": "Reglamento del Estudiante.pdf",
+                "article_label": "Artículo 35",
+            },
+            "expected_answer_summary": "resumen 4",
+        },
     ]
     eval_set_path = tmp_path / "eval_set.jsonl"
     eval_set_path.write_text(
@@ -121,20 +157,24 @@ def test_run_evaluation_scores_rag_citation_matches_and_baseline_is_always_zero(
     run = use_case.execute(actor=admin_user)
 
     assert run.id is not None
-    assert run.summary == {"total": 3, "rag_citation_matches": 2, "baseline_citation_matches": 0}
+    assert run.summary == {"total": 4, "rag_citation_matches": 3, "baseline_citation_matches": 1}
 
     by_id = {r["id"]: r for r in run.results}
     assert by_id["ok-1"]["rag_citation_match"] is True
     assert by_id["ok-2"]["rag_citation_match"] is True
     assert by_id["mismatch-1"]["rag_citation_match"] is False
-    assert all(r["baseline_citation_match"] is False for r in run.results)
+    assert by_id["baseline-hit"]["rag_citation_match"] is True
+    assert by_id["baseline-hit"]["baseline_citation_match"] is True
+    assert by_id["ok-1"]["baseline_citation_match"] is False
+    assert by_id["ok-2"]["baseline_citation_match"] is False
+    assert by_id["mismatch-1"]["baseline_citation_match"] is False
 
     persisted = None
     with SqlAlchemyUnitOfWork() as uow:
         persisted = uow.rag_evaluation_runs.get_latest()
     assert persisted is not None
     assert persisted.id == run.id
-    assert persisted.summary["rag_citation_matches"] == 2
+    assert persisted.summary["rag_citation_matches"] == 3
 
 
 def test_run_evaluation_requires_permission(student_role, password_hasher, tmp_path):
