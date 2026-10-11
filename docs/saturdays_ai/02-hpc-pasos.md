@@ -6,7 +6,7 @@ Runbook para que el usuario ejecute en su propia sesión del HPC (`hpc.cedia.edu
 
 | Servicio | Modelo | GPU | Puerto local | Para qué |
 |---|---|---|---|---|
-| **vLLM (texto)** | `Qwen/Qwen2.5-7B-Instruct` | GPU 0 | `8001` | Genera las respuestas del RAG (validación de sílabos, evaluación) — ya validado, 15/15 |
+| **vLLM (texto)** | `Qwen/Qwen2.5-14B-Instruct` (antes 7B) | GPU 0 | `8001` | Genera las respuestas del RAG (validación de sílabos, evaluación) — el 15/15 se obtuvo con el 7B; re-evaluar tras subir a 14B |
 | **TEI** | `intfloat/multilingual-e5-large` | (CPU; toca GPU 0 levemente) | `8002` | Calcula los embeddings de consulta y corpus |
 | **vLLM (visión)** | `Qwen/Qwen2.5-VL-7B-Instruct` | GPU 1 | `8003` | Sirve al AI Tutor (pistas de texto Y análisis de imágenes) — **nuevo** |
 
@@ -102,17 +102,19 @@ Si dice `[ERROR] File already exists`, no es un error — ya se hizo antes, segu
 ### 1.2. Arrancar vLLM (texto)
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 enroot start --mount $HOME --root --rw vllm-server \
-  Qwen/Qwen2.5-7B-Instruct \
+enroot start --mount $HOME --root --rw --env CUDA_VISIBLE_DEVICES=0 vllm-server \
+  Qwen/Qwen2.5-14B-Instruct \
   --port 8001 \
   --max-model-len 4096
 ```
 
 **Importante**: la imagen `vllm/vllm-openai` tiene su `ENTRYPOINT` fijo en `vllm serve` — lo que le pases a `enroot start <contenedor> <comando>` se agrega como argumento a ese entrypoint, no lo reemplaza. No escribas `vllm serve ...` ni `python3 -m vllm.entrypoints...` delante del modelo (ambos rompen el comando) — el modelo y las opciones van directo, como arriba.
 
-**`CUDA_VISIBLE_DEVICES=0` es nuevo (2026-10-11)**: con 2 GPUs en la misma reserva, si no fijas cuál usa cada proceso, los dos vLLM intentarían tomar la GPU 0 por defecto y chocarían. Este queda en la GPU 0; el de visión (sección 2.5) va en la GPU 1.
+**`--env CUDA_VISIBLE_DEVICES=0` (2026-10-11, corregido)**: con 2 GPUs en la misma reserva, hay que fijar cuál usa cada proceso — este queda en la GPU 0; el de visión (sección 3) va en la GPU 1. **Ojo con la sintaxis**: tiene que ir como `--env CUDA_VISIBLE_DEVICES=0` (flag de `enroot start`), **no** como `CUDA_VISIBLE_DEVICES=0 enroot start ...` (prefijo de shell) — enroot no hereda variables de entorno del shell automáticamente (mismo motivo que `--env HF_ENDPOINT=...` en la sección 2.2), así que el prefijo se ignora en silencio y los dos vLLM terminan compitiendo por la misma GPU física sin ningún aviso, hasta que un modelo grande no cabe junto al otro y truena con un error de memoria.
 
-Esperar a `INFO: Application startup complete.` — no devuelve el prompt, se queda corriendo ahí (correcto, no es que se colgó). El modelo (`Qwen/Qwen2.5-7B-Instruct`, abierto, sin token de Hugging Face) se descarga solo la primera vez y queda cacheado en `$HOME/.cache/huggingface`. **No cerrar esta pestaña.**
+**Modelo actualizado a `Qwen2.5-14B-Instruct`** (antes `Qwen2.5-7B-Instruct`, 2026-10-11): 29.6GB en vez de 14.19GB — cabe cómodo en los 40GB de la GPU 0. Si subes de nuevo, vuelve a correr la evaluación de 15 preguntas para confirmar que sigue citando bien.
+
+Esperar a `INFO: Application startup complete.` — no devuelve el prompt, se queda corriendo ahí (correcto, no es que se colgó). El modelo se descarga solo la primera vez y queda cacheado en `$HOME/.cache/huggingface`. **No cerrar esta pestaña.**
 
 ---
 
@@ -177,7 +179,7 @@ Si dice `[ERROR] File already exists`, no es un error — seguir directo a 3.2.
 ### 3.2. Arrancar vLLM (visión)
 
 ```bash
-CUDA_VISIBLE_DEVICES=1 enroot start --mount $HOME --root --rw vllm-vl-server \
+enroot start --mount $HOME --root --rw --env CUDA_VISIBLE_DEVICES=1 vllm-vl-server \
   Qwen/Qwen2.5-VL-7B-Instruct \
   --port 8003 \
   --max-model-len 8192 \
@@ -185,7 +187,7 @@ CUDA_VISIBLE_DEVICES=1 enroot start --mount $HOME --root --rw vllm-vl-server \
 ```
 
 Notas:
-- `CUDA_VISIBLE_DEVICES=1`: lo pone en la segunda GPU de la reserva, separado del modelo de texto (que usa la GPU 0, sección 1.2) — sin esto, los dos vLLM pelean por la misma GPU.
+- `--env CUDA_VISIBLE_DEVICES=1` (flag de `enroot start`, no prefijo de shell — ver la nota de la sección 1.2): lo pone en la segunda GPU de la reserva, separado del modelo de texto (que usa la GPU 0, sección 1.2) — sin esto bien puesto, los dos vLLM pelean por la misma GPU física sin ningún aviso hasta que un modelo no cabe junto al otro.
 - `--max-model-len 8192` (el doble que el modelo de texto): los modelos con visión consumen más tokens de contexto por imagen (la codificación de la imagen ocupa cientos o miles de tokens, según su resolución) — si ves un error de contexto insuficiente, es la primera variable a subir.
 - `--trust-remote-code`: Qwen2.5-VL trae código propio (no solo pesos) que `vllm` necesita poder ejecutar para cargar el modelo correctamente.
 - **Primera vez que este proyecto sirve un modelo con visión por vLLM** — a diferencia del modelo de texto (ya probado varias veces), es razonable que aparezca algún error nuevo la primera vez; avisa a Claude Code con el mensaje exacto si pasa, para diagnosticarlo igual que los errores anteriores de este documento.
@@ -294,7 +296,7 @@ Anota aquí la fecha y duración real de la sesión, para la diapositiva de "arq
 - **Un `srun --jobid=...` se queda colgado o da `Job/step already completing or completed`**: estás tratando de crear un segundo "paso" en la misma reserva (`-n 1` solo da un cupo). Para cualquier conexión adicional al mismo nodo, usar `ssh <nodo>` directo, nunca `srun` otra vez.
 - **Viste un `JOBID` de otro usuario con tu mismo nombre en `squeue`**: la columna `USER` se corta a 8 caracteres — puede coincidir con la de alguien más (pasó con `francisco.mendoza__yachaytech.edu.ec`, truncado igual que `francisco.higuera__ute.edu.ec`). Antes de cancelar un job que no reconoces, confirmar con `scontrol show job <JOBID>` (revisar el campo `Command`/`WorkDir`, ahí se ve el usuario real) — nunca cancelar un job que no sea tuyo.
 - **Cerraste por error la pestaña de la Pestaña 1 (el `salloc`)**: la reserva murió, y con ella todo lo que corría adentro (los 3 servicios). No hay que recuperarla — repetir desde la sección 1 (los contenedores y modelos siguen descargados, así que es rápido).
-- **Los dos vLLM intentan usar la misma GPU / uno falla con un error de memoria al arrancar el segundo**: falta el `CUDA_VISIBLE_DEVICES` (0 para el de texto, 1 para el de visión, secciones 1.2 y 3.2) — revisa que cada `enroot start` lo tenga.
+- **Los dos vLLM intentan usar la misma GPU / uno falla con `ValueError: Free memory on device cuda:0 (X/39.49 GiB) is less than desired GPU memory utilization`** (pasó de verdad 2026-10-11, al subir el de texto a 14B): el síntoma es justo este error de memoria insuficiente en una GPU que "debería" tener casi 40GB libres. Causa real: `CUDA_VISIBLE_DEVICES=N` puesto como **prefijo de shell** (`CUDA_VISIBLE_DEVICES=1 enroot start ...`) no llega al contenedor — enroot no hereda variables de entorno del shell automáticamente. Hay que pasarlo como **flag** de `enroot start`: `enroot start ... --env CUDA_VISIBLE_DEVICES=1 vllm-vl-server ...` (secciones 1.2 y 3.2 ya corregidas). Con modelos chicos (7B+7B) el error no se nota porque ambos caben juntos en una sola GPU por accidente; con un modelo más grande (14B+7B) ya no caben y revienta — si ves este error, mata los dos procesos y vuelve a arrancarlos con la sintaxis `--env` correcta, confirmando con `nvidia-smi` que cada uno queda en su propia GPU.
 - **El modelo de visión da un error de "contexto insuficiente" (context length exceeded) al analizar una imagen**: sube `--max-model-len` en la sección 3.2 (empezar en 8192, subir a 16384 si persiste) — las imágenes consumen más tokens de contexto que el texto solo.
 - **`salloc: error: QOSMaxGRESPerJob`** al pedir `--gres=gpu:a100-sxm4-40gb:2`: estás en la partición equivocada — `gpu-dev` no permite más de 1 GPU por job. Usa `-p gpu` en vez de `-p gpu-dev` (ver la nota de la sección 1 y el diagnóstico de §9 para confirmar el límite exacto de cada partición).
 - **`salloc: error: QOSMaxCpuPerUserLimit`** al pedir `-c 20` (o más): esa partición tiene un tope de CPU por job más bajo de lo que pediste (p. ej. `gpu-dev` tope en `cpu=16`) — baja el `-c` o cambia de partición (`-p gpu` admite hasta `cpu=160`). Confirmar el tope exacto con el comando de `sacctmgr` en §9.
@@ -357,8 +359,8 @@ srun --jobid=<JOBID> --pty bash
 Ya dentro del nodo, los 3 servicios de un tirón (los contenedores `vllm-server`/`tei-server`/`vllm-vl-server` deben existir ya — ver secciones 1.1, 2.1 y 3.1 si es la primera vez):
 
 ```bash
-CUDA_VISIBLE_DEVICES=0 nohup enroot start --mount $HOME --root --rw vllm-server \
-  Qwen/Qwen2.5-7B-Instruct --port 8001 --max-model-len 4096 \
+nohup enroot start --mount $HOME --root --rw --env CUDA_VISIBLE_DEVICES=0 vllm-server \
+  Qwen/Qwen2.5-14B-Instruct --port 8001 --max-model-len 4096 \
   > ~/vllm.log 2>&1 &
 disown
 
@@ -367,7 +369,7 @@ nohup enroot start --mount $HOME --root --rw --env HF_ENDPOINT=https://huggingfa
   > ~/tei.log 2>&1 &
 disown
 
-CUDA_VISIBLE_DEVICES=1 nohup enroot start --mount $HOME --root --rw vllm-vl-server \
+nohup enroot start --mount $HOME --root --rw --env CUDA_VISIBLE_DEVICES=1 vllm-vl-server \
   Qwen/Qwen2.5-VL-7B-Instruct --port 8003 --max-model-len 8192 --trust-remote-code \
   > ~/vllm-vl.log 2>&1 &
 disown
