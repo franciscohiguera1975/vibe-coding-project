@@ -4,7 +4,11 @@ Runbook para que el usuario ejecute en su propia sesión del HPC (`hpc.cedia.edu
 
 **Qué se arma**: **vLLM** (genera las respuestas, puerto `8001`) y **TEI** (calcula embeddings, puerto `8002`), los dos dentro de **una sola reserva de Slurm**, corriendo como dos procesos separados en el mismo nodo — se conecta a ese nodo por `ssh` directo para cada pieza adicional, sin volver a pasar por `salloc`/`srun` (eso es lo que evita el límite de 1 job). Cada uno se tunela por separado hacia el VPS. No es un servicio permanente: se levanta antes de usar la función de RAG (prueba o demo) y se apaga después (ver `00-plan.md` §5 para el porqué).
 
-**4 pestañas de terminal en total, ninguna se cierra mientras dure la sesión:**
+**Dos formas equivalentes de hacer esto — elige una:**
+- **Opción A (abajo, secciones 0-5): 4 pestañas**, cada una en primer plano — más fácil de ver el progreso de cada servicio en vivo, cada pieza aislada en su propia ventana.
+- **Opción B (sección 8, al final): 1 sola pestaña**, con los 4 procesos en segundo plano (`nohup` + `disown`) — mismo resultado, menos ventanas que gestionar, y de hecho más resistente a un cierre accidental de la pestaña (los procesos sobreviven aunque la cierres, mientras la reserva de Slurm siga activa).
+
+**4 pestañas de terminal en total (Opción A), ninguna se cierra mientras dure la sesión:**
 
 | Pestaña | Qué hace |
 |---|---|
@@ -41,6 +45,8 @@ Copia esa línea completa y pásasela a Claude Code — la autoriza en el VPS (`
 ```bash
 ssh francisco.higuera__ute.edu.ec@hpc.cedia.edu.ec
 salloc -p gpu-dev -n 1 -c 10 --mem=24G --gres=gpu:a100-sxm4-40gb:1 --time=02:00:00
+salloc -p gpu-dev -n 1 -c 10 --mem=24G --gres=gpu:a100-sxm4-40gb:1 --time=08:00:00 --nodelist=compute-0-2
+
 ```
 
 (`-c 10 --mem=24G`: un poco más que solo para vLLM, porque esta misma reserva también va a correr TEI al lado — ver sección 2. La GPU completa es solo para vLLM; TEI corre en CPU).
@@ -235,3 +241,59 @@ Tus propias reservas activas, con `JOBID` y `NODELIST`.
 scontrol show job <JOBID>
 ```
 Detalle de una reserva específica — nodo asignado, tiempo restante, recursos otorgados, y el usuario real que la lanzó (útil para confirmar si un job visto en `squeue` es tuyo o de alguien con nombre parecido).
+
+```bash
+sinfo -N -o "%N %C %O" -p gpu-dev
+```
+**Carga real de CPU por nodo** (descubierto el 2026-10-11, cuando `vLLM` tardó 10+ minutos sin error en `compute-0-1`): `%C` son los CPUs asignados/libres/otros/totales de cada nodo, `%O` es su `CPU_LOAD` (promedio de carga). Si un nodo tiene `CPU_LOAD` muy por encima del otro (p. ej. 87 contra 26), significa que **otros usuarios** tienen trabajos ajenos saturando ese nodo — nada que ver con tu propia reserva, pero sí explica una importación de `torch` anormalmente lenta (es un cuello de botella de CPU/I-O, no de GPU: revisa con `nvidia-smi` si tu proceso ya está tocando la GPU o sigue atascado antes de eso). Si ves esto, cancela (`scancel <JOBID>`) y vuelve a reservar apuntando al nodo más libre:
+```bash
+salloc -p gpu-dev -n 1 -c 10 --mem=24G --gres=gpu:a100-sxm4-40gb:1 --time=02:00:00 --nodelist=<nodo-mas-libre>
+```
+
+---
+
+## 8. Opción B — todo en una sola pestaña (alternativa a las secciones 1-4)
+
+Mismo resultado que las 4 pestañas de arriba, pero con los 4 procesos en segundo plano dentro de **una única conexión** al nodo. Útil si prefieres gestionar menos ventanas; no es menos robusto — `nohup` (ignora el `SIGHUP` que manda cerrar la terminal) + `disown` (lo saca de la lista de trabajos de la shell, que si no también lo mataría al salir) hacen que los 4 procesos sigan vivos **aunque cierres esta pestaña por error**, mientras la reserva de Slurm (el job) siga activa. Lo único que de verdad los mata a todos es que termine el job (`scancel` o que se acabe el `--time`), exactamente igual que con 4 pestañas.
+
+```bash
+ssh francisco.higuera__ute.edu.ec@hpc.cedia.edu.ec
+salloc -p gpu-dev -n 1 -c 10 --mem=24G --gres=gpu:a100-sxm4-40gb:1 --time=02:00:00
+```
+Anota el `JOBID` y el `NODO` que te asigne (igual que en la sección 1).
+```bash
+srun --jobid=<JOBID> --pty bash
+```
+
+Ya dentro del nodo, los 4 procesos de un tirón (los contenedores `vllm-server`/`tei-server` deben existir ya — ver secciones 1.1 y 2.1 si es la primera vez):
+
+```bash
+nohup enroot start --mount $HOME --root --rw vllm-server \
+  Qwen/Qwen2.5-7B-Instruct --port 8001 --max-model-len 4096 \
+  > ~/vllm.log 2>&1 &
+disown
+
+nohup enroot start --mount $HOME --root --rw --env HF_ENDPOINT=https://huggingface.co tei-server \
+  --model-id intfloat/multilingual-e5-large --port 8002 \
+  > ~/tei.log 2>&1 &
+disown
+
+nohup ssh -i ~/.ssh/hpc_tunnel_key -N -R 8765:localhost:8001 deploy@74.208.222.22 \
+  > ~/tunnel_vllm.log 2>&1 &
+disown
+
+nohup ssh -i ~/.ssh/hpc_tunnel_key -N -R 8766:localhost:8002 deploy@74.208.222.22 \
+  > ~/tunnel_tei.log 2>&1 &
+disown
+```
+
+El prompt vuelve de inmediato después de cada bloque (a diferencia de la Opción A, donde `vLLM`/`TEI` se quedan "colgados" en pantalla a propósito). Verificar que los 4 siguen corriendo:
+
+```bash
+jobs                 # lista los 4 procesos en segundo plano de esta shell
+tail -f ~/vllm.log    # ver el progreso de arranque de vLLM en vivo (Ctrl+C solo sale del tail, no mata el proceso)
+curl http://localhost:8001/v1/models   # vLLM, una vez arriba
+curl http://localhost:8002/health      # TEI, una vez arriba
+```
+
+**Diferencia real con la Opción A**: en la Opción A, cerrar por error una de las 4 pestañas mata *solo* lo que corría ahí (el proceso en primer plano recibe el `SIGHUP`). En la Opción B, con una sola pestaña, el riesgo lógico sería que cerrarla matara los 4 procesos a la vez — pero `nohup`+`disown` evita exactamente eso: los 4 quedan desacoplados de la terminal, así que sobreviven a que la cierres. La única desventaja real es que ya no ves el log de cada servicio en pantalla por defecto (hay que `tail -f` el archivo correspondiente si quieres mirar el progreso).
