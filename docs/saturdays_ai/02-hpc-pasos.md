@@ -300,6 +300,16 @@ Anota aquí la fecha y duración real de la sesión, para la diapositiva de "arq
 - **El modelo de visión da un error de "contexto insuficiente" (context length exceeded) al analizar una imagen**: sube `--max-model-len` en la sección 3.2 (empezar en 8192, subir a 16384 si persiste) — las imágenes consumen más tokens de contexto que el texto solo.
 - **`salloc: error: QOSMaxGRESPerJob`** al pedir `--gres=gpu:a100-sxm4-40gb:2`: estás en la partición equivocada — `gpu-dev` no permite más de 1 GPU por job. Usa `-p gpu` en vez de `-p gpu-dev` (ver la nota de la sección 1 y el diagnóstico de §9 para confirmar el límite exacto de cada partición).
 - **`salloc: error: QOSMaxCpuPerUserLimit`** al pedir `-c 20` (o más): esa partición tiene un tope de CPU por job más bajo de lo que pediste (p. ej. `gpu-dev` tope en `cpu=16`) — baja el `-c` o cambia de partición (`-p gpu` admite hasta `cpu=160`). Confirmar el tope exacto con el comando de `sacctmgr` en §9.
+- **Necesitas matar uno de los procesos de la Opción B (p. ej. para cambiar de modelo) pero `jobs` no muestra nada y `pgrep -af <nombre-del-modelo>` tampoco** (descubierto 2026-10-11): es esperado, no un error — `disown` saca el proceso de la lista de `jobs` de esa shell a propósito (para que sobreviva si cierras la pestaña), y `pgrep -af` es sensible a mayúsculas (los nombres de modelo llevan "Qwen" con mayúscula, no "qwen"). La forma confiable de encontrar el PID real es por el puerto que ocupa o por `nvidia-smi`, no por nombre:
+  ```bash
+  ss -tlnp | grep -E '8001|8002|8003'   # el campo users:(("...",pid=NNNNN,...)) trae el PID real
+  nvidia-smi                             # la tabla de Processes trae el PID del proceso que usa cada GPU
+  ```
+  Mata el PID del **proceso principal del servidor** (el que aparece en `ss -tlnp`, no el `VLLM::EngineCore` hijo que aparece en `nvidia-smi` — ese muere solo junto con su padre):
+  ```bash
+  kill <PID>
+  ```
+  Confirma con otro `nvidia-smi` que la GPU correspondiente quedó en ~0MiB antes de arrancar el reemplazo.
 
 ## 9. Comandos de diagnóstico (de consulta, no reservan ni cambian nada)
 
