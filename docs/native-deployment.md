@@ -25,12 +25,14 @@ User=vibe-coding
 WorkingDirectory=/opt/vibe-coding-platform/apps/backend
 EnvironmentFile=/opt/vibe-coding-platform/.env
 ExecStart=/opt/vibe-coding-platform/apps/backend/.venv/bin/gunicorn app.main:app \
-  -k uvicorn.workers.UvicornWorker -b 127.0.0.1:3000 --workers 2
+  -k uvicorn.workers.UvicornWorker -b 127.0.0.1:3000 --workers 2 --timeout 300
 Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
 ```
+
+`--timeout 300` (gunicorn por defecto son 30s): necesario porque hay endpoints síncronos de larga duración que llaman a un LLM real (p. ej. `POST /api/rag/evaluation/run`, 15 preguntas × 2 generaciones) — sin este ajuste, gunicorn mata y reinicia el worker a los 30s, abortando la petición a medias sin que quede ningún registro del error (nginx solo ve un 504).
 
 ```bash
 sudo systemctl daemon-reload

@@ -188,3 +188,21 @@ Como la recarga de embeddings solo depende de TEI, se procedió con esa parte:
 **Dato clave para la cifra de la rúbrica**: `rag_citation_match` (lo que persiste `RunRagEvaluationUseCase` como "aciertos RAG") depende solo de la recuperación (embeddings + BM25 + RRF), no de `vLLM` — `vLLM` solo redacta el texto de la respuesta que se ve en pantalla, no afecta este conteo. Por eso el **15/15** ya es la cifra real y reproducible, aunque `vLLM` siga caído.
 
 **Pendiente real, ahora acotado solo a esto**: correr el endpoint oficial `POST /api/rag/evaluation/run` (no el script ad-hoc) una vez `vLLM` esté arriba de nuevo, para que (a) quede oficialmente persistido en `rag_evaluation_runs` y (b) la pantalla "Evaluación" de la plataforma muestre el resultado real en vivo durante la demo — se espera que confirme el mismo 15/15, más las respuestas en lenguaje natural generadas por `vLLM`. El usuario está reintentando levantar `vLLM` (el arranque es lento — `import torch` tarda varios minutos en un job/contenedor recién creado, consistente con lo ya documentado en `02-hpc-pasos.md`).
+
+## 11. vLLM lento por contención real del nodo HPC, y corrida oficial de evaluación (2026-10-11)
+
+`vLLM` tardó más de 10 minutos sin arrancar (sin error) en el job 29189/`compute-0-1`. Diagnóstico en vivo (`top`, `nvidia-smi`, pedidos por Claude Code, ejecutados por el usuario): `load average` de ~87 en `compute-0-1`, causado por trabajos **de otros usuarios** (GROMACS, entrenamientos de ML) con cientos de horas acumuladas — nada que ver con la reserva del usuario. `nvidia-smi` confirmó que `vLLM` ni siquiera había tocado la GPU todavía (0% uso, solo TEI con 1.5GB). `sinfo -N -o "%N %C %O" -p gpu-dev` mostró `compute-0-2` con 192 CPUs libres de 256 (carga 26) contra solo 56 libres en `compute-0-1` (carga 87). Se canceló el job y se volvió a reservar con `--nodelist=compute-0-2`; ahí `vLLM` y TEI arrancaron en tiempo normal.
+
+**Corrida oficial**: con ambos túneles confirmados (`curl` desde el VPS: HTTP 200 en los dos), se intentó primero `POST /api/rag/evaluation/run` vía la API pública — **504 Gateway Timeout**. Causa raíz encontrada: `gunicorn` corre con su timeout de worker por defecto (**30 segundos**, nunca configurado explícitamente en el `.service` de producción) — el endpoint, al llamar a `vLLM` real 30 veces (15 preguntas × baseline + RAG), tarda varios minutos, así que el worker se mataba a medio proceso sin dejar ningún registro (ni en `rag_evaluation_runs` ni en los logs). **Corregido en producción**: se agregó `--timeout 300` al `ExecStart` de `/etc/systemd/system/vibe-coding-platform-api.service` (`systemctl daemon-reload` + `restart`), y se documentó en `docs/native-deployment.md` para que sobreviva a una reinstalación futura — el workflow de deploy (`deploy.yml`) no toca el `.service`, así que este fix persiste solo mientras no se reinstale el servicio desde cero.
+
+Con el timeout corregido, se corrió el caso de uso directamente en el servidor (script puntual invocando `RunRagEvaluationUseCase` con los adaptadores reales, para no depender de que la primera corrida larga pasara por gunicorn/nginx mientras se verificaba el fix) — **resultado oficial, persistido en `rag_evaluation_runs`**:
+
+```
+{'total': 15, 'rag_citation_matches': 15, 'baseline_citation_matches': 0}
+```
+
+**15/15 con RAG, 0/15 con baseline.** Confirmado también cualitativamente: el baseline alucina (p. ej., para la pregunta sobre contenido obligatorio del sílabo, inventa el "Artículo 35" y cita una universidad inexistente, "Universidad Tecnológica de El Salvador"); el RAG cita el Artículo 67 real del Reglamento de Régimen Académico con el texto exacto de la normativa. Visible ahora en vivo en la pantalla "Evaluación" de la plataforma (`GET /api/rag/evaluation`, verificado con `curl` autenticado).
+
+Informe (.docx) y presentación (.pptx) actualizados con esta cifra real (reemplazando los 3 placeholders "pendiente" que quedaban en cada documento) y con el ejemplo cualitativo del baseline alucinando — commit `c64fa33`.
+
+**Ya no queda ningún pendiente bloqueante para el Demo Day** más allá de la validación cualitativa con usuarios reales (coordinadores de carrera), documentada como "próximos pasos", no como bloqueo.
