@@ -153,6 +153,7 @@ Pestaña nueva, conectando otra vez al mismo nodo:
 ssh francisco.higuera__ute.edu.ec@hpc.cedia.edu.ec
 ssh NODO
 curl http://localhost:8002/health
+curl -s -o /dev/null -w "HTTP %{http_code}\n" http://localhost:8002/health
 ```
 
 Abrir el túnel:
