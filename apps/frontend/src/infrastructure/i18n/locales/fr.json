@@ -3,7 +3,7 @@
     "nav": {
       "home": "Accueil",
       "catalog": "Catalogue",
-      "about": "La plateforme",
+      "about": "Plateforme",
       "presentation": "Présentation",
       "rag": "Validation RAG",
       "syllabusValidation": "Validation des syllabus",
@@ -12,7 +12,10 @@
     "admin": "Administration",
     "login": "Se connecter",
     "logout": "Se déconnecter",
-    "openMenu": "Ouvrir le menu"
+    "openMenu": "Ouvrir le menu",
+    "userMenu": {
+      "accountSecurity": "Compte et sécurité"
+    }
   },
   "language": {
     "label": "Langue",
@@ -105,7 +108,7 @@
     "pageTitle": "À propos de la plateforme",
     "breadcrumbs": {
       "home": "Accueil",
-      "about": "La plateforme"
+      "about": "Plateforme"
     },
     "steps": {
       "eyebrow": "Étape par étape",
@@ -130,6 +133,24 @@
         "title": "Recevez une rétroaction",
         "description": "Consultez votre score, le détail de l'évaluation et les suggestions d'un tuteur IA."
       }
+    }
+  },
+  "accountSecurityPage": {
+    "pageTitle": "Compte et sécurité",
+    "breadcrumbs": {
+      "home": "Accueil",
+      "account": "Compte et sécurité"
+    },
+    "account": {
+      "title": "Informations du compte",
+      "fullName": "Nom complet",
+      "email": "Adresse e-mail",
+      "roles": "Rôles"
+    },
+    "security": {
+      "title": "Sécurité",
+      "description": "Pour changer votre mot de passe, nous vous enverrons un lien de réinitialisation par e-mail.",
+      "changePasswordCta": "Changer le mot de passe"
     }
   },
   "catalogPage": {

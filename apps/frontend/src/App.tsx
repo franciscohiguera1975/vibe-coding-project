@@ -8,6 +8,7 @@ import { NotFoundPage } from '@/presentation/pages/public/NotFoundPage';
 import { PracticeDetailPage } from '@/presentation/pages/public/PracticeDetailPage';
 import { PracticeEmbedPage } from '@/presentation/pages/public/PracticeEmbedPage';
 import { SyllabusValidationPage } from '@/presentation/pages/public/SyllabusValidationPage';
+import { AccountSecurityPage } from '@/presentation/pages/public/AccountSecurityPage';
 import { RagEvaluationPage } from '@/presentation/pages/public/RagEvaluationPage';
 import { LoginPage } from '@/presentation/pages/auth/LoginPage';
 import { ForgotPasswordPage } from '@/presentation/pages/auth/ForgotPasswordPage';
@@ -42,6 +43,14 @@ export default function App() {
           }
         />
         <Route path="evaluacion-rag" element={<RagEvaluationPage />} />
+        <Route
+          path="cuenta-y-seguridad"
+          element={
+            <ProtectedRoute>
+              <AccountSecurityPage />
+            </ProtectedRoute>
+          }
+        />
         <Route path="login" element={<LoginPage />} />
         <Route path="recuperar-contrasena" element={<ForgotPasswordPage />} />
         <Route path="restablecer-contrasena" element={<ResetPasswordPage />} />

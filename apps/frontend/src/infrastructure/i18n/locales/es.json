@@ -3,7 +3,7 @@
     "nav": {
       "home": "Inicio",
       "catalog": "Catálogo",
-      "about": "La plataforma",
+      "about": "Plataforma",
       "presentation": "Presentación",
       "rag": "Validación RAG",
       "syllabusValidation": "Validación de sílabos",
@@ -12,7 +12,10 @@
     "admin": "Administración",
     "login": "Ingresar",
     "logout": "Salir",
-    "openMenu": "Abrir menú"
+    "openMenu": "Abrir menú",
+    "userMenu": {
+      "accountSecurity": "Cuenta y seguridad"
+    }
   },
   "language": {
     "label": "Idioma",
@@ -105,7 +108,7 @@
     "pageTitle": "Acerca de la plataforma",
     "breadcrumbs": {
       "home": "Inicio",
-      "about": "La plataforma"
+      "about": "Plataforma"
     },
     "steps": {
       "eyebrow": "Paso a paso",
@@ -130,6 +133,24 @@
         "title": "Reciba retroalimentación",
         "description": "Vea su puntaje, el detalle de la evaluación y sugerencias de un tutor de IA."
       }
+    }
+  },
+  "accountSecurityPage": {
+    "pageTitle": "Cuenta y seguridad",
+    "breadcrumbs": {
+      "home": "Inicio",
+      "account": "Cuenta y seguridad"
+    },
+    "account": {
+      "title": "Datos de la cuenta",
+      "fullName": "Nombre completo",
+      "email": "Correo electrónico",
+      "roles": "Roles"
+    },
+    "security": {
+      "title": "Seguridad",
+      "description": "Para cambiar tu contraseña, te enviamos un enlace de restablecimiento a tu correo.",
+      "changePasswordCta": "Cambiar contraseña"
     }
   },
   "catalogPage": {

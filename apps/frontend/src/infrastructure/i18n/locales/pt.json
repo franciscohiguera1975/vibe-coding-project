@@ -3,7 +3,7 @@
     "nav": {
       "home": "Início",
       "catalog": "Catálogo",
-      "about": "A plataforma",
+      "about": "Plataforma",
       "presentation": "Apresentação",
       "rag": "Validação RAG",
       "syllabusValidation": "Validação de Planos de Ensino",
@@ -12,7 +12,10 @@
     "admin": "Administração",
     "login": "Entrar",
     "logout": "Sair",
-    "openMenu": "Abrir menu"
+    "openMenu": "Abrir menu",
+    "userMenu": {
+      "accountSecurity": "Conta e segurança"
+    }
   },
   "language": {
     "label": "Idioma",
@@ -105,7 +108,7 @@
     "pageTitle": "Sobre a plataforma",
     "breadcrumbs": {
       "home": "Início",
-      "about": "A plataforma"
+      "about": "Plataforma"
     },
     "steps": {
       "eyebrow": "Passo a passo",
@@ -130,6 +133,24 @@
         "title": "Receba retroalimentação",
         "description": "Veja sua pontuação, o detalhe da avaliação e sugestões de um tutor de IA."
       }
+    }
+  },
+  "accountSecurityPage": {
+    "pageTitle": "Conta e segurança",
+    "breadcrumbs": {
+      "home": "Início",
+      "account": "Conta e segurança"
+    },
+    "account": {
+      "title": "Dados da conta",
+      "fullName": "Nome completo",
+      "email": "E-mail",
+      "roles": "Funções"
+    },
+    "security": {
+      "title": "Segurança",
+      "description": "Para alterar sua senha, enviaremos um link de redefinição para seu e-mail.",
+      "changePasswordCta": "Alterar senha"
     }
   },
   "catalogPage": {

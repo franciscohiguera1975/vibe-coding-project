@@ -3,7 +3,7 @@
     "nav": {
       "home": "Home",
       "catalog": "Catalog",
-      "about": "The platform",
+      "about": "Platform",
       "presentation": "Presentation",
       "rag": "RAG Validation",
       "syllabusValidation": "Syllabus Validation",
@@ -12,7 +12,10 @@
     "admin": "Administration",
     "login": "Sign in",
     "logout": "Sign out",
-    "openMenu": "Open menu"
+    "openMenu": "Open menu",
+    "userMenu": {
+      "accountSecurity": "Account & security"
+    }
   },
   "language": {
     "label": "Language",
@@ -105,7 +108,7 @@
     "pageTitle": "About the platform",
     "breadcrumbs": {
       "home": "Home",
-      "about": "The platform"
+      "about": "Platform"
     },
     "steps": {
       "eyebrow": "Step by step",
@@ -130,6 +133,24 @@
         "title": "Get feedback",
         "description": "See your score, the evaluation details and suggestions from an AI tutor."
       }
+    }
+  },
+  "accountSecurityPage": {
+    "pageTitle": "Account & security",
+    "breadcrumbs": {
+      "home": "Home",
+      "account": "Account & security"
+    },
+    "account": {
+      "title": "Account details",
+      "fullName": "Full name",
+      "email": "Email address",
+      "roles": "Roles"
+    },
+    "security": {
+      "title": "Security",
+      "description": "To change your password, we'll send a reset link to your email.",
+      "changePasswordCta": "Change password"
     }
   },
   "catalogPage": {

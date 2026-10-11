@@ -1,11 +1,12 @@
 import { useAuth } from '@/application/hooks/auth-context';
 import { LanguageSwitcher } from '@/presentation/components/LanguageSwitcher';
+import { UserMenu } from '@/presentation/components/UserMenu';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink } from 'react-router-dom';
 
 function navLinkClass({ isActive }: { isActive: boolean }): string {
-  return `relative py-1 text-sm font-semibold uppercase tracking-wide transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand-500 after:transition-transform after:content-[''] hover:after:scale-x-100 ${
+  return `relative whitespace-nowrap py-1 text-sm font-semibold uppercase tracking-wide transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand-500 after:transition-transform after:content-[''] hover:after:scale-x-100 ${
     isActive ? 'text-brand-600 after:scale-x-100' : 'text-navy-700 hover:text-brand-600'
   }`;
 }
@@ -43,7 +44,7 @@ export function Header() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
+        <nav className="hidden items-center gap-5 lg:flex xl:gap-7">
           {navLinks.map((link) => (
             <NavLink key={link.to} to={link.to} className={navLinkClass} end={link.to === '/'}>
               {link.label}
@@ -56,7 +57,7 @@ export function Header() {
           >
             <button
               type="button"
-              className="relative py-1 text-sm font-semibold uppercase tracking-wide text-navy-700 transition-colors hover:text-brand-600"
+              className="relative whitespace-nowrap py-1 text-sm font-semibold uppercase tracking-wide text-navy-700 transition-colors hover:text-brand-600"
               onClick={() => setRagMenuOpen((v) => !v)}
               aria-expanded={ragMenuOpen}
             >
@@ -79,35 +80,24 @@ export function Header() {
           </div>
         </nav>
 
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="hidden items-center gap-3 lg:flex">
           <LanguageSwitcher />
           {user ? (
             <>
               {user.roles.some((r) => r !== 'STUDENT') && (
                 <Link
                   to="/admin"
-                  className="text-sm font-semibold uppercase tracking-wide text-navy-700 hover:text-brand-600"
+                  className="whitespace-nowrap text-sm font-semibold uppercase tracking-wide text-navy-700 hover:text-brand-600"
                 >
                   {t('header.admin')}
                 </Link>
               )}
-              <Link
-                to="/perfil"
-                className="text-sm font-semibold text-navy-700 hover:text-brand-600"
-              >
-                {user.fullName}
-              </Link>
-              <button
-                onClick={logout}
-                className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
-              >
-                {t('header.logout')}
-              </button>
+              <UserMenu user={user} onLogout={logout} />
             </>
           ) : (
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+              className="inline-flex items-center gap-2 whitespace-nowrap rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
             >
               {t('header.login')}
               <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth={2}>
@@ -118,7 +108,7 @@ export function Header() {
         </div>
 
         <button
-          className="rounded-md p-2 text-navy-700 md:hidden"
+          className="rounded-md p-2 text-navy-700 lg:hidden"
           onClick={() => setMenuOpen((v) => !v)}
           aria-label={t('header.openMenu')}
         >
@@ -135,7 +125,7 @@ export function Header() {
       </div>
 
       {menuOpen && (
-        <div className="border-t border-ink-100 px-4 py-3 md:hidden">
+        <div className="border-t border-ink-100 px-4 py-3 lg:hidden">
           <nav className="flex flex-col gap-3">
             {navLinks.map((link) => (
               <NavLink key={link.to} to={link.to} className={navLinkClass} end={link.to === '/'}>
@@ -152,12 +142,17 @@ export function Header() {
             ))}
             <LanguageSwitcher />
             {user ? (
-              <button
-                onClick={logout}
-                className="rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white"
-              >
-                {t('header.logout')}
-              </button>
+              <>
+                <NavLink to="/cuenta-y-seguridad" className={navLinkClass}>
+                  {t('header.userMenu.accountSecurity')}
+                </NavLink>
+                <button
+                  onClick={logout}
+                  className="rounded-md bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white"
+                >
+                  {t('header.logout')}
+                </button>
+              </>
             ) : (
               <Link
                 to="/login"
