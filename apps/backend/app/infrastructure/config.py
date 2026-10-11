@@ -30,9 +30,18 @@ class Settings(BaseSettings):
     jwt_access_expires_in: str = "15m"
     jwt_refresh_expires_in: str = "7d"
 
-    ai_provider: Literal["mock", "anthropic"] = "mock"
+    # openai_compatible apunta el tutor (texto) a un vLLM/endpoint compatible con
+    # OpenAI — independiente de RAG_LLM_PROVIDER aunque en produccion ambos puedan
+    # apuntar al mismo vLLM (ver docs/saturdays_ai/00-plan.md §3 y §5). El analisis
+    # de imagen necesita ademas un modelo con vision (ai_vision_*), casi siempre
+    # distinto del modelo de texto — sin esas dos variables, analyze_image falla
+    # explicitamente en vez de degradar en silencio.
+    ai_provider: Literal["mock", "anthropic", "openai_compatible"] = "mock"
     ai_api_key: str = ""
     ai_model: str = "claude-sonnet-5"
+    ai_base_url: str = ""
+    ai_vision_base_url: str = ""
+    ai_vision_model: str = ""
     ai_agent_max_iterations: int = 8
     ai_agent_max_tokens: int = 4000
 

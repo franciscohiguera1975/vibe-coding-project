@@ -22,8 +22,10 @@ un `.env` con valores reales.
 | `FRONTEND_PORT` | `5173` | Puerto del frontend |
 | `FRONTEND_URL` | `http://localhost:5173` | Origen del frontend, usado como `CORS_ALLOWED_ORIGINS` por defecto |
 | `VITE_API_URL` | `http://localhost:3000` | URL de la API consumida por el frontend — horneada en el bundle en tiempo de build |
-| `AI_PROVIDER` | `mock` | `mock` (sin red, determinista) o `anthropic` |
-| `AI_API_KEY` | _(vacío)_ | API key de Anthropic; requerida solo si `AI_PROVIDER=anthropic` |
+| `AI_PROVIDER` | `mock` | `mock` (sin red, determinista), `anthropic` u `openai_compatible` (vLLM u otro endpoint compatible con OpenAI) |
+| `AI_API_KEY` | _(vacío)_ | API key de Anthropic, o del endpoint `openai_compatible`; requerida solo si `AI_PROVIDER` no es `mock` |
+| `AI_BASE_URL` | _(vacío)_ | URL base del endpoint de chat completions; requerida solo si `AI_PROVIDER=openai_compatible` |
+| `AI_VISION_BASE_URL` / `AI_VISION_MODEL` | _(vacío)_ | Modelo con visión para `analyze_image` (casi siempre distinto del modelo de texto); opcionales, solo con `AI_PROVIDER=openai_compatible` |
 | `STORAGE_PROVIDER` | `local` | `local`, `minio` o `s3` — ver [`ai.md`](ai.md) §Imágenes y `architecture.md` |
 | `STORAGE_LOCAL_PATH` | `./storage/uploads` | Carpeta de archivos subidos (adaptador local) |
 | `STORAGE_MINIO_*` / `STORAGE_S3_BUCKET` | _(vacío)_ | Configuración de los adaptadores MinIO/S3 (stubs, ver `architecture.md`) |

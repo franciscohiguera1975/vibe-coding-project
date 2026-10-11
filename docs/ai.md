@@ -21,6 +21,16 @@ Qué adaptador se usa se decide por `AI_PROVIDER` (ver
 - **`anthropic`** (`AnthropicAdapter`): llama a la API de Claude
   (`AI_API_KEY`, `AI_MODEL`) para `generate_text`/`generate_feedback`, y usa
   visión real del modelo para `analyze_image`.
+- **`openai_compatible`** (`OpenAICompatibleAiAdapter`): `generate_text`/
+  `generate_feedback` contra cualquier endpoint de chat completions compatible
+  con OpenAI (`AI_BASE_URL`, `AI_API_KEY`, `AI_MODEL`) — pensado para un vLLM
+  en el HPC de CEDIA, igual patrón que `RAG_LLM_PROVIDER=openai_compatible`
+  (ver [`saturdays_ai/00-plan.md`](saturdays_ai/00-plan.md) §3 y §5: puerto
+  independiente de `RagPort`, aunque en producción ambos puedan apuntar al
+  mismo vLLM). `analyze_image` necesita además un modelo con visión, casi
+  siempre distinto del modelo de texto (`AI_VISION_BASE_URL`,
+  `AI_VISION_MODEL`, p.ej. Qwen2.5-VL) — sin esas dos variables, falla
+  explícitamente en vez de degradar en silencio.
 
 ## Casos de uso que consumen el puerto
 

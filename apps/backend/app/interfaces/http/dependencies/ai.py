@@ -16,4 +16,20 @@ def get_ai_provider() -> AIProvider:
         if not settings.ai_api_key:
             raise RuntimeError("AI_PROVIDER=anthropic requiere AI_API_KEY configurada")
         return AnthropicAdapter(api_key=settings.ai_api_key, model=settings.ai_model)
+    if settings.ai_provider == "openai_compatible":
+        from app.infrastructure.ai.openai_compatible_ai_adapter import (
+            OpenAICompatibleAiAdapter,
+        )
+
+        if not settings.ai_base_url:
+            raise RuntimeError(
+                "AI_PROVIDER=openai_compatible requiere AI_BASE_URL configurada"
+            )
+        return OpenAICompatibleAiAdapter(
+            base_url=settings.ai_base_url,
+            api_key=settings.ai_api_key,
+            chat_model=settings.ai_model,
+            vision_base_url=settings.ai_vision_base_url,
+            vision_model=settings.ai_vision_model,
+        )
     return MockAIAdapter()
