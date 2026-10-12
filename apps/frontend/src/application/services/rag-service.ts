@@ -1,5 +1,9 @@
 import type { HttpClient } from '@/application/ports/http-client';
-import type { ChecklistItemResult, RagEvaluationRun } from '@/domain/entities/rag';
+import type {
+  ChatNormativaAnswer,
+  ChecklistItemResult,
+  RagEvaluationRun,
+} from '@/domain/entities/rag';
 
 export class RagService {
   constructor(private readonly http: HttpClient) {}
@@ -20,5 +24,9 @@ export class RagService {
 
   runEvaluation(): Promise<RagEvaluationRun> {
     return this.http.post<RagEvaluationRun>('/rag/evaluation/run');
+  }
+
+  chatNormativa(question: string): Promise<ChatNormativaAnswer> {
+    return this.http.post<ChatNormativaAnswer>('/rag/chat', { question });
   }
 }

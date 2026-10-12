@@ -32,3 +32,13 @@ class RagEvaluationRunResponse(BaseModel):
     id: str
     results: list[RagEvaluationResultItem]
     summary: dict[str, int]
+
+
+class ChatNormativaRequest(BaseModel):
+    question: str
+
+
+class ChatNormativaResponse(BaseModel):
+    question: str
+    answer: str
+    citations: list[CitationRefResponse]

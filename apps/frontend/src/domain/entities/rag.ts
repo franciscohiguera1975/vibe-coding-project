@@ -32,3 +32,9 @@ export interface RagEvaluationRun {
   results: RagEvaluationResultItem[];
   summary: RagEvaluationSummary;
 }
+
+export interface ChatNormativaAnswer {
+  question: string;
+  answer: string;
+  citations: CitationRef[];
+}

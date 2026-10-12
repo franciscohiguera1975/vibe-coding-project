@@ -40,3 +40,9 @@ export function useRunRagEvaluation() {
     },
   });
 }
+
+export function useChatNormativa() {
+  return useMutation({
+    mutationFn: (question: string) => ragService.chatNormativa(question),
+  });
+}

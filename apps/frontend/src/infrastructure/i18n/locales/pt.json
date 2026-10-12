@@ -7,7 +7,8 @@
       "presentation": "Apresentação",
       "rag": "Validação RAG",
       "syllabusValidation": "Validação de Planos de Ensino",
-      "ragEvaluation": "Avaliação"
+      "ragEvaluation": "Avaliação",
+      "normativaChat": "Chat de normativas"
     },
     "admin": "Administração",
     "login": "Entrar",
@@ -631,5 +632,19 @@
       "baseline": "Linha de base (sem RAG)",
       "rag": "Com RAG"
     }
+  },
+  "normativaChatPage": {
+    "pageTitle": "Chat de normativas",
+    "breadcrumbs": {
+      "home": "Início",
+      "current": "Chat de normativas"
+    },
+    "description": "Pergunte o que quiser sobre normativa acadêmica e de educação superior da UTE. A resposta se baseia nos regulamentos indexados quando aplicável (citando o artigo); se o tema não estiver coberto, isso é dito explicitamente e a resposta usa conhecimento geral.",
+    "empty": "Escreva sua primeira pergunta sobre normativa acadêmica.",
+    "inputPlaceholder": "Por exemplo: quantas faltas posso ter antes de reprovar por falta de frequência?",
+    "sendButton": "Enviar",
+    "thinking": "Pensando…",
+    "citationsLabel": "Fontes:",
+    "error": "Não foi possível obter uma resposta. Tente novamente."
   }
 }

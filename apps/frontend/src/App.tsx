@@ -10,6 +10,7 @@ import { PracticeEmbedPage } from '@/presentation/pages/public/PracticeEmbedPage
 import { SyllabusValidationPage } from '@/presentation/pages/public/SyllabusValidationPage';
 import { AccountSecurityPage } from '@/presentation/pages/public/AccountSecurityPage';
 import { RagEvaluationPage } from '@/presentation/pages/public/RagEvaluationPage';
+import { NormativaChatPage } from '@/presentation/pages/public/NormativaChatPage';
 import { LoginPage } from '@/presentation/pages/auth/LoginPage';
 import { ForgotPasswordPage } from '@/presentation/pages/auth/ForgotPasswordPage';
 import { ResetPasswordPage } from '@/presentation/pages/auth/ResetPasswordPage';
@@ -43,6 +44,14 @@ export default function App() {
           }
         />
         <Route path="evaluacion-rag" element={<RagEvaluationPage />} />
+        <Route
+          path="chat-normativa"
+          element={
+            <ProtectedRoute>
+              <NormativaChatPage />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="cuenta-y-seguridad"
           element={

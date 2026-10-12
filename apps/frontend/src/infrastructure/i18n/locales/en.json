@@ -7,7 +7,8 @@
       "presentation": "Presentation",
       "rag": "RAG Validation",
       "syllabusValidation": "Syllabus Validation",
-      "ragEvaluation": "Evaluation"
+      "ragEvaluation": "Evaluation",
+      "normativaChat": "Regulations chat"
     },
     "admin": "Administration",
     "login": "Sign in",
@@ -631,5 +632,19 @@
       "baseline": "Baseline (no RAG)",
       "rag": "With RAG"
     }
+  },
+  "normativaChatPage": {
+    "pageTitle": "Regulations chat",
+    "breadcrumbs": {
+      "home": "Home",
+      "current": "Regulations chat"
+    },
+    "description": "Ask anything about UTE's academic and higher-education regulations. Answers are grounded in the indexed regulations when they apply (citing the article); if the topic isn't covered, it says so explicitly and answers with general knowledge.",
+    "empty": "Write your first question about academic regulations.",
+    "inputPlaceholder": "For example: how many absences can I have before failing a course?",
+    "sendButton": "Send",
+    "thinking": "Thinking…",
+    "citationsLabel": "Sources:",
+    "error": "Couldn't get an answer. Please try again."
   }
 }

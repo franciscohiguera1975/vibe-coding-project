@@ -27,6 +27,7 @@ export function Header() {
   const ragLinks = [
     { to: '/validacion-silabos', label: t('header.nav.syllabusValidation') },
     { to: '/evaluacion-rag', label: t('header.nav.ragEvaluation') },
+    { to: '/chat-normativa', label: t('header.nav.normativaChat') },
   ];
 
   return (

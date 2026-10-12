@@ -2,6 +2,7 @@ import json
 
 import pytest
 
+from app.application.use_cases.rag.chat_normativa import ChatNormativaUseCase
 from app.application.use_cases.rag.run_evaluation import RunRagEvaluationUseCase
 from app.application.use_cases.rag.validate_syllabus import ValidateSyllabusUseCase
 from app.domain.entities.rag import NormativaChunk
@@ -198,3 +199,26 @@ def test_run_evaluation_requires_permission(student_role, password_hasher, tmp_p
     )
     with pytest.raises(PermissionDeniedError):
         use_case.execute(actor=student)
+
+
+def test_chat_normativa_returns_answer_with_citations(admin_user, rag_mock, seeded_chunks):
+    use_case = ChatNormativaUseCase(SqlAlchemyUnitOfWork, rag_mock, rag_mock)
+
+    result = use_case.execute(
+        actor=admin_user,
+        question="recalificacion resultados de aprendizaje incluidos en el silabo",
+    )
+
+    assert isinstance(result.answer, str) and result.answer
+    assert len(result.citations) == 3
+    expected_labels = {"Artículo 67", "Artículo 40", "Artículo 35"}
+    assert {c.article_label for c in result.citations} == expected_labels
+
+
+def test_chat_normativa_returns_no_citations_without_loaded_chunks(admin_user, rag_mock):
+    use_case = ChatNormativaUseCase(SqlAlchemyUnitOfWork, rag_mock, rag_mock)
+
+    result = use_case.execute(actor=admin_user, question="cualquier pregunta")
+
+    assert result.citations == []
+    assert isinstance(result.answer, str) and result.answer

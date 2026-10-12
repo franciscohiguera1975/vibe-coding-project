@@ -138,3 +138,20 @@ def test_run_evaluation_and_get_latest(admin_user):
     latest = client.get("/api/rag/evaluation")
     assert latest.status_code == 200
     assert latest.json()["id"] == run_body["id"]
+
+
+def test_chat_normativa_requires_authentication():
+    response = client.post("/api/rag/chat", json={"question": "que es la matricula?"})
+    assert response.status_code == 403
+
+
+def test_chat_normativa_returns_answer_and_citations(admin_user):
+    headers = _admin_headers()
+    response = client.post(
+        "/api/rag/chat", json={"question": "que es la matricula?"}, headers=headers
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["question"] == "que es la matricula?"
+    assert isinstance(body["answer"], str) and body["answer"]
+    assert isinstance(body["citations"], list)

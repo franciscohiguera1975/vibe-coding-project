@@ -7,7 +7,8 @@
       "presentation": "Presentación",
       "rag": "Validación RAG",
       "syllabusValidation": "Validación de sílabos",
-      "ragEvaluation": "Evaluación"
+      "ragEvaluation": "Evaluación",
+      "normativaChat": "Chat de normativa"
     },
     "admin": "Administración",
     "login": "Ingresar",
@@ -631,5 +632,19 @@
       "baseline": "Línea base (sin RAG)",
       "rag": "Con RAG"
     }
+  },
+  "normativaChatPage": {
+    "pageTitle": "Chat de normativa",
+    "breadcrumbs": {
+      "home": "Inicio",
+      "current": "Chat de normativa"
+    },
+    "description": "Pregunta lo que quieras sobre normativa académica y de educación superior de la UTE. Se responde con base en los reglamentos indexados cuando aplica (citando el artículo); si el tema no está cubierto, lo dice explícitamente y responde con conocimiento general.",
+    "empty": "Escribe tu primera pregunta sobre normativa académica.",
+    "inputPlaceholder": "Por ejemplo: ¿cuántas faltas puedo tener antes de reprobar por inasistencia?",
+    "sendButton": "Enviar",
+    "thinking": "Pensando…",
+    "citationsLabel": "Fuentes:",
+    "error": "No se pudo obtener una respuesta. Intenta de nuevo."
   }
 }

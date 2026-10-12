@@ -7,7 +7,8 @@
       "presentation": "Présentation",
       "rag": "Validation RAG",
       "syllabusValidation": "Validation des syllabus",
-      "ragEvaluation": "Évaluation"
+      "ragEvaluation": "Évaluation",
+      "normativaChat": "Chat réglementation"
     },
     "admin": "Administration",
     "login": "Se connecter",
@@ -631,5 +632,19 @@
       "baseline": "Référence (sans RAG)",
       "rag": "Avec RAG"
     }
+  },
+  "normativaChatPage": {
+    "pageTitle": "Chat réglementation",
+    "breadcrumbs": {
+      "home": "Accueil",
+      "current": "Chat réglementation"
+    },
+    "description": "Posez vos questions sur la réglementation académique et de l'enseignement supérieur de l'UTE. La réponse s'appuie sur les règlements indexés lorsque c'est pertinent (en citant l'article) ; si le sujet n'est pas couvert, cela est indiqué explicitement et la réponse utilise des connaissances générales.",
+    "empty": "Posez votre première question sur la réglementation académique.",
+    "inputPlaceholder": "Par exemple : combien d'absences puis-je avoir avant d'échouer pour absentéisme ?",
+    "sendButton": "Envoyer",
+    "thinking": "Réflexion en cours…",
+    "citationsLabel": "Sources :",
+    "error": "Impossible d'obtenir une réponse. Veuillez réessayer."
   }
 }

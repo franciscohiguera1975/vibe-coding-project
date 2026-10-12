@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, File, UploadFile
 
+from app.application.use_cases.rag.chat_normativa import ChatNormativaUseCase
 from app.application.use_cases.rag.run_evaluation import RunRagEvaluationUseCase
 from app.application.use_cases.rag.validate_syllabus import (
     ChecklistItemResult,
@@ -12,11 +13,14 @@ from app.infrastructure.config import Settings, get_settings
 from app.infrastructure.documents.docx_extraction import validate_and_extract_docx_text
 from app.interfaces.http.dependencies.auth import get_current_user, require_permission
 from app.interfaces.http.dependencies.rag_use_cases import (
+    get_chat_normativa_use_case,
     get_run_rag_evaluation_use_case,
     get_validate_syllabus_use_case,
 )
 from app.interfaces.http.dependencies.unit_of_work import get_uow_factory
 from app.interfaces.http.schemas.rag import (
+    ChatNormativaRequest,
+    ChatNormativaResponse,
     ChecklistItemResultResponse,
     CitationRefResponse,
     RagEvaluationRunResponse,
@@ -89,3 +93,20 @@ def get_latest_evaluation(
     if run is None:
         raise NotFoundError("RagEvaluationRun", "latest")
     return RagEvaluationRunResponse(id=str(run.id), results=run.results, summary=run.summary)
+
+
+@router.post("/chat", response_model=ChatNormativaResponse)
+def chat_normativa(
+    payload: ChatNormativaRequest,
+    actor: User = Depends(get_current_user),
+    use_case: ChatNormativaUseCase = Depends(get_chat_normativa_use_case),
+) -> ChatNormativaResponse:
+    result = use_case.execute(actor=actor, question=payload.question)
+    return ChatNormativaResponse(
+        question=payload.question,
+        answer=result.answer,
+        citations=[
+            CitationRefResponse(source_document=c.source_document, article_label=c.article_label)
+            for c in result.citations
+        ],
+    )
