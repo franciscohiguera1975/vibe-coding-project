@@ -6,7 +6,7 @@ Runbook para que el usuario ejecute en su propia sesión del HPC (`hpc.cedia.edu
 
 | Servicio | Modelo | GPU | Puerto local | Para qué |
 |---|---|---|---|---|
-| **vLLM (texto)** | `Qwen/Qwen2.5-14B-Instruct` (antes 7B) | GPU 0 | `8001` | Genera las respuestas del RAG (validación de sílabos, evaluación) — el 15/15 se obtuvo con el 7B; re-evaluar tras subir a 14B |
+| **vLLM (texto)** | `Qwen/Qwen2.5-14B-Instruct` (antes 7B) | GPU 0 | `8001` | Genera las respuestas del RAG (validación de sílabos, evaluación) — 15/15 confirmado también con el 14B (re-evaluado 2026-10-11) |
 | **TEI** | `intfloat/multilingual-e5-large` | (CPU; toca GPU 0 levemente) | `8002` | Calcula los embeddings de consulta y corpus |
 | **vLLM (visión)** | `Qwen/Qwen2.5-VL-7B-Instruct` | GPU 1 | `8003` | Sirve al AI Tutor (pistas de texto Y análisis de imágenes) — **nuevo** |
 
@@ -112,7 +112,7 @@ enroot start --mount $HOME --root --rw --env CUDA_VISIBLE_DEVICES=0 vllm-server 
 
 **`--env CUDA_VISIBLE_DEVICES=0` (2026-10-11, corregido)**: con 2 GPUs en la misma reserva, hay que fijar cuál usa cada proceso — este queda en la GPU 0; el de visión (sección 3) va en la GPU 1. **Ojo con la sintaxis**: tiene que ir como `--env CUDA_VISIBLE_DEVICES=0` (flag de `enroot start`), **no** como `CUDA_VISIBLE_DEVICES=0 enroot start ...` (prefijo de shell) — enroot no hereda variables de entorno del shell automáticamente (mismo motivo que `--env HF_ENDPOINT=...` en la sección 2.2), así que el prefijo se ignora en silencio y los dos vLLM terminan compitiendo por la misma GPU física sin ningún aviso, hasta que un modelo grande no cabe junto al otro y truena con un error de memoria.
 
-**Modelo actualizado a `Qwen2.5-14B-Instruct`** (antes `Qwen2.5-7B-Instruct`, 2026-10-11): 29.6GB en vez de 14.19GB — cabe cómodo en los 40GB de la GPU 0. Si subes de nuevo, vuelve a correr la evaluación de 15 preguntas para confirmar que sigue citando bien.
+**Modelo actualizado a `Qwen2.5-14B-Instruct`** (antes `Qwen2.5-7B-Instruct`, 2026-10-11): 29.6GB en vez de 14.19GB — cabe cómodo en los 40GB de la GPU 0. Re-evaluado contra producción tras el cambio: mismo 15/15 (ver `00-plan.md` §12). Si subes de nuevo a otro modelo, repite esa evaluación para confirmar que sigue citando bien.
 
 Esperar a `INFO: Application startup complete.` — no devuelve el prompt, se queda corriendo ahí (correcto, no es que se colgó). El modelo se descarga solo la primera vez y queda cacheado en `$HOME/.cache/huggingface`. **No cerrar esta pestaña.**
 
