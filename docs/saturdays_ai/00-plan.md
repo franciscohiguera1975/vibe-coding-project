@@ -227,10 +227,30 @@ Mismo 15/15 (la métrica depende solo de recuperación, no del modelo de generac
 
 **Activado en producción y verificado en vivo**: `AI_PROVIDER=openai_compatible`, `AI_BASE_URL`/`AI_VISION_BASE_URL=http://localhost:8767/v1`, `AI_MODEL`/`AI_VISION_MODEL=Qwen/Qwen2.5-VL-7B-Instruct` (mismo modelo de visión para texto e imagen del tutor, puerto 8767 — el del RAG, 8765, no se tocó). `POST /api/ai/hint` probado contra una práctica real (`image-02-diagnostico-errores`): respuesta pedagógica real y específica ("compara los conteos... verifica iluminación, superposición, desenfoque..."), ya no la respuesta simulada del mock. Falta probar `analyze_image` (necesita subir una imagen real, no solo JSON) — pendiente, no bloqueante.
 
-**Pendiente de reflejar en los entregables**: el informe (.docx) y la presentación (.pptx) todavía dicen `Qwen2.5-7B-Instruct` para el RAG y no mencionan el AI Tutor conectado al HPC ni la arquitectura de 2 GPUs — actualizar antes de la demo si da tiempo, no es bloqueante (el contenido técnico sigue siendo correcto en espíritu, solo desactualizado en el número de versión del modelo).
+**Reflejado en los entregables** (ver §14): informe y presentación ya actualizados con el modelo de 14B, la arquitectura de 2 GPUs/3 servicios y el AI Tutor conectado al HPC.
 
 ## 13. Tercera pantalla — chat de consultas sobre normativa (2026-10-11)
 
 Nueva pantalla en el menú "Validación RAG" (junto a Validación de sílabos y Evaluación): un chat de preguntas libres sobre normativa académica. `ChatNormativaUseCase` reutiliza la misma recuperación híbrida (BM25 + vectorial + RRF) que `ValidateSyllabusUseCase`, pero sin checklist fijo — una pregunta, una respuesta, sin memoria de conversación. A diferencia del checklist (donde un `NO_DETERMINADO` es correcto y deseado), aquí el system prompt permite que el LLM responda con conocimiento general cuando la normativa indexada no cubre el tema, marcándolo explícitamente como no verificado — inspirado en el skill de la guía 24 de CEDIA (chatbot/tutor de curso) en cuanto a mostrar siempre los fragmentos recuperados antes de confiar en la respuesta, pero con una política más permisiva que la de esa guía (que nunca sale del material autorizado) porque este caso de uso sí necesita poder responder preguntas generales de educación superior.
 
 `POST /api/rag/chat`, página `/chat-normativa`, 130 pruebas backend (4 nuevas), 394 claves i18n (paridad verificada en los 4 idiomas). Probado en el navegador (mock) y en producción con el modelo real de 14B — ejemplo real: pregunta sobre inasistencia, respuesta cita correctamente el Art. 42 del Reglamento del Estudiante (70% de asistencia mínima) y razona con precisión sobre por qué la normativa habla en porcentaje y no en número de faltas. Commit `ab5291d`.
+
+## 14. Informe y presentación puestos al día + preguntas de ejemplo para la demo (2026-10-11)
+
+El usuario preguntó explícitamente si el mecanismo del RAG (explicado paso a paso en el chat) y todo lo del §12/§13 ya estaban reflejados en los entregables — no lo estaban del todo, así que se actualizaron ambos documentos (editados a mano vía XML crudo, mismo procedimiento ya usado antes en este proyecto, porque el script original de generación con `docx-js`/`build_deck.js` ya no existe en el entorno de esta sesión):
+
+**`DemoDaySaturdaysAI_HybridRetrieval_Informe.docx`**:
+- Nueva subsección "Mecanismo paso a paso (lo que pasa en cada consulta)" en la sección 2 — los 8 pasos exactos explicados al usuario (TEI solo convierte texto a vector, nunca busca; LanceDB solo almacena, la búsqueda coseno+BM25+RRF es Python puro en el VPS).
+- Modelo de generación actualizado a 14B en las 4 menciones (puerto `RagPort`, tabla de modelos, justificación de elección, tabla de capas).
+- Nueva fila en la tabla de modelos: "Tutor IA (texto + imagen) · Qwen/Qwen2.5-VL-7B-Instruct · HPC CEDIA — GPU dedicada (nuevo, 2026-10-11)"; el párrafo introductorio pasó de "dos modelos" a "tres modelos".
+- Nueva bala en "Demo funcional" mencionando la pantalla de Chat de normativa.
+- Sección 6 (túneles SSH): de "dos túneles" a "3 túneles SSH inversos... repartido en 2 GPUs"; nueva fila en la tabla de capas para el vLLM de visión.
+- Validado con `scripts/office/validate.py` (XSD + diff contra el original) tras corregir dos errores de XML mal balanceado introducidos durante la edición a mano (un `</w:p>` de más y, el real causante, un `</w:p>` de menos que se había tragado el cierre del párrafo anterior a la nueva subsección) — lección: tras cada inserción de párrafos nuevos hay que contar aperturas/cierres de `<w:p>` explícitamente, no solo verificar que el anchor se reemplazó una vez.
+
+**`DemoDaySaturdaysAI_HybridRetrieval_Presentacion.pptx`**: dado que el entorno no permite render visual (LibreOffice confirmado roto), se descartó agregar una tercera caja nueva al diagrama de arquitectura de la diapositiva 5 (cálculo mostró que no sobra espacio vertical sin reposicionar todo el layout, riesgo alto sin poder verificar visualmente) y en su lugar se hicieron solo ediciones de texto dentro de cajas/tablas ya existentes, verificando antes que el texto nuevo cabe en el espacio ya disponible de cada caja (conteo de caracteres vs. alto declarado):
+- Diapositiva 5: `vLLM · Qwen2.5-7B-Instruct` → 14B; `inverso ×2` → `×3`; el pie "1 sola reserva Slurm..." reescrito para mencionar las 2 GPUs dedicadas (RAG + Tutor IA).
+- Diapositiva 7: modelo de la tabla actualizado a 14B; se añadió una frase al callout "¿Por qué LanceDB + BM25?" mencionando que el Tutor IA usa un modelo de visión aparte en una segunda GPU, sin pasar por la recuperación.
+- Diapositiva 8: cifras reales actualizadas (118→130 pruebas backend, 372→394 claves i18n, verificadas corriendo `pytest --collect-only` y un script de conteo sobre los 4 `.json` de locale antes de escribir el número).
+- Validado con `scripts/office/validate.py` (XSD) — pasó limpio.
+
+**`03-preguntas-demo.md`** (nuevo): preguntas de ejemplo probadas en vivo contra producción con el modelo de 14B, organizadas en 3 categorías (cita correcta, honestidad ante lo que la normativa no cubre, razonamiento sobre un caso ambiguo) más una lista de respaldo y un guion de demo de 4 minutos.
