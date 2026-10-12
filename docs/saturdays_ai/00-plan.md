@@ -206,3 +206,23 @@ Con el timeout corregido, se corrió el caso de uso directamente en el servidor 
 Informe (.docx) y presentación (.pptx) actualizados con esta cifra real (reemplazando los 3 placeholders "pendiente" que quedaban en cada documento) y con el ejemplo cualitativo del baseline alucinando — commit `c64fa33`.
 
 **Ya no queda ningún pendiente bloqueante para el Demo Day** más allá de la validación cualitativa con usuarios reales (coordinadores de carrera), documentada como "próximos pasos", no como bloqueo.
+
+## 12. AI Tutor conectado al HPC + arquitectura de 3 servicios/2 GPUs + modelo de texto subido a 14B (2026-10-11)
+
+Cambio grande: el AI Tutor ("Preguntar al tutor IA") dejó de estar en `mock` y ahora usa cómputo real del HPC, igual que el RAG — y de paso el RAG subió su modelo de generación de 7B a 14B.
+
+**Código nuevo** (`AIProvider`, el puerto del tutor, independiente de `RagPort` — ver §3/§5): `OpenAICompatibleAiAdapter` (`app/infrastructure/ai/openai_compatible_ai_adapter.py`), implementa `generate_text`/`generate_feedback` contra un vLLM (igual patrón que `OpenAICompatibleRagAdapter`) y `analyze_image` contra un **modelo con visión separado** (`AI_VISION_BASE_URL`/`AI_VISION_MODEL`), con el formato de mensajes de visión de OpenAI (`image_url` + base64). Nuevo valor `AI_PROVIDER=openai_compatible`. Commit `099d4fe`.
+
+**Arquitectura HPC, de 2 a 3 servicios**: se agregó un segundo vLLM con un modelo de visión-lenguaje (`Qwen2.5-VL-7B-Instruct`, sirve texto Y análisis de imagen para el tutor — un modelo VL no pierde capacidad de texto puro) en una **segunda GPU**, aislado del vLLM del RAG. Esto obligó a pasar de 1 a 2 GPUs por reserva, lo que destapó dos descubrimientos reales de la cuenta/clúster:
+- **`gpu-dev` solo permite 1 GPU por job** (`QOSMaxGRESPerJob`) — hubo que cambiar a la partición **`gpu`** (mismos nodos físicos, otra QOS, hasta 2 GPUs y `cpu=160` por job). Diagnosticado con `sacctmgr show qos format=Name,MaxTRESPerJob%40`, ahora documentado en `02-hpc-pasos.md` §9 con la tabla completa de límites por partición.
+- **`CUDA_VISIBLE_DEVICES=N` como prefijo de shell no funciona con enroot** — los contenedores no heredan variables de entorno del shell (mismo motivo que el fix de `HF_ENDPOINT` para TEI, semanas atrás). Hay que pasarlo como `--env CUDA_VISIBLE_DEVICES=N`, flag de `enroot start`. Sin el fix, los dos vLLM terminaban compartiendo la misma GPU física sin ningún aviso — con modelos chicos (7B+7B) cabían juntos por accidente; con el de texto ya en 14B, ya no cupieron y reventó con un error real de memoria (`ValueError: Free memory on device cuda:0 ... less than desired`), que fue como se descubrió el bug.
+
+**Modelo de texto del RAG subido a `Qwen/Qwen2.5-14B-Instruct`** (antes 7B, 29.6GB vs 14.19GB) — pedido explícito del usuario, aprovechando que ahora cada vLLM vive aislado en su propia GPU de 40GB. Re-verificado con la corrida oficial de evaluación tras el cambio:
+
+```
+{'total': 15, 'rag_citation_matches': 15, 'baseline_citation_matches': 1}
+```
+
+Mismo 15/15 (la métrica depende solo de recuperación, no del modelo de generación — esperado). Revisado además el texto real de una respuesta: formato más limpio (lista de elementos en vez de prosa continua), misma cita correcta (Art. 67) — sin regresión, posible mejora cualitativa. `RAG_CHAT_MODEL=Qwen/Qwen2.5-14B-Instruct` agregado al `.env` de producción, servicio reiniciado.
+
+**Pendiente de reflejar en los entregables**: el informe (.docx) y la presentación (.pptx) todavía dicen `Qwen2.5-7B-Instruct` para el RAG y no mencionan el AI Tutor conectado al HPC ni la arquitectura de 2 GPUs — actualizar antes de la demo si da tiempo, no es bloqueante (el contenido técnico sigue siendo correcto en espíritu, solo desactualizado en el número de versión del modelo).
