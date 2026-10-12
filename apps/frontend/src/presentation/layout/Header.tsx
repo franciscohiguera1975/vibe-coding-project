@@ -1,9 +1,11 @@
 import { useAuth } from '@/application/hooks/auth-context';
 import { LanguageSwitcher } from '@/presentation/components/LanguageSwitcher';
 import { UserMenu } from '@/presentation/components/UserMenu';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink } from 'react-router-dom';
+
+const MENU_CLOSE_DELAY_MS = 200;
 
 function navLinkClass({ isActive }: { isActive: boolean }): string {
   return `relative whitespace-nowrap py-1 text-sm font-semibold uppercase tracking-wide transition-colors after:absolute after:-bottom-1 after:left-0 after:h-0.5 after:w-full after:origin-left after:scale-x-0 after:bg-brand-500 after:transition-transform after:content-[''] hover:after:scale-x-100 ${
@@ -16,6 +18,19 @@ export function Header() {
   const { t } = useTranslation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [ragMenuOpen, setRagMenuOpen] = useState(false);
+  const ragCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function openRagMenu() {
+    if (ragCloseTimer.current) {
+      clearTimeout(ragCloseTimer.current);
+      ragCloseTimer.current = null;
+    }
+    setRagMenuOpen(true);
+  }
+
+  function scheduleCloseRagMenu() {
+    ragCloseTimer.current = setTimeout(() => setRagMenuOpen(false), MENU_CLOSE_DELAY_MS);
+  }
 
   const navLinks = [
     { to: '/', label: t('header.nav.home') },
@@ -51,11 +66,7 @@ export function Header() {
               {link.label}
             </NavLink>
           ))}
-          <div
-            className="relative"
-            onMouseEnter={() => setRagMenuOpen(true)}
-            onMouseLeave={() => setRagMenuOpen(false)}
-          >
+          <div className="relative" onMouseEnter={openRagMenu} onMouseLeave={scheduleCloseRagMenu}>
             <button
               type="button"
               className="relative whitespace-nowrap py-1 text-sm font-semibold uppercase tracking-wide text-navy-700 transition-colors hover:text-brand-600"

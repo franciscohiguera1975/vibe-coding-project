@@ -1,7 +1,9 @@
 import type { User } from '@/domain/entities/user';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+
+const MENU_CLOSE_DELAY_MS = 200;
 
 function getInitials(fullName: string): string {
   const letters = fullName
@@ -16,9 +18,22 @@ function getInitials(fullName: string): string {
 export function UserMenu({ user, onLogout }: { user: User; onLogout: () => void }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function openMenu() {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+    setOpen(true);
+  }
+
+  function scheduleClose() {
+    closeTimer.current = setTimeout(() => setOpen(false), MENU_CLOSE_DELAY_MS);
+  }
 
   return (
-    <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+    <div className="relative" onMouseEnter={openMenu} onMouseLeave={scheduleClose}>
       <button
         type="button"
         className="flex items-center gap-2 rounded-full p-1 pr-2 transition-colors hover:bg-navy-50"
