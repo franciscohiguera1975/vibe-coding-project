@@ -83,10 +83,10 @@
     "instructors": {
       "eyebrow": "Instrutores",
       "title": "Quem a constrói",
-      "instructor1Role": "Docente de Programação",
+      "instructor1Role": "Docente de Programação · Unidade Acadêmica Especializada em Formação Técnica e Tecnológica",
       "instructor2Role": "Faculdade de Ciências Sociais, Educação e Humanidades · Depto. de Comunicação e Artes",
-      "instructor3Role": "Docente de Banco de Dados",
-      "instructor4Role": "Docente-Pesquisador-Unidade Acadêmica Especializada em Formação Técnica e Tecnológica"
+      "instructor3Role": "Docente de Aprendizado de Máquina · Unidade Acadêmica Especializada em Formação Técnica e Tecnológica",
+      "instructor4Role": "Diretor do Curso de Tecnologia em Desenvolvimento de Software · Unidade Acadêmica Especializada em Formação Técnica e Tecnológica"
     },
     "testimonials": {
       "eyebrow": "Depoimentos",

@@ -83,10 +83,10 @@
     "instructors": {
       "eyebrow": "Instructors",
       "title": "Who is building it",
-      "instructor1Role": "Programming Instructor",
+      "instructor1Role": "Programming Instructor · Specialized Academic Unit for Technical and Technological Training",
       "instructor2Role": "Faculty of Social Sciences, Education and Humanities · Dept. of Communication and Arts",
-      "instructor3Role": "Database Instructor",
-      "instructor4Role": "Teacher-Researcher, Specialized Academic Unit for Technical and Technological Training"
+      "instructor3Role": "Machine Learning Instructor · Specialized Academic Unit for Technical and Technological Training",
+      "instructor4Role": "Director of the Software Development Technology Program · Specialized Academic Unit for Technical and Technological Training"
     },
     "testimonials": {
       "eyebrow": "Testimonials",

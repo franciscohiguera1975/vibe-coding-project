@@ -83,10 +83,10 @@
     "instructors": {
       "eyebrow": "Enseignants",
       "title": "Qui la construit",
-      "instructor1Role": "Enseignant de programmation",
+      "instructor1Role": "Enseignant de programmation · Unité académique spécialisée en formation technique et technologique",
       "instructor2Role": "Faculté des sciences sociales, de l'éducation et des humanités · Département de communication et des arts",
-      "instructor3Role": "Enseignant de bases de données",
-      "instructor4Role": "Enseignant-chercheur · Unité académique spécialisée en formation technique et technologique"
+      "instructor3Role": "Enseignant en apprentissage automatique · Unité académique spécialisée en formation technique et technologique",
+      "instructor4Role": "Directeur de la filière Technologie du développement logiciel · Unité académique spécialisée en formation technique et technologique"
     },
     "testimonials": {
       "eyebrow": "Témoignages",
