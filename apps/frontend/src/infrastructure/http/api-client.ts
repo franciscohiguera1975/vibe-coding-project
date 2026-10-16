@@ -128,7 +128,8 @@ export class ApiClient implements HttpClient {
       body: body !== undefined ? JSON.stringify(toSnakeCase(body)) : undefined,
     });
 
-    if (response.status === 401 && !isRetry && !path.startsWith('/auth/')) {
+    const skipRefresh = path.startsWith('/auth/login') || path.startsWith('/auth/refresh');
+    if (response.status === 401 && !isRetry && !skipRefresh) {
       const refreshed = await this.refreshAccessToken();
       if (refreshed) return this.request<T>(method, path, body, true);
       this.tokens.clear();
