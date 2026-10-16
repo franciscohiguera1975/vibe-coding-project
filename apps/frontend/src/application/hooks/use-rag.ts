@@ -35,6 +35,10 @@ export function useRunRagEvaluation() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: () => ragService.runEvaluation(),
+    onMutate: async () => {
+      await queryClient.cancelQueries({ queryKey: ['rag-evaluation-latest'] });
+      queryClient.setQueryData(['rag-evaluation-latest'], null);
+    },
     onSuccess: (run) => {
       queryClient.setQueryData(['rag-evaluation-latest'], run);
     },

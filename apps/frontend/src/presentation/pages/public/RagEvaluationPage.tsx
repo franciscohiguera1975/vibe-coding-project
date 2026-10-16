@@ -53,13 +53,25 @@ export function RagEvaluationPage() {
           )}
         </div>
 
-        {isLoading && <p className="mt-8 text-sm text-ink-500">{t('ragEvaluationPage.loading')}</p>}
+        {runEvaluation.isPending && (
+          <div className="mt-8 flex items-center gap-3 text-sm text-ink-500">
+            <span
+              className="h-4 w-4 animate-spin rounded-full border-2 border-ink-300 border-t-navy-900"
+              aria-hidden
+            />
+            {t('ragEvaluationPage.running')}
+          </div>
+        )}
 
-        {!isLoading && !data && (
+        {!runEvaluation.isPending && isLoading && (
+          <p className="mt-8 text-sm text-ink-500">{t('ragEvaluationPage.loading')}</p>
+        )}
+
+        {!runEvaluation.isPending && !isLoading && !data && (
           <p className="mt-8 text-sm text-ink-500">{t('ragEvaluationPage.empty')}</p>
         )}
 
-        {data && (
+        {!runEvaluation.isPending && data && (
           <>
             <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
               <div className="card p-5 text-center">
