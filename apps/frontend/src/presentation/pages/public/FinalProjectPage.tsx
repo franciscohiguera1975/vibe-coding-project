@@ -5,12 +5,12 @@ const VIDEOS = [
   {
     lang: 'Español',
     src: '/videos/proyecto-final-es.mp4',
-    duration: '4:32',
+    duration: '5:27',
   },
   {
     lang: 'English',
     src: '/videos/proyecto-final-en.mp4',
-    duration: '4:44',
+    duration: '5:30',
   },
 ];
 
