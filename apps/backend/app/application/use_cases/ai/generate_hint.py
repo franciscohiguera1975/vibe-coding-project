@@ -7,7 +7,6 @@ from app.application.ports.unit_of_work import UnitOfWork
 from app.domain.entities.identity import User
 from app.domain.entities.practice import Practice
 from app.domain.exceptions import NotFoundError
-from app.domain.services.rag_retrieval import retrieve_top_k
 
 logger = logging.getLogger(__name__)
 
@@ -62,19 +61,16 @@ class GenerateAIHintUseCase:
 
     def _retrieve_grounding(self, uow: UnitOfWork, practice: Practice) -> str:
         """Recuperacion OPCIONAL y aditiva de normativa relacionada (mismo motor que
-        ValidateSyllabusUseCase: EmbeddingPort + rag_retrieval.retrieve_top_k).
+        ValidateSyllabusUseCase: EmbeddingPort + NormativaChunkRepository.search_hybrid).
         Envuelto en try/except a proposito: ver docstring de la clase."""
         if self._embedding_port is None:
             return ""
         try:
-            chunks = uow.normativa_chunks.list_all()
-            if not chunks:
-                return ""
             query = f"{practice.title} {practice.instructions}".strip()
             if not query:
                 return ""
             query_embedding = self._embedding_port.embed(query)
-            retrieved = retrieve_top_k(query_embedding, query, chunks, k=2)
+            retrieved = uow.normativa_chunks.search_hybrid(query_embedding, query, k=2)
             if not retrieved:
                 return ""
             citations = "; ".join(

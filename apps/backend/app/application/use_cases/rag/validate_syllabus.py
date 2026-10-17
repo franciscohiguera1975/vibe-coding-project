@@ -4,8 +4,6 @@ from dataclasses import dataclass
 from app.application.ports.rag import EmbeddingPort, RagPort
 from app.application.ports.unit_of_work import UnitOfWork
 from app.domain.entities.identity import User
-from app.domain.entities.rag import NormativaChunk
-from app.domain.services.rag_retrieval import Bm25Index, build_bm25_index, retrieve_top_k
 from app.domain.services.syllabus_checklist import CHECKLIST_ITEMS, ChecklistItem, detect_item
 
 _JUDGE_SYSTEM_PROMPT = (
@@ -58,31 +56,16 @@ class ValidateSyllabusUseCase:
         self._rag_port = rag_port
 
     def execute(self, *, actor: User, syllabus_text: str) -> list[ChecklistItemResult]:
-        with self._uow_factory() as uow:
-            all_chunks = uow.normativa_chunks.list_all()
-        # Un solo indice BM25 para las 5 consultas de abajo (una por item del
-        # checklist) en vez de reconstruirlo 5 veces sobre los mismos ~900
-        # chunks.
-        bm25_index = build_bm25_index(all_chunks)
+        return [self._evaluate_item(item, syllabus_text) for item in CHECKLIST_ITEMS]
 
-        return [
-            self._evaluate_item(item, syllabus_text, all_chunks, bm25_index)
-            for item in CHECKLIST_ITEMS
-        ]
-
-    def _evaluate_item(
-        self,
-        item: ChecklistItem,
-        syllabus_text: str,
-        all_chunks: list[NormativaChunk],
-        bm25_index: Bm25Index,
-    ) -> ChecklistItemResult:
+    def _evaluate_item(self, item: ChecklistItem, syllabus_text: str) -> ChecklistItemResult:
         # La consulta de recuperacion combina la etiqueta del item y sus palabras
         # clave (no el silabo completo): buscamos el articulo que define ESE
         # requisito, no uno parecido al texto libre del estudiante.
         query = f"{item.label}: {' '.join(item.keywords)}"
         query_embedding = self._embedding_port.embed(query, is_query=True)
-        retrieved = retrieve_top_k(query_embedding, query, all_chunks, k=3, bm25_index=bm25_index)
+        with self._uow_factory() as uow:
+            retrieved = uow.normativa_chunks.search_hybrid(query_embedding, query, k=3)
 
         if not retrieved:
             return ChecklistItemResult(

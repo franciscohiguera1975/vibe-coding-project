@@ -94,15 +94,15 @@ def test_run_evaluation_scores_rag_and_baseline_citation_matches(
 ):
     # Preguntas controladas: la primera y la tercera piden exactamente el texto de
     # un chunk existente (asi MockRagAdapter.embed, deterministico por hash del
-    # texto, produce el mismo vector y la recuperacion las encuentra con score 1.0);
-    # la segunda espera una cita que no corresponde a ningun chunk cargado, para
-    # verificar que el score de "no coincide" tambien se calcula correctamente.
+    # texto, produce el mismo vector y la busqueda hibrida nativa lo recupera
+    # en el primer lugar); la segunda espera una cita que no corresponde a
+    # ningun chunk cargado, para verificar el caso de "no coincide".
     # La cuarta ("baseline-hit") verifica `baseline_citation_match`: su propia
     # pregunta menciona el articulo esperado, y MockRagAdapter.generate() hace eco
     # del prompt — asi el baseline "acierta" la cita sin haber recuperado nada,
     # igual que lo haria un LLM real que ya conoce la normativa de memoria. Su
     # `rag_citation_match` tambien da True, pero no porque la recuperacion haya
-    # sido buena: con solo 3 chunks sembrados y k=3, `retrieve_top_k` siempre
+    # sido buena: con solo 3 chunks sembrados y k=3, `search_hybrid` siempre
     # devuelve los 3 (cualquier cita entre esos 3 "acierta" sin importar el
     # ranking) — por eso "mismatch-1" (que pide un documento no cargado) es la
     # unica forma real de ver un `rag_citation_match` en False en este fixture.

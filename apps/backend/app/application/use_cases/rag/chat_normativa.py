@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from app.application.ports.rag import EmbeddingPort, RagPort
 from app.application.ports.unit_of_work import UnitOfWork
 from app.domain.entities.identity import User
-from app.domain.services.rag_retrieval import retrieve_top_k
 
 _SYSTEM_PROMPT = (
     "Eres un asistente que responde preguntas sobre normativa academica y de "
@@ -62,11 +61,9 @@ class ChatNormativaUseCase:
         self._rag_port = rag_port
 
     def execute(self, *, actor: User, question: str) -> ChatAnswer:
-        with self._uow_factory() as uow:
-            all_chunks = uow.normativa_chunks.list_all()
-
         query_embedding = self._embedding_port.embed(question, is_query=True)
-        retrieved = retrieve_top_k(query_embedding, question, all_chunks, k=3)
+        with self._uow_factory() as uow:
+            retrieved = uow.normativa_chunks.search_hybrid(query_embedding, question, k=3)
 
         citations = [
             ChatCitation(

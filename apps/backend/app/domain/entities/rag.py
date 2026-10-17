@@ -25,7 +25,8 @@ class NormativaChunk:
 @dataclass(frozen=True, slots=True)
 class RetrievedChunk:
     """Un NormativaChunk recuperado para una consulta concreta, con su score de
-    similitud (coseno, ver app.domain.services.rag_retrieval)."""
+    relevancia (fusion RRF de busqueda vectorial + BM25, resuelta por LanceDB
+    — ver NormativaChunkRepository.search_hybrid)."""
 
     chunk: NormativaChunk
     score: float

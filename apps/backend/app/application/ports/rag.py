@@ -5,8 +5,9 @@ class EmbeddingPort(Protocol):
     """Puerto de embeddings para el motor de RAG (docs/saturdays_ai/00-plan.md §5).
     Independiente de RagPort a proposito: el proveedor real (TEI, vLLM, etc.)
     corre en el HPC de CEDIA, tunelado al VPS (ver docs/saturdays_ai/02-hpc-pasos.md);
-    solo la BUSQUEDA sobre los vectores ya calculados (rag_retrieval.py, LanceDB)
-    vive siempre en el VPS. Las implementaciones concretas viven en infrastructure/ai.
+    solo la BUSQUEDA sobre los vectores ya calculados (LanceDB, busqueda hibrida
+    nativa) vive siempre en el VPS. Las implementaciones concretas viven en
+    infrastructure/ai.
 
     `is_query` distingue consulta de pasaje porque algunos modelos (p.ej. la
     familia E5 — `intfloat/multilingual-e5-large`, el default de este proyecto)

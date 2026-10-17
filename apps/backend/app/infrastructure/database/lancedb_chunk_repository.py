@@ -1,15 +1,17 @@
 """Implementacion de NormativaChunkRepository sobre LanceDB (base de datos
 vectorial embebida — corre en el mismo proceso que la consulta, como SQLite,
 por eso vive en el VPS junto al backend y no en el HPC; ver
-docs/saturdays_ai/00-plan.md §5 para el razonamiento completo de esta decision
-pedagogica deliberada).
+docs/saturdays_ai/00-plan.md §5 y §9 para el razonamiento completo).
 
-Importante: este adaptador SOLO cambia DONDE viven los chunks+embeddings. La
-recuperacion semantica sigue siendo la misma fuerza bruta en Python sobre
-`list_all()` (ver app.domain.services.rag_retrieval) — no se usa la busqueda
-vectorial nativa de LanceDB, a proposito, para que el cambio quede contenido a
-la capa de infraestructura sin tocar el dominio/casos de uso (Protocol
-NormativaChunkRepository sin cambios).
+`search_hybrid` resuelve la recuperacion hibrida (vector + BM25, fusionados
+con RRF) dentro de LanceDB: indice IVF-PQ sobre `embedding`, indice FTS
+(Tantivy, BM25 real, stemming en espanol) sobre `text`, y `RRFReranker(K=60)`
+para fusionar — mismo k=60 que usan Elasticsearch/OpenSearch por defecto.
+Reemplaza una version anterior que hacia esta fusion a mano en Python sobre
+`list_all()` (fuerza bruta): medido contra el corpus real (896 chunks),
+list_all() + Python ≈800ms vs. search_hybrid() con indices ya creados
+≈10-15ms — la diferencia es la materializacion de las 896 filas a objetos
+Python en cada consulta, no el calculo en si.
 
 La tabla se crea de forma perezosa (lazy) en el primer upsert, infiriendo la
 dimension del vector embedding del primer chunk insertado: 128 en modo mock
@@ -28,8 +30,14 @@ from pathlib import Path
 
 import lancedb
 import pyarrow as pa
+from lancedb.index import FTS, IvfPq
+from lancedb.rerankers import RRFReranker
 
-from app.domain.entities.rag import NormativaChunk
+from app.domain.entities.rag import NormativaChunk, RetrievedChunk
+
+# Mismo valor (60) que usan Elasticsearch/OpenSearch por defecto para su
+# propia fusion RRF — ver docs/saturdays_ai/00-plan.md §9.
+_RRF_K = 60
 
 
 def _schema_for_dimension(dimension: int) -> pa.Schema:
@@ -46,8 +54,8 @@ def _schema_for_dimension(dimension: int) -> pa.Schema:
 
 def _row_to_chunk(row: dict) -> NormativaChunk:
     # Sin id/created_at/updated_at: LanceDB no necesita una clave surrogate, y
-    # nada rio abajo (rag_retrieval.py, los casos de uso) lee esos campos de un
-    # NormativaChunk (ver docs/saturdays_ai/00-plan.md).
+    # nada rio abajo (los casos de uso) lee esos campos de un NormativaChunk
+    # (ver docs/saturdays_ai/00-plan.md).
     embedding = row.get("embedding")
     return NormativaChunk(
         chunk_id=row["chunk_id"],
@@ -123,3 +131,35 @@ class LanceDbNormativaChunkRepository:
     def count(self) -> int:
         table = self._open_table()
         return table.count_rows() if table is not None else 0
+
+    def search_hybrid(
+        self, query_embedding: list[float], query_text: str, *, k: int = 3
+    ) -> list[RetrievedChunk]:
+        table = self._open_table()
+        if table is None or table.count_rows() == 0:
+            return []
+        self._ensure_indexes(table)
+        rows = (
+            table.search(query_type="hybrid")
+            .vector(query_embedding)
+            .text(query_text or " ")
+            .rerank(reranker=RRFReranker(K=_RRF_K))
+            .limit(k)
+            .to_list()
+        )
+        return [
+            RetrievedChunk(chunk=_row_to_chunk(row), score=row.get("_relevance_score", 0.0))
+            for row in rows
+        ]
+
+    def _ensure_indexes(self, table) -> None:
+        """Crea los indices vectorial (IVF-PQ) y de texto (FTS/BM25, con
+        stemming en espanol — el corpus de normativa es 100% espanol) si no
+        existen todavia — idempotente y barato de chequear (`list_indices()`
+        es ~1-2ms), a diferencia de crearlos (~200-300ms), por eso se evita
+        recrearlos en cada busqueda."""
+        existing = {idx.columns[0] for idx in table.list_indices()}
+        if "embedding" not in existing:
+            table.create_index("embedding", config=IvfPq(distance_type="cosine"))
+        if "text" not in existing:
+            table.create_index("text", config=FTS(language="Spanish"))

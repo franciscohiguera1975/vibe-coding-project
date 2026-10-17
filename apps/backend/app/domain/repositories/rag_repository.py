@@ -1,7 +1,7 @@
 import uuid
 from typing import Protocol
 
-from app.domain.entities.rag import NormativaChunk, RagEvaluationRun
+from app.domain.entities.rag import NormativaChunk, RagEvaluationRun, RetrievedChunk
 
 
 class NormativaChunkRepository(Protocol):
@@ -12,6 +12,14 @@ class NormativaChunkRepository(Protocol):
     def list_all(self) -> list[NormativaChunk]: ...
 
     def count(self) -> int: ...
+
+    def search_hybrid(
+        self, query_embedding: list[float], query_text: str, *, k: int = 3
+    ) -> list[RetrievedChunk]:
+        """Recuperacion hibrida (vectorial + palabra clave, fusionadas con RRF)
+        resuelta por el motor de almacenamiento, no por quien llama — a
+        diferencia de list_all(), que trae todo a Python."""
+        ...
 
 
 class RagEvaluationRunRepository(Protocol):
