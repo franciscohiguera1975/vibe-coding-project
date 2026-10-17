@@ -4,14 +4,16 @@ por eso vive en el VPS junto al backend y no en el HPC; ver
 docs/saturdays_ai/00-plan.md §5 y §9 para el razonamiento completo).
 
 `search_hybrid` resuelve la recuperacion hibrida (vector + BM25, fusionados
-con RRF) dentro de LanceDB: indice IVF-PQ sobre `embedding`, indice FTS
-(Tantivy, BM25 real, stemming en espanol) sobre `text`, y `RRFReranker(K=60)`
-para fusionar — mismo k=60 que usan Elasticsearch/OpenSearch por defecto.
-Reemplaza una version anterior que hacia esta fusion a mano en Python sobre
-`list_all()` (fuerza bruta): medido contra el corpus real (896 chunks),
-list_all() + Python ≈800ms vs. search_hybrid() con indices ya creados
-≈10-15ms — la diferencia es la materializacion de las 896 filas a objetos
-Python en cada consulta, no el calculo en si.
+con RRF) dentro de LanceDB: coseno EXACTO sobre `embedding` (sin indice ANN,
+ver nota en `_ensure_indexes` sobre por que un IVF-PQ degrada el recall a
+este tamano de corpus), indice FTS (Tantivy, BM25 real, stemming en espanol)
+sobre `text`, y `RRFReranker(K=60)` para fusionar — mismo k=60 que usan
+Elasticsearch/OpenSearch por defecto. Reemplaza una version anterior que
+hacia esta fusion a mano en Python sobre `list_all()` (fuerza bruta): medido
+contra el corpus real (896 chunks), list_all() + Python ≈800ms vs.
+search_hybrid() ≈100-200ms — mas lento que un ANN, pero exacto, y todavia
+varias veces mas rapido que materializar las 896 filas a objetos Python en
+cada consulta.
 
 La tabla se crea de forma perezosa (lazy) en el primer upsert, infiriendo la
 dimension del vector embedding del primer chunk insertado: 128 en modo mock
@@ -30,7 +32,7 @@ from pathlib import Path
 
 import lancedb
 import pyarrow as pa
-from lancedb.index import FTS, IvfPq
+from lancedb.index import FTS
 from lancedb.rerankers import RRFReranker
 
 from app.domain.entities.rag import NormativaChunk, RetrievedChunk
@@ -143,6 +145,8 @@ class LanceDbNormativaChunkRepository:
             table.search(query_type="hybrid")
             .vector(query_embedding)
             .text(query_text or " ")
+            .metric("cosine")
+            .bypass_vector_index()
             .rerank(reranker=RRFReranker(K=_RRF_K))
             .limit(k)
             .to_list()
@@ -153,13 +157,18 @@ class LanceDbNormativaChunkRepository:
         ]
 
     def _ensure_indexes(self, table) -> None:
-        """Crea los indices vectorial (IVF-PQ) y de texto (FTS/BM25, con
-        stemming en espanol — el corpus de normativa es 100% espanol) si no
-        existen todavia — idempotente y barato de chequear (`list_indices()`
-        es ~1-2ms), a diferencia de crearlos (~200-300ms), por eso se evita
-        recrearlos en cada busqueda."""
+        """Crea el indice de texto (FTS/BM25, con stemming en espanol — el
+        corpus de normativa es 100% espanol) si no existe todavia —
+        idempotente y barato de chequear (`list_indices()` es ~1-2ms), a
+        diferencia de crearlo (~100-200ms), por eso se evita recrearlo en
+        cada busqueda.
+
+        Deliberadamente NO se crea un indice vectorial (IVF-PQ): es una
+        aproximacion (ANN), y a este tamano de corpus (~900 filas) degrada el
+        recall de forma medible sin ganancia real de velocidad (ver
+        bypass_vector_index() en search_hybrid, que fuerza coseno exacto). IVF-PQ
+        esta pensado para corpus de miles/millones de filas, donde la busqueda
+        exacta si se vuelve el cuello de botella — no es el caso aqui."""
         existing = {idx.columns[0] for idx in table.list_indices()}
-        if "embedding" not in existing:
-            table.create_index("embedding", config=IvfPq(distance_type="cosine"))
         if "text" not in existing:
             table.create_index("text", config=FTS(language="Spanish"))
