@@ -138,9 +138,24 @@ class LanceDbNormativaChunkRepository:
         self, query_embedding: list[float], query_text: str, *, k: int = 3
     ) -> list[RetrievedChunk]:
         table = self._open_table()
-        if table is None or table.count_rows() == 0:
+        row_count = table.count_rows() if table is not None else 0
+        if table is None or row_count == 0:
             return []
         self._ensure_indexes(table)
+        # IMPORTANTE: pedir el pool COMPLETO (no `k`) antes de fusionar, y
+        # recortar a `k` despues en Python. Un `.limit(k)` ahi arriba no solo
+        # limita el resultado final: tambien limita cuantos candidatos aporta
+        # CADA lado (vector y texto) a la fusion RRF. Con k=3 cada lado solo
+        # contribuye sus propios 3 mejores candidatos — un chunk que rankea
+        # muy bien en texto (p.ej. 2do lugar) pero mediocre en vector (p.ej.
+        # 25to) queda totalmente fuera de la fusion porque nunca entra al
+        # "top 3" vectorial, aunque con el ranking COMPLETO (como hacia la
+        # version en Python) su score RRF combinado si alcanzaria para el top
+        # final. Verificado empiricamente contra las 15 preguntas de
+        # evaluacion: con pool=k=3 el resultado bajaba a 12/15; con el pool
+        # completo, 15/15 (igual que la version en Python). El costo extra es
+        # ~nulo: bypass_vector_index() ya escanea todas las filas sin importar
+        # el limite pedido, y el FTS ya calcula el score de cada coincidencia.
         rows = (
             table.search(query_type="hybrid")
             .vector(query_embedding)
@@ -148,20 +163,27 @@ class LanceDbNormativaChunkRepository:
             .metric("cosine")
             .bypass_vector_index()
             .rerank(reranker=RRFReranker(K=_RRF_K))
-            .limit(k)
+            .limit(row_count)
             .to_list()
         )
         return [
             RetrievedChunk(chunk=_row_to_chunk(row), score=row.get("_relevance_score", 0.0))
-            for row in rows
+            for row in rows[:k]
         ]
 
     def _ensure_indexes(self, table) -> None:
-        """Crea el indice de texto (FTS/BM25, con stemming en espanol — el
-        corpus de normativa es 100% espanol) si no existe todavia —
+        """Crea el indice de texto (FTS/BM25) si no existe todavia —
         idempotente y barato de chequear (`list_indices()` es ~1-2ms), a
         diferencia de crearlo (~100-200ms), por eso se evita recrearlo en
         cada busqueda.
+
+        `stem=False, remove_stop_words=False`: el corpus es 100% espanol, pero
+        el stemming y la eliminacion de palabras vacias de Tantivy cambian el
+        ranking BM25 de forma no trivial frente al tokenizador naive (sin
+        normalizar) que usaba la version anterior en Python — verificado
+        empiricamente: con esas opciones activas, una pregunta bajaba el
+        chunk correcto del 3er al 28vo lugar en el ranking de texto. Dejarlas
+        desactivadas reproduce el comportamiento de la version en Python.
 
         Deliberadamente NO se crea un indice vectorial (IVF-PQ): es una
         aproximacion (ANN), y a este tamano de corpus (~900 filas) degrada el
@@ -171,4 +193,6 @@ class LanceDbNormativaChunkRepository:
         exacta si se vuelve el cuello de botella — no es el caso aqui."""
         existing = {idx.columns[0] for idx in table.list_indices()}
         if "text" not in existing:
-            table.create_index("text", config=FTS(language="Spanish"))
+            table.create_index(
+                "text", config=FTS(language="Spanish", stem=False, remove_stop_words=False)
+            )
